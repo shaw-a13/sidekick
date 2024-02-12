@@ -213,7 +213,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - 572efa83877c16ee53a119ab1325b35b13a0539002eaf61fbe59374003fc52b2.zip
+        - 1c7597a804848b87c09177e92aedadec015331b2ea3d456eec0047b7f4466ca5.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -315,10 +315,67 @@ Resources:
       aws:asset:path: asset.e976a796f036a5efbf44b99e44cfb5a961df08d8dbf7cd37e60bf216fb982a00
       aws:asset:is-bundled: false
       aws:asset:property: Code
+  PoolD3F588B8:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_phone_number
+            Priority: 1
+          - Name: verified_email
+            Priority: 2
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      AliasAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      EmailVerificationMessage: The verification code to your new account is {####}
+      EmailVerificationSubject: Verify your new account
+      SmsVerificationMessage: The verification code to your new account is {####}
+      VerificationMessageTemplate:
+        DefaultEmailOption: CONFIRM_WITH_CODE
+        EmailMessage: The verification code to your new account is {####}
+        EmailSubject: Verify your new account
+        SmsMessage: The verification code to your new account is {####}
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: SideKickStack/Pool/Resource
+  Poolappclient2D3B8A6A:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - openid
+      CallbackURLs:
+        - Fn::Join:
+            - ""
+            - - https://
+              - Fn::GetAtt:
+                  - CloudfrontDistributionE1C514EC
+                  - DomainName
+              - /home
+      LogoutURLs:
+        - Fn::Join:
+            - ""
+            - - https://
+              - Fn::GetAtt:
+                  - CloudfrontDistributionE1C514EC
+                  - DomainName
+              - /login
+      SupportedIdentityProviders:
+        - COGNITO
+      UserPoolId:
+        Ref: PoolD3F588B8
+    Metadata:
+      aws:cdk:path: SideKickStack/Pool/app-client/Resource
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/3VRwWrDMAz9lt4db+1g7NqmFAqDlhZ2DY6tBjWOXSy7pZj8++xkZNlhYHhP8pNkPa/4cvXOXxfiQYVUbaGx5vHshWxZSlVRi65WgsddMNKjNay8mDn/FE9wX+Aox2c0jQZvJ0XPUHQ8nqyGLB7waDXKZw5H1jN6q6IgAk98nYEpuGn77MB4vgmyBb+dElnN45jdCAI20tzuh43wO2Ue90xqG9TF2dQ6bpG8wzoMuxwcNmjWUgLRXqVJ6IfyMhfscsF/inmbvmcnIBucBDbskqxMRQ0rA3nbTXfZjIn/uTo6e0cFblhudL/S2eQq/YfUyNcPKjUOvuc2h+BvIdlirAJ+pZf78oOns1pcCbFwIT2zA34a8RuM5irU7gEAAA==
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VRTWsCMRD9Ld5jWi2UXnVFEAqK0l6XmB2X0WxGMokiYf97k912uz0UAvPm6z0yby5n81f5PFF3nurqMjV4lPHglb6IVCqjUc2xUjKug9UeyYriZMf4XT3AfYLjnB/Q1gY8DROtQNXIuCcDebiLOzKoHzntUSv4pYyKGTzLRQ6igquhRwPWy2XQF/CroZCnZeyrS8UgepjpvlEfflXGeSu0oVCdHCXquEL2Do+h+8vWYY12oTUwb6qkhL5bL/LCOi/8NzGmSQJUW/Qk4weD2xGZPDLgH1AYTATjVl9pW7EHpuA0iO4WyYokWosisKdm6OVjDvhPa+fohhW47ji9e6XJJpXJT21QLu6ctDrfMs02+GtIZ7VUgTzz0232JtObT86MOHUhfbMBue/jF69L6z0uAgAA
     Metadata:
       aws:cdk:path: SideKickStack/CDKMetadata/Default
 Outputs:

@@ -3,8 +3,9 @@ import * as s3 from 'aws-cdk-lib/aws-s3'
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
 import * as cloudfrontOrigins from 'aws-cdk-lib/aws-cloudfront-origins'
 import * as s3Deployment from 'aws-cdk-lib/aws-s3-deployment'
-import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as lambda from 'aws-cdk-lib/aws-lambda'
+import * as certificate from 'aws-cdk-lib/aws-certificatemanager'
 import { Construct } from 'constructs';
 import path = require('path');
 
@@ -51,10 +52,32 @@ export class SidekickStack extends cdk.Stack {
     });
 
     new s3Deployment.BucketDeployment(this, 'BucketDeployment', {
-        sources: [s3Deployment.Source.asset('resources/frontend')],
+        sources: [s3Deployment.Source.asset('frontend/build')],
         destinationBucket: siteBucket,
         distribution,
         distributionPaths: ['/*'],
+    });
+
+    const pool = new cognito.UserPool(this, 'Pool', {
+      signInAliases: { username: true, email: true }
+    });
+
+    new cognito.UserPoolDomain(this, 'domain', {
+      userPool: pool,
+      cognitoDomain: {
+        domainPrefix: 'sidekick'
+      }
+    })
+
+    pool.addClient('app-client', {
+      oAuth: {
+        flows: {
+          authorizationCodeGrant: true,
+        },
+        scopes: [ cognito.OAuthScope.OPENID ],
+        callbackUrls: [ `https://${distribution.domainName}/home` ],
+        logoutUrls: [ `https://${distribution.domainName}/login` ],
+      },
     });
 
     new cdk.CfnOutput(this, 'CloudFrontURL', {
