@@ -1,3 +1,5 @@
+import { Authenticator } from "@aws-amplify/ui-react";
+
 const Home = () => {
     return <h1>Home</h1>;
   };
