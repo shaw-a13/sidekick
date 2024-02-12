@@ -59,6 +59,7 @@ export class SidekickStack extends cdk.Stack {
     });
 
     const pool = new cognito.UserPool(this, 'Pool', {
+      selfSignUpEnabled: true,
       signInAliases: { username: true, email: true }
     });
 

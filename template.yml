@@ -213,7 +213,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - 1c7597a804848b87c09177e92aedadec015331b2ea3d456eec0047b7f4466ca5.zip
+        - 9a0bb1e9bf86e438dde76885d62e3ab03b33f440905c92fa8f2615ef33ac4ef4.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -325,7 +325,7 @@ Resources:
           - Name: verified_email
             Priority: 2
       AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: true
+        AllowAdminCreateUserOnly: false
       AliasAttributes:
         - email
       AutoVerifiedAttributes:
@@ -372,10 +372,18 @@ Resources:
         Ref: PoolD3F588B8
     Metadata:
       aws:cdk:path: SideKickStack/Pool/app-client/Resource
+  domainFBFFA2F6:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: sidekick
+      UserPoolId:
+        Ref: PoolD3F588B8
+    Metadata:
+      aws:cdk:path: SideKickStack/domain/Resource
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/3VRTWsCMRD9Ld5jWi2UXnVFEAqK0l6XmB2X0WxGMokiYf97k912uz0UAvPm6z0yby5n81f5PFF3nurqMjV4lPHglb6IVCqjUc2xUjKug9UeyYriZMf4XT3AfYLjnB/Q1gY8DROtQNXIuCcDebiLOzKoHzntUSv4pYyKGTzLRQ6igquhRwPWy2XQF/CroZCnZeyrS8UgepjpvlEfflXGeSu0oVCdHCXquEL2Do+h+8vWYY12oTUwb6qkhL5bL/LCOi/8NzGmSQJUW/Qk4weD2xGZPDLgH1AYTATjVl9pW7EHpuA0iO4WyYokWosisKdm6OVjDvhPa+fohhW47ji9e6XJJpXJT21QLu6ctDrfMs02+GtIZ7VUgTzz0232JtObT86MOHUhfbMBue/jF69L6z0uAgAA
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VRwWrDMAz9lt5db+1g7NqmFAaDlpbtGlxHC2odq1h2SzH599lJm2WHQUBPT09PjjSXs/mrfJ6oK091dZoaPMi490qfRKLKaFRzqJSM62C1R7Ki+LZj/KFu4L7Acc73aGsDngZFK1A1Mu7IQBZ3cUsG9S2nPWoFv5RRMYNnuchBVHA2dGvAerkM+gR+NRBZLWPPLhWD6GG2u6M+/E4Z563QhkL17ShZxxWyd3gI3b9sHNZoF1oD83uVJqHv2ovcsM4N/ynGNmkA1RY9yfjJ4LZEJksG/ACFwWQwLt2ZR7qiRqEdC3qmbcUOmILTILplpVulV9WiCOypGWp52wP+U9o6umAFrttef97S5CuW6eDaoFxcOT2mO2y22QR/DmnvliqQR366zN5k+uaTIyNOXUh7aEDu+vgDE+xtak8CAAA=
     Metadata:
       aws:cdk:path: SideKickStack/CDKMetadata/Default
 Outputs:
