@@ -1,6 +1,14 @@
+import { withAuthenticationRequired } from "@auth0/auth0-react";
+import { Container } from "react-bootstrap";
 
 const Dashboard = () => {
-  return <h1>Dashboard</h1>;
+
+  return (
+    <Container>
+      <h1>Dashboard</h1>
+    </Container>
+  );
+  
 };
 
-export default Dashboard;
+export default withAuthenticationRequired(Dashboard);
