@@ -5,7 +5,6 @@ import * as cloudfrontOrigins from 'aws-cdk-lib/aws-cloudfront-origins'
 import * as s3Deployment from 'aws-cdk-lib/aws-s3-deployment'
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as lambda from 'aws-cdk-lib/aws-lambda'
-import * as certificate from 'aws-cdk-lib/aws-certificatemanager'
 import { Construct } from 'constructs';
 import path = require('path');
 
@@ -48,6 +47,11 @@ export class SidekickStack extends cdk.Stack {
                 responseHttpStatus: 200,
                 responsePagePath: '/index.html',
             },
+            {
+              httpStatus: 403,
+              responseHttpStatus: 200,
+              responsePagePath: '/index.html',
+          },
         ],
     });
 

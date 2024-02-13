@@ -168,6 +168,9 @@ Resources:
           - ErrorCode: 404
             ResponseCode: 200
             ResponsePagePath: /index.html
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
         DefaultCacheBehavior:
           CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
           Compress: true
@@ -213,7 +216,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - c1c782e40c3a0ff8e9990a3733f34477f7bbe5e9b04fa7a321d237506b9c40ae.zip
+        - 8c6615178cc48b030ed9d2fd25d688bc06d570fda3939d31f32030c2f001e10f.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
