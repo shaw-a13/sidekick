@@ -4,9 +4,7 @@ import LogoutButton from "../components/logoutButton";
 import Profile from "../components/profile";
 
 const Home = () => {
-    return <Container> 
-      <LoginButton />
-      <LogoutButton />
+    return <Container className="m-5"> 
       <Profile />
     </Container>;
   };
