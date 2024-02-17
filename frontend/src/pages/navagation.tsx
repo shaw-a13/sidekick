@@ -1,6 +1,5 @@
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
-import { Button } from "react-bootstrap";
 import { Nav } from "react-bootstrap";
 import { useAuth0 } from '@auth0/auth0-react';
 import LoginButton from '../components/loginButton';
