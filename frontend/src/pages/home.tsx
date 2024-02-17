@@ -32,7 +32,7 @@ const Home = () => {
             <h5>Sidekick</h5>
             <p>Elevate your legal workflow</p>
             <p>
-              Seamlessly integrate automatation with your legal processes with
+              Seamlessly integrate automation with your legal processes with
               your document extraction ally
             </p>
             <div className="text-center">
