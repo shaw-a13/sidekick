@@ -31,6 +31,21 @@ export class SidekickStack extends cdk.Stack {
       handler: 'index.handler',
     });
 
+    const authorizerLambda = new lambda.Function(this, 'AuthorizerLambda', {
+      code: lambda.Code.fromAsset(('lambda/authorizer_lambda'), {
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_9.bundlingImage,
+          command: [
+            'bash', '-c',
+            'pip install -r requirements.txt -t /asset-output && rsync -r . /asset-output'
+          ],
+        },
+      }),
+      logGroup: new cdk.aws_logs.LogGroup(this, 'AuthorizerLogGroup'),
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'index.handler',
+    });
+
     //Create S3 Bucket for our website
     const siteBucket = new s3.Bucket(this, 'FrontendBucket', {
       autoDeleteObjects: true,
@@ -99,9 +114,16 @@ export class SidekickStack extends cdk.Stack {
       }
     });
 
+    const authorizer = new apiGateway.TokenAuthorizer(this, 'ApiAuthorizer', {
+      handler: authorizerLambda,
+    });
+
     const caseApi = new apiGateway.LambdaRestApi(this, 'caseApi', {
       handler: sampleLambda,
       proxy: false,
+      defaultMethodOptions: {
+        authorizer
+      },
       defaultCorsPreflightOptions: {
         allowOrigins: apiGateway.Cors.ALL_ORIGINS
       }

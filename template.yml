@@ -54,6 +54,72 @@ Resources:
       aws:asset:path: asset.a53ebcaaa955089c5e56d4c4caef4481dbad6e0ecda903973cb9f5036b75190c
       aws:asset:is-bundled: true
       aws:asset:property: Code
+  AuthorizerLogGroup2583BEC8:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 731
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: SideKickStack/AuthorizerLogGroup/Resource
+  AuthorizerLambdaServiceRole30885946:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: SideKickStack/AuthorizerLambda/ServiceRole/Resource
+  AuthorizerLambda972EEEAB:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
+        S3Key: 90001bcf7f883bc08e01b5518ebfa755bf53a659c36fa5a2f5ad8ce46d4512f0.zip
+      Handler: index.handler
+      LoggingConfig:
+        LogGroup:
+          Ref: AuthorizerLogGroup2583BEC8
+      Role:
+        Fn::GetAtt:
+          - AuthorizerLambdaServiceRole30885946
+          - Arn
+      Runtime: python3.9
+    DependsOn:
+      - AuthorizerLambdaServiceRole30885946
+    Metadata:
+      aws:cdk:path: SideKickStack/AuthorizerLambda/Resource
+      aws:asset:path: asset.90001bcf7f883bc08e01b5518ebfa755bf53a659c36fa5a2f5ad8ce46d4512f0
+      aws:asset:is-bundled: true
+      aws:asset:property: Code
+  AuthorizerLambdaSideKickStackApiAuthorizer429ED155Permissions48A76F73:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - AuthorizerLambda972EEEAB
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: caseApi6724F033
+            - /authorizers/
+            - Ref: ApiAuthorizer68095F41
+    Metadata:
+      aws:cdk:path: SideKickStack/AuthorizerLambda/SideKickStackApiAuthorizer429ED155:Permissions
   FrontendBucketEFE2E19C:
     Type: AWS::S3::Bucket
     Properties:
@@ -421,19 +487,55 @@ Resources:
     DeletionPolicy: Retain
     Metadata:
       aws:cdk:path: SideKickStack/sidekickTable/Resource
+  ApiAuthorizer68095F41:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      AuthorizerResultTtlInSeconds: 300
+      AuthorizerUri:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Fn::Select:
+                - 1
+                - Fn::Split:
+                    - ":"
+                    - Fn::GetAtt:
+                        - AuthorizerLambda972EEEAB
+                        - Arn
+            - ":apigateway:"
+            - Fn::Select:
+                - 3
+                - Fn::Split:
+                    - ":"
+                    - Fn::GetAtt:
+                        - AuthorizerLambda972EEEAB
+                        - Arn
+            - :lambda:path/2015-03-31/functions/
+            - Fn::GetAtt:
+                - AuthorizerLambda972EEEAB
+                - Arn
+            - /invocations
+      IdentitySource: method.request.header.Authorization
+      Name: SideKickStackApiAuthorizer429ED155
+      RestApiId:
+        Ref: caseApi6724F033
+      Type: TOKEN
+    Metadata:
+      aws:cdk:path: SideKickStack/ApiAuthorizer/Resource
   caseApi6724F033:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: caseApi
     Metadata:
       aws:cdk:path: SideKickStack/caseApi/Resource
-  caseApiDeployment083907F34f9841436e2f7a0723cd6f79fc222ef1:
+  caseApiDeployment083907F34746cd2a0ce098e6490170cb972cf256:
     Type: AWS::ApiGateway::Deployment
     Properties:
       Description: Automatically created by the RestApi construct
       RestApiId:
         Ref: caseApi6724F033
     DependsOn:
+      - ApiAuthorizer68095F41
       - caseApicasescaseGETBF6E3B17
       - caseApicasescaseOPTIONS4E928E59
       - caseApicasescase46203A39
@@ -447,7 +549,7 @@ Resources:
     Type: AWS::ApiGateway::Stage
     Properties:
       DeploymentId:
-        Ref: caseApiDeployment083907F34f9841436e2f7a0723cd6f79fc222ef1
+        Ref: caseApiDeployment083907F34746cd2a0ce098e6490170cb972cf256
       RestApiId:
         Ref: caseApi6724F033
       StageName: prod
@@ -562,7 +664,9 @@ Resources:
   caseApicasesGETFDFC3D16:
     Type: AWS::ApiGateway::Method
     Properties:
-      AuthorizationType: NONE
+      AuthorizationType: CUSTOM
+      AuthorizerId:
+        Ref: ApiAuthorizer68095F41
       HttpMethod: GET
       Integration:
         IntegrationHttpMethod: POST
@@ -658,7 +762,9 @@ Resources:
   caseApicasescaseGETBF6E3B17:
     Type: AWS::ApiGateway::Method
     Properties:
-      AuthorizationType: NONE
+      AuthorizationType: CUSTOM
+      AuthorizerId:
+        Ref: ApiAuthorizer68095F41
       HttpMethod: GET
       Integration:
         IntegrationHttpMethod: POST
@@ -680,7 +786,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/3VS22ojMQz9lr473m0Ky76mCYGFloZ029fg2OqsGo8VLLthMPPvtT2TZra0YNDR7chIZy6v57/kzyt14pk2h5nFvUyPQemDyKFdsqrdGyXTOjodkJxYvrgpvlMd+GfwXPxHdI2FQP9VbMC3yCXfC1StTFuyUBLVbsii7mpdRb3gm11SzBBYLooRBo6WuhZckLdRHyCsPgKlWqYheqsYxAAL3YgGc5ky9XuhLUXz4ilTpxVy8LiP9d8PHht0C62B+Y/JkzDU9mVpWJeG7yqmNHkANQ4DyfTE4DdEtpR84DNYWswE09QYObsrahW6acEQ6YXpnGrJ5KP9VfthrxX0Qh2xUQFOqpPprl5xCxwWR6y7H+FllfXvFy9LoKlsA8j1FL2GuuR7CP/IlOSIztmRueK+v4TrHQtR1odYRg7UftXyKbXx9IYGfJ056HBni9x2WZnaolycOO+pKrDQPMRwjFkSjgzIV/7xdv1b5je/emXEmY/5RC3I7WDfAUrfbXX4AgAA
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VS0W7bMAz8lr4r6poBQ1/dBB0GZGiQbnsNFIn12MiiIUoNPMP/Pkl2EqNoAQM8kqejJd5S3i2/yS836sQLbY4LiwfZPweljyKV9r1VzcEo2T9GpwOSE6sXN8db8A0yT9lGdeD/gC/5M7raQqALfxCoGtnvyEIml7gli7orSgUNgr/ue8UMgWWVgzDQWuoacEE+RH2EsL4UMlv2Y/VBMYgRZrkJjeE6ZZ4PwlLNst9Q/d1TbMsNJjwIbSmaF09pbL9GDh4Psdz6yWONrtIamH+Y9BcYivQqH3jMBz5jzGXSAKodBpL9bwa/JbKZcsFnsLKYBOatqXJO19QodHPCWBmE6ZxqyKSF/lKH8c0LGIRqsVYBTqpLPTqCq2L4Sx7/gc+sWbYp+98Bh6rFsrUJXpdQbnbNknnqMmsEiU/Rayjr+QlJ2OTmhM7dSbngYbiWiwOyUPKSWEUO1Hx05F1r6+kNDfgyc3Tw3mZr7pOntUVZnTi9YnFrlnmKoY3JTI4MyFe+fbu7l+lb3rwy4sLHtMAG5G6M/wFwQWBZMgMAAA==
     Metadata:
       aws:cdk:path: SideKickStack/CDKMetadata/Default
 Outputs:
