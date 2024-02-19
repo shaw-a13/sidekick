@@ -10,6 +10,7 @@ or in the "license" file accompanying this file. This file is distributed on an 
 from __future__ import print_function
 from uuid import uuid4
 import jwt
+import time
 
 import re
 
@@ -27,6 +28,9 @@ def handler(event, context):
     """2. Decode a JWT token inline"""
     result = jwt.decode(event['authorizationToken'].split('Bearer ')[1], options={'verify_aud': False, 'verify_signature':False})
     print(result)
+    if result['exp']< int(time.time()):
+        raise Exception('Unauthorized')
+    
     """3. Lookup in a self-managed DB"""
     principalId = f"user|{str(uuid4())}"
     print(principalId)
@@ -55,8 +59,8 @@ def handler(event, context):
     policy.restApiId = apiGatewayArnTmp[0]
     policy.region = tmp[3]
     policy.stage = apiGatewayArnTmp[1]
-    policy.denyAllMethods()
-    """policy.allowMethod(HttpVerb.GET, "/pets/*")"""
+    # policy.denyAllMethods()
+    policy.allowMethod(HttpVerb.GET, "/cases")
 
     # Finally, build the policy
     authResponse = policy.build()
@@ -71,7 +75,7 @@ def handler(event, context):
     }
     # context['arr'] = ['foo'] <- this is invalid, APIGW will not accept it
     # context['obj'] = {'foo':'bar'} <- also invalid
- 
+    print(authResponse)
     authResponse['context'] = context
     
     return authResponse
