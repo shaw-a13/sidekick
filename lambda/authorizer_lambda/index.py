@@ -25,7 +25,7 @@ def handler(event, context):
     """this could be accomplished in a number of ways:"""
     """1. Call out to OAuth provider"""
     """2. Decode a JWT token inline"""
-    result = jwt.decode(event['authorizationToken'], options={'verify_aud': False, 'verify_signature':False})
+    result = jwt.decode(event['authorizationToken'].split('Bearer ')[1], options={'verify_aud': False, 'verify_signature':False})
     print(result)
     """3. Lookup in a self-managed DB"""
     principalId = f"user|{str(uuid4())}"
