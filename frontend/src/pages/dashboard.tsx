@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import { Container } from "react-bootstrap";
+import { CaseService } from '../services/case-service'
 
 const Dashboard = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -24,13 +25,22 @@ const Dashboard = () => {
             },
           });
         console.log(accessToken)
-  
+        return accessToken
       } catch (e: any) {
         console.log(e.message);
       }
     };
+
+    const caseService = new CaseService()
+    let accessToken
   
-    getAccessToken();
+    getAccessToken().then( res => {
+      accessToken = res
+      if (accessToken){
+        caseService.getAllCases(accessToken)
+      }
+    })
+
   }, [getAccessTokenSilently, user?.sub]);
 
   return (

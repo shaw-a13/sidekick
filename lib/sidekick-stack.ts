@@ -129,7 +129,11 @@ export class SidekickStack extends cdk.Stack {
       }
     });
 
-    const cases = caseApi.root.addResource('cases');
+    const cases = caseApi.root.addResource('cases', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apiGateway.Cors.ALL_ORIGINS
+      }
+    });
     cases.addMethod('GET');
 
     const singleCase = cases.addResource('{case}');

@@ -11,6 +11,11 @@ def handler(event, context):
         data = response['Items']
         return {
             'statusCode': response['ResponseMetadata']['HTTPStatusCode'],
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+            },
             'body': json.dumps(data)
             }
 
