@@ -1,54 +1,67 @@
 import React, { useEffect, useState } from "react";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import { Container } from "react-bootstrap";
-import { CaseService } from '../services/case-service'
+import { CaseService, CaseRecord } from "../services/case-service";
+import { AxiosResponse } from "axios";
 
 const Dashboard = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
-  const [userMetadata, setUserMetadata] = useState(null);
+  const [cases, setCases] = useState<CaseRecord[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getAccessToken = async () => {
-      const domain = "dev-loovxx4fwuzohi8k.us.auth0.com"
-  
       try {
-        // const accessToken = await getAccessTokenWithPopup({
-        //   authorizationParams: {
-        //     audience: `https://sidekick-api.com`,
-        //     scope: "read:current_user",
-        //   },
-        // });
         const accessToken = await getAccessTokenSilently({
-            authorizationParams: {
-              audience: `https://sidekick-api.com`,
-              scope: "read:current_user",
-            },
-          });
-        console.log(accessToken)
-        return accessToken
+          authorizationParams: {
+            audience: `https://sidekick-api.com`,
+            scope: "read:current_user",
+          },
+        });
+        console.log(accessToken);
+        return accessToken;
       } catch (e: any) {
         console.log(e.message);
       }
     };
 
-    const caseService = new CaseService()
-    let accessToken
-  
-    getAccessToken().then( res => {
-      accessToken = res
-      if (accessToken){
-        caseService.getAllCases(accessToken)
-      }
-    })
+    const caseService = new CaseService();
+    let accessToken;
 
+    getAccessToken().then(async (res) => {
+      accessToken = res;
+      if (accessToken) {
+        setLoading(true);
+        try {
+          await caseService.getAllCases(accessToken).then((res) => {
+            if (res) {
+              console.log(res)
+              setCases(res.data)
+            }
+          });
+        } catch (e) {
+          console.log(e);
+        }
+        setLoading(false);
+      }
+    });
   }, [getAccessTokenSilently, user?.sub]);
 
   return (
     <Container>
-      <h1>Dashboard</h1>
+      <div>
+        {loading && <div>Loading</div>}
+        {!loading && (
+          <div>
+            <h2>Doing stuff with data</h2>
+            {cases.map((caseRecord) => (
+              <h1>{caseRecord.customerName}</h1>
+            ))}
+          </div>
+        )}
+      </div>
     </Container>
   );
-  
 };
 
 export default withAuthenticationRequired(Dashboard);

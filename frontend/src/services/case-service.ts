@@ -1,5 +1,11 @@
 import axios from 'axios';
 
+export interface CaseRecord {
+    customerName: string;
+    SK: string;
+    Status: string;
+}
+
 export class CaseService {
     private readonly baseUrl: string
 
@@ -8,12 +14,11 @@ export class CaseService {
     }
     public async getAllCases(token: string) {
         try {
-            const response = await axios.get(`${this.baseUrl}/cases`, {
+            return await axios.get<CaseRecord[]>(`${this.baseUrl}/cases`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(response);
           } catch (error) {
             console.log('error')
             console.error(error);
