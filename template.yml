@@ -300,7 +300,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - df05c7806dab44ade26b08f493c13da2f5fbaecfdd565627d1d652809e5c3570.zip
+        - 66e5870aa5a026f71ec92fcc177f6c89b8df9782f3eef6e1458b9eced1fe9192.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
