@@ -1,13 +1,119 @@
 import React, { useEffect, useState } from "react";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
-import { Container } from "react-bootstrap";
+import {
+  Container,
+  Button,
+  Badge,
+  Dropdown,
+  InputGroup,
+  Form,
+} from "react-bootstrap";
 import { CaseService, CaseRecord } from "../services/case-service";
 import { AxiosResponse } from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch, faUndo } from "@fortawesome/free-solid-svg-icons";
+
+const statuses: { [key: string]: string } = {
+  ACTIVE: "success",
+  PENDING: "warning",
+  CLOSED: "danger",
+};
 
 const Dashboard = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [cases, setCases] = useState<CaseRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refSearch, setRefSearch] = useState("");
+  const [clientSearch, setClientSearch] = useState("");
+
+  const caseRes = {
+    data: [
+      {
+        customerName: "Jayne Salter",
+        SK: "REF12336",
+        Status: "CLOSED",
+        PK: "CASE",
+      },
+      {
+        customerName: "John Smith",
+        SK: "REF12345",
+        Status: "ACTIVE",
+        PK: "CASE",
+      },
+      {
+        customerName: "Jack Doe",
+        SK: "REF44332",
+        Status: "ACTIVE",
+        PK: "CASE",
+      },
+      {
+        customerName: "Louise Smith",
+        SK: "REF55744",
+        Status: "ACTIVE",
+        PK: "CASE",
+      },
+      {
+        customerName: "Jane Doe",
+        SK: "REF67899",
+        Status: "ACTIVE",
+        PK: "CASE",
+      },
+    ],
+    status: 200,
+    statusText: "",
+    headers: {
+      "content-length": "420",
+      "content-type": "application/json",
+    },
+    config: {
+      transitional: {
+        silentJSONParsing: true,
+        forcedJSONParsing: true,
+        clarifyTimeoutError: false,
+      },
+      adapter: ["xhr", "http"],
+      transformRequest: [null],
+      transformResponse: [null],
+      timeout: 0,
+      xsrfCookieName: "XSRF-TOKEN",
+      xsrfHeaderName: "X-XSRF-TOKEN",
+      maxContentLength: -1,
+      maxBodyLength: -1,
+      env: {},
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        Authorization:
+          "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkdqQ3pUVFVrQVNESlMxWkhiR3BESCJ9.eyJpc3MiOiJodHRwczovL2Rldi1sb292eHg0Znd1em9oaThrLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2NTYyNjAxMjE3YjRiZGI1MDExMzYwYmQiLCJhdWQiOlsiaHR0cHM6Ly9zaWRla2ljay1hcGkuY29tIiwiaHR0cHM6Ly9kZXYtbG9vdnh4NGZ3dXpvaGk4ay51cy5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzEyNTE2OTQ5LCJleHAiOjE3MTI2MDMzNDksInNjb3BlIjoib3BlbmlkIiwiYXpwIjoiNGtPZnl6VFFlWW1EbzBzSXNMaHYxa05ld0ptTEVXbGsifQ.ZVQPjdhBk_jPgx2a_QiMUOACQOA1UAojjBrBAD5FXHE6-gbshngNbatjib4pnBEYDGew7f0pJtZqsiWvCfr_rPdQohWtScUJXtIpy9BGUhC10EgM9OJmE5yXQsxc8ZwkycaiFisO3eh3x5bO7zirZQwX3DGhIoqi2bteVJYCnfIRYXgOWJ3hT_8Kd5HeYxP3dzQdbE5GNSWYeFYF-REYQiW1_g3Pp76M4h0sUIgAN0YdR7ZSjnNgOF5tAgUNQUckiBfcaubJLO_gALOCXnq79XSz6oXhc0LEcwFbn8rkYGk_hDYERFCRlwvtn_opu2DzcrmVNUaED6xo-jy8I-M7EA",
+      },
+      method: "get",
+      url: "https://0lsi10z5ki.execute-api.eu-west-1.amazonaws.com/prod/cases",
+    },
+    request: {},
+  };
+
+  const filterByStatus = (status: string) => {
+    setCases(
+      cases.filter((caseRecord) => {
+        return caseRecord.Status === status;
+      })
+    );
+  };
+
+  const filterByRef = (search: string) => {
+    setCases(
+      cases.filter((caseRecord) => {
+        return caseRecord.SK === search;
+      })
+    );
+  };
+
+  const filterByClient = (search: string) => {
+    setCases(
+      cases.filter((caseRecord) => {
+        return caseRecord.customerName === search;
+      })
+    );
+  };
 
   useEffect(() => {
     const getAccessToken = async () => {
@@ -26,30 +132,123 @@ const Dashboard = () => {
     };
 
     const caseService = new CaseService();
+    
     let accessToken;
 
     getAccessToken().then(async (res) => {
       accessToken = res;
       if (accessToken) {
-        setLoading(true);
-        try {
-          await caseService.getAllCases(accessToken).then((res) => {
-            if (res) {
-              console.log(res)
-              setCases(res.data)
-            }
-          });
-        } catch (e) {
-          console.log(e);
-        }
-        setLoading(false);
+        setCases(caseRes.data);
+        // setLoading(true);
+        // try {
+        //   await caseService.getAllCases(accessToken).then((res) => {
+        //     if (res) {
+        //       console.log(res)
+        //       setCases(res.data)
+        //     }
+        //   });
+        // } catch (e) {
+        //   console.log(e);
+        // }
+        // setLoading(false);
       }
     });
   }, [getAccessTokenSilently, user?.sub]);
 
   return (
-    <Container>
-      <div>
+    <Container className="pt-5">
+      <h2>Dashboard</h2>
+      <p>{clientSearch}</p>
+      <Container className="pt-5">
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Filter by Reference</th>
+              <th scope="col">Filter by Name</th>
+              <th scope="col">Filter by Status</th>
+            </tr>
+          </thead>
+          <thead>
+            <tr>
+              <th scope="col">
+                <InputGroup>
+                  <Form.Control
+                    placeholder="Search for a reference"
+                    aria-label="Case reference"
+                    onChange={(e) => setRefSearch(e.target.value)}
+                  />
+                  <Button variant="outline-primary" id="button-addon2" onClick={() => filterByRef(refSearch)}>
+                    <FontAwesomeIcon icon={faSearch} />
+                  </Button>
+                </InputGroup>
+              </th>
+              <th scope="col">
+                <InputGroup>
+                  <Form.Control
+                    placeholder="Search for a client"
+                    aria-label="Client name"
+                    onChange={(e) => setClientSearch(e.target.value)}
+                  />
+                  <Button
+                    variant="outline-primary"
+                    id="button-addon2"
+                    onClick={() => filterByClient(clientSearch)}
+                  >
+                    <FontAwesomeIcon icon={faSearch} />
+                  </Button>
+                </InputGroup>
+              </th>
+              <th scope="col">
+                <Dropdown>
+                  <Dropdown.Toggle variant="primary">Status</Dropdown.Toggle>
+
+                  <Dropdown.Menu>
+                    {Object.keys(statuses).map((statusItem) => (
+                      <Dropdown.Item onClick={() => filterByStatus(statusItem)}>{statusItem}</Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              </th>
+              <th scope="col">
+                <Button variant="outline-primary" id="button-addon2" onClick={() => {setCases(caseRes.data)}}>
+                  <FontAwesomeIcon icon={faUndo} />
+                </Button>
+              </th>
+            </tr>
+          </thead>
+          <thead>
+            <tr>
+              <th scope="col">Reference</th>
+              <th scope="col">Name</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cases.map((caseRecord) => (
+              <tr>
+                <td>{caseRecord.SK}</td>
+                <td>{caseRecord.customerName}</td>
+                <td>
+                  <Badge
+                    bg={statuses[caseRecord.Status]}
+                    text="light"
+                  >
+                    {caseRecord.Status}
+                  </Badge>
+                </td>
+                <td>
+                  <Button
+                    style={{ backgroundColor: "#e0fbfc", color: "black" }}
+                  >
+                    View
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* <div>
         {loading && <div>Loading</div>}
         {!loading && (
           <div>
@@ -59,7 +258,8 @@ const Dashboard = () => {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
+      </Container>
     </Container>
   );
 };
