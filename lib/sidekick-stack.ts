@@ -54,30 +54,30 @@ export class SidekickStack extends cdk.Stack {
     });
 
     const distribution = new cloudfront.Distribution(this, 'CloudfrontDistribution', {
-        defaultBehavior: {
-            origin: new cloudfrontOrigins.S3Origin(siteBucket),
-            viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      defaultBehavior: {
+        origin: new cloudfrontOrigins.S3Origin(siteBucket),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      },
+      defaultRootObject: 'index.html',
+      errorResponses: [
+        {
+          httpStatus: 404,
+          responseHttpStatus: 200,
+          responsePagePath: '/index.html',
         },
-        defaultRootObject: 'index.html',
-        errorResponses: [
-            {
-                httpStatus: 404,
-                responseHttpStatus: 200,
-                responsePagePath: '/index.html',
-            },
-            {
-              httpStatus: 403,
-              responseHttpStatus: 200,
-              responsePagePath: '/index.html',
-          },
-        ],
+        {
+          httpStatus: 403,
+          responseHttpStatus: 200,
+          responsePagePath: '/index.html',
+        },
+      ],
     });
 
     new s3Deployment.BucketDeployment(this, 'BucketDeployment', {
-        sources: [s3Deployment.Source.asset('frontend/build')],
-        destinationBucket: siteBucket,
-        distribution,
-        distributionPaths: ['/*'],
+      sources: [s3Deployment.Source.asset('frontend/build')],
+      destinationBucket: siteBucket,
+      distribution,
+      distributionPaths: ['/*'],
     });
 
     const pool = new cognito.UserPool(this, 'Pool', {
@@ -97,9 +97,9 @@ export class SidekickStack extends cdk.Stack {
         flows: {
           authorizationCodeGrant: true,
         },
-        scopes: [ cognito.OAuthScope.OPENID ],
-        callbackUrls: [ `https://${distribution.domainName}/home` ],
-        logoutUrls: [ `https://${distribution.domainName}/login` ],
+        scopes: [cognito.OAuthScope.OPENID],
+        callbackUrls: [`https://${distribution.domainName}/home`],
+        logoutUrls: [`https://${distribution.domainName}/login`],
       },
     });
 
@@ -145,22 +145,56 @@ export class SidekickStack extends cdk.Stack {
       resources: [sidekickTable.tableArn]
     }))
 
+    const caseBucket = new s3.Bucket(this, 'caseBucket', {
+      bucketName: 'sidekick-cases',
+      autoDeleteObjects: true,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      cors: [{ allowedHeaders: ['*'], allowedMethods: [s3.HttpMethods.PUT], allowedOrigins: [`https://${distribution.domainName}`, 'http://localhost:3000'] }],
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const generatePresignedUrlLambda = new lambda.Function(this, 'GeneratePresignedUrlLambda', {
+      code: lambda.Code.fromAsset(('lambda/generate_presigned_url'), {
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_9.bundlingImage,
+          command: [
+            'bash', '-c',
+            'pip install -r requirements.txt -t /asset-output && rsync -r . /asset-output'
+          ],
+        },
+      }),
+      environment: {
+        S3_BUCKET: caseBucket.bucketName
+      },
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'index.handler',
+    });
+
+    generatePresignedUrlLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: [
+        's3:PutObject',
+      ],
+      resources: [caseBucket.bucketArn],
+      effect: iam.Effect.ALLOW
+    }))
+
+
     new cdk.CfnOutput(this, 'CloudFrontURL', {
-        value: distribution.domainName,
-        description: 'The distribution URL',
-        exportName: 'CloudfrontURL',
+      value: distribution.domainName,
+      description: 'The distribution URL',
+      exportName: 'CloudfrontURL',
     });
 
     new cdk.CfnOutput(this, 'BucketName', {
-        value: siteBucket.bucketName,
-        description: 'The name of the S3 bucket',
-        exportName: 'BucketName',
+      value: siteBucket.bucketName,
+      description: 'The name of the S3 bucket',
+      exportName: 'BucketName',
     });
 
     new cdk.CfnOutput(this, 'CaseApiUrl', {
       value: caseApi.url,
       description: 'The case api URL',
       exportName: 'CaseApiUrl',
-  });
+    });
   }
 }
