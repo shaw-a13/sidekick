@@ -239,6 +239,7 @@ const Dashboard = () => {
                 <td>
                   <Button
                     style={{ backgroundColor: "#e0fbfc", color: "black" }}
+                    href={"case/"+caseRecord.SK}
                   >
                     View
                   </Button>

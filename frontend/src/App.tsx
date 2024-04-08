@@ -4,6 +4,7 @@ import Login from "./pages/login";
 import './App.css';
 import Navagation from "./pages/navagation";
 import Dashboard from "./pages/dashboard";
+import Case from "./pages/case";
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
             <Route index element={<Home />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="login" element={<Login />} />
+            <Route path="case/:id" element={<Case />} />
           </Routes>
       </BrowserRouter>
   )
