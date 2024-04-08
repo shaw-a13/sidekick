@@ -5,6 +5,7 @@ import './App.css';
 import Navagation from "./pages/navagation";
 import Dashboard from "./pages/dashboard";
 import Case from "./pages/case";
+import Upload from "./pages/upload";
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
           <Navagation />
           <Routes>
             <Route index element={<Home />} />
+            <Route path="upload" element={<Upload />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="login" element={<Login />} />
             <Route path="case/:id" element={<Case />} />

@@ -7,6 +7,7 @@ import LogoutButton from '../components/logoutButton';
 
 let pages = [
   {name: 'Home', href: '/', authenticationRequired: false},
+  {name: 'Upload', href: '/upload', authenticationRequired: true},
   {name: 'Dashboard', href: '/dashboard', authenticationRequired: true},
   {name: 'Profile', href: '/profile', authenticationRequired: true},
 ]
