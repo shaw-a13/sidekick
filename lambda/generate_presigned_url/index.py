@@ -7,7 +7,7 @@ from os import environ as env
 # Configure S3 client
 s3 = boto3.client('s3')
 
-def lambda_handler(event, context):
+def handler(event, context):
     print(event)
     # Get the bucket name from environment variable
     bucket_name = env['S3_BUCKET']

@@ -300,7 +300,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - 66e5870aa5a026f71ec92fcc177f6c89b8df9782f3eef6e1458b9eced1fe9192.zip
+        - c2e928abc6a7f0b6a3dc704d1a16fc97732623cfc55c7f658733cb0b562853d5.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -899,7 +899,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 8eacb28d8b508cd4fa08ea6b28755830e1a6166df5ab34dd20e47be3c90c351a.zip
+        S3Key: 527baa8ca50b71b0dab5c57b0a5293c1d8ddbd1f5f15f93ad72de1c53a5084fc.zip
       Environment:
         Variables:
           S3_BUCKET:
@@ -915,7 +915,7 @@ Resources:
       - GeneratePresignedUrlLambdaServiceRoleD3347AFA
     Metadata:
       aws:cdk:path: SideKickStack/GeneratePresignedUrlLambda/Resource
-      aws:asset:path: asset.8eacb28d8b508cd4fa08ea6b28755830e1a6166df5ab34dd20e47be3c90c351a
+      aws:asset:path: asset.527baa8ca50b71b0dab5c57b0a5293c1d8ddbd1f5f15f93ad72de1c53a5084fc
       aws:asset:is-bundled: true
       aws:asset:property: Code
   CDKMetadata:
