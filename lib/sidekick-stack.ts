@@ -17,6 +17,17 @@ export class SidekickStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const sidekickTable = new dynamodb.Table(this, 'sidekickTable', {
+      partitionKey: {
+        name: 'PK',
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'SK',
+        type: dynamodb.AttributeType.STRING,
+      }
+    });
+
     const sampleLambda = new lambda.Function(this, 'MyFunction', {
       code: lambda.Code.fromAsset(('lambda/sample_lambda'), {
         bundling: {
@@ -30,6 +41,12 @@ export class SidekickStack extends cdk.Stack {
       runtime: lambda.Runtime.PYTHON_3_9,
       handler: 'index.handler',
     });
+
+    sampleLambda.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['dynamodb:Scan'],
+      resources: [sidekickTable.tableArn]
+    }))
 
     const authorizerLambda = new lambda.Function(this, 'AuthorizerLambda', {
       code: lambda.Code.fromAsset(('lambda/authorizer_lambda'), {
@@ -103,17 +120,6 @@ export class SidekickStack extends cdk.Stack {
       },
     });
 
-    const sidekickTable = new dynamodb.Table(this, 'sidekickTable', {
-      partitionKey: {
-        name: 'PK',
-        type: dynamodb.AttributeType.STRING,
-      },
-      sortKey: {
-        name: 'SK',
-        type: dynamodb.AttributeType.STRING,
-      }
-    });
-
     const authorizer = new apiGateway.TokenAuthorizer(this, 'ApiAuthorizer', {
       handler: authorizerLambda,
     });
@@ -138,12 +144,6 @@ export class SidekickStack extends cdk.Stack {
 
     const singleCase = cases.addResource('{case}');
     singleCase.addMethod('GET');
-
-    sampleLambda.addToRolePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['dynamodb:Scan'],
-      resources: [sidekickTable.tableArn]
-    }))
 
     const caseBucket = new s3.Bucket(this, 'caseBucket', {
       bucketName: 'sidekick-cases',
@@ -174,11 +174,17 @@ export class SidekickStack extends cdk.Stack {
       actions: [
         's3:PutObject',
       ],
-      resources: [caseBucket.bucketArn],
+      resources: [caseBucket.bucketArn, `${caseBucket.bucketArn}/*`],
       effect: iam.Effect.ALLOW
     }))
 
-
+    const upload = caseApi.root.addResource('upload', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apiGateway.Cors.ALL_ORIGINS
+      }
+    });
+    upload.addMethod('GET', new apiGateway.LambdaIntegration(generatePresignedUrlLambda));
+    
     new cdk.CfnOutput(this, 'CloudFrontURL', {
       value: distribution.domainName,
       description: 'The distribution URL',
