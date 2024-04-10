@@ -9,6 +9,7 @@ s3 = boto3.client('s3')
 
 def handler(event, context):
     print(event)
+    print(event['headers']['origin'])
     # Get the bucket name from environment variable
     bucket_name = env['S3_BUCKET']
     key = f'{uuid.uuid4()}.pdf'      # Generate a unique key for the object
@@ -29,7 +30,7 @@ def handler(event, context):
     response = {
         'statusCode': 200,
         'headers': {
-            'Access-Control-Allow-Origin': 'http://localhost:3000'
+            'Access-Control-Allow-Origin': event['headers']['origin']
         },
         'body': json.dumps({
             'presignedUrl': presigned_url,
