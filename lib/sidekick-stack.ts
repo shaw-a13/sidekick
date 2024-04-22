@@ -28,8 +28,8 @@ export class SidekickStack extends cdk.Stack {
       }
     });
 
-    const sampleLambda = new lambda.Function(this, 'MyFunction', {
-      code: lambda.Code.fromAsset(('lambda/sample_lambda'), {
+    const caseApiLambda = new lambda.Function(this, 'caseApiLambda', {
+      code: lambda.Code.fromAsset(('lambda/case_api'), {
         bundling: {
           image: lambda.Runtime.PYTHON_3_9.bundlingImage,
           command: [
@@ -42,7 +42,7 @@ export class SidekickStack extends cdk.Stack {
       handler: 'index.handler',
     });
 
-    sampleLambda.addToRolePolicy(new iam.PolicyStatement({
+    caseApiLambda.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: ['dynamodb:Scan'],
       resources: [sidekickTable.tableArn]
