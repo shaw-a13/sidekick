@@ -125,7 +125,7 @@ export class SidekickStack extends cdk.Stack {
     });
 
     const caseApi = new apiGateway.LambdaRestApi(this, 'caseApi', {
-      handler: sampleLambda,
+      handler: caseApiLambda,
       proxy: false,
       defaultMethodOptions: {
         authorizer

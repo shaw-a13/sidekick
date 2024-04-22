@@ -19,7 +19,7 @@ Resources:
     DeletionPolicy: Retain
     Metadata:
       aws:cdk:path: SideKickStack/sidekickTable/Resource
-  MyFunctionServiceRole3C357FF2:
+  caseApiLambdaServiceRole2618F57C:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -36,8 +36,8 @@ Resources:
               - Ref: AWS::Partition
               - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
     Metadata:
-      aws:cdk:path: SideKickStack/MyFunction/ServiceRole/Resource
-  MyFunctionServiceRoleDefaultPolicyB705ABD4:
+      aws:cdk:path: SideKickStack/caseApiLambda/ServiceRole/Resource
+  caseApiLambdaServiceRoleDefaultPolicy86BCAE1B:
     Type: AWS::IAM::Policy
     Properties:
       PolicyDocument:
@@ -49,12 +49,12 @@ Resources:
                 - sidekickTableFDBE0BEC
                 - Arn
         Version: "2012-10-17"
-      PolicyName: MyFunctionServiceRoleDefaultPolicyB705ABD4
+      PolicyName: caseApiLambdaServiceRoleDefaultPolicy86BCAE1B
       Roles:
-        - Ref: MyFunctionServiceRole3C357FF2
+        - Ref: caseApiLambdaServiceRole2618F57C
     Metadata:
-      aws:cdk:path: SideKickStack/MyFunction/ServiceRole/DefaultPolicy/Resource
-  MyFunction3BAA72D1:
+      aws:cdk:path: SideKickStack/caseApiLambda/ServiceRole/DefaultPolicy/Resource
+  caseApiLambda8B1F541B:
     Type: AWS::Lambda::Function
     Properties:
       Code:
@@ -63,14 +63,14 @@ Resources:
       Handler: index.handler
       Role:
         Fn::GetAtt:
-          - MyFunctionServiceRole3C357FF2
+          - caseApiLambdaServiceRole2618F57C
           - Arn
       Runtime: python3.9
     DependsOn:
-      - MyFunctionServiceRoleDefaultPolicyB705ABD4
-      - MyFunctionServiceRole3C357FF2
+      - caseApiLambdaServiceRoleDefaultPolicy86BCAE1B
+      - caseApiLambdaServiceRole2618F57C
     Metadata:
-      aws:cdk:path: SideKickStack/MyFunction/Resource
+      aws:cdk:path: SideKickStack/caseApiLambda/Resource
       aws:asset:path: asset.4833ab93ae313b10e8882fea75611a35770d5227a67f678f18faf51a843880bd
       aws:asset:is-bundled: true
       aws:asset:property: Code
@@ -320,7 +320,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - b304cdf3f99389b2fe2b4ef534a90de5e38c04af2d160b04f92cf6b12bebc703.zip
+        - fcbb9a61deb68586bf6191031ea47e09123380ae466d64e5acf60e3255a658b5.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -528,7 +528,7 @@ Resources:
       Name: caseApi
     Metadata:
       aws:cdk:path: SideKickStack/caseApi/Resource
-  caseApiDeployment083907F366a52b7f743059d79a79179f21f2e6a1:
+  caseApiDeployment083907F3da73a8ec1919252070a3808c60e98d4d:
     Type: AWS::ApiGateway::Deployment
     Properties:
       Description: Automatically created by the RestApi construct
@@ -552,7 +552,7 @@ Resources:
     Type: AWS::ApiGateway::Stage
     Properties:
       DeploymentId:
-        Ref: caseApiDeployment083907F366a52b7f743059d79a79179f21f2e6a1
+        Ref: caseApiDeployment083907F3da73a8ec1919252070a3808c60e98d4d
       RestApiId:
         Ref: caseApi6724F033
       StageName: prod
@@ -634,7 +634,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName:
         Fn::GetAtt:
-          - MyFunction3BAA72D1
+          - caseApiLambda8B1F541B
           - Arn
       Principal: apigateway.amazonaws.com
       SourceArn:
@@ -653,7 +653,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName:
         Fn::GetAtt:
-          - MyFunction3BAA72D1
+          - caseApiLambda8B1F541B
           - Arn
       Principal: apigateway.amazonaws.com
       SourceArn:
@@ -679,7 +679,7 @@ Resources:
             - ""
             - - arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/
               - Fn::GetAtt:
-                  - MyFunction3BAA72D1
+                  - caseApiLambda8B1F541B
                   - Arn
               - /invocations
       ResourceId:
@@ -732,7 +732,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName:
         Fn::GetAtt:
-          - MyFunction3BAA72D1
+          - caseApiLambda8B1F541B
           - Arn
       Principal: apigateway.amazonaws.com
       SourceArn:
@@ -751,7 +751,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName:
         Fn::GetAtt:
-          - MyFunction3BAA72D1
+          - caseApiLambda8B1F541B
           - Arn
       Principal: apigateway.amazonaws.com
       SourceArn:
@@ -777,7 +777,7 @@ Resources:
             - ""
             - - arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/
               - Fn::GetAtt:
-                  - MyFunction3BAA72D1
+                  - caseApiLambda8B1F541B
                   - Arn
               - /invocations
       ResourceId:

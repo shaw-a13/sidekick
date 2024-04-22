@@ -5,7 +5,7 @@ import './App.css';
 import Navagation from "./pages/navagation";
 import Dashboard from "./pages/dashboard";
 import Case from "./pages/case";
-import Upload from "./pages/upload";
+import Upload from "./pages/upload/upload";
 
 
 function App() {
