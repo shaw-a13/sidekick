@@ -1,15 +1,55 @@
 import axios from "axios";
 import { useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import { CaseService, CaseRecord } from "../../services/case-service";
 import CaseTypeStep from "./steps/caseTypeStep";
 import ClientInfoStep from "./steps/clientInfoStep";
 import DocumentUploadStep from "./steps/documentUploadStep";
 import CaseInfoStep from "./steps/caseInfoStep";
+import { useAuth0 } from "@auth0/auth0-react";
+import { Client } from "./interfaces/client";
 
 const Upload = () => {
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+
+  const caseService = new CaseService();
+
+  const getAccessToken = async () => {
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: `https://sidekick-api.com`,
+          scope: "read:current_user",
+        },
+      });
+      console.log(accessToken);
+      return accessToken;
+    } catch (e: any) {
+      console.log(e.message);
+    }
+  };
+  
+  const addCase = (clientInfo: Client, caseInfo: any) => {
+    getAccessToken().then(async (res) => {
+      const accessToken = res;
+      if (accessToken) {
+        try {
+          await caseService.addClient(accessToken, clientInfo).then((res) => {
+            if (res) {
+              console.log(res)
+            }
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    });
+  
+  }
+
   const [step, setStep] = useState(0);
   const [caseType, setCaseType] = useState("");
-  console.log(caseType)
+  console.log(caseType);
   const initialClientFormState = {
     firstName: "",
     lastName: "",
@@ -85,6 +125,14 @@ const Upload = () => {
             </Button>
           </Card.Header>
           <Card.Body className="text-center">{steps[step].component}</Card.Body>
+          <Button
+            className="m-2"
+            onClick={() => {
+              putCase(clientInfo, caseInfo);
+            }}
+          >
+            Upload
+          </Button>
         </Card>
       </Row>
     </Container>
