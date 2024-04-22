@@ -61,6 +61,7 @@ def handler(event, context):
     policy.stage = apiGatewayArnTmp[1]
     # policy.denyAllMethods()
     policy.allowMethod(HttpVerb.GET, "/cases")
+    policy.allowMethod(HttpVerb.POST, "/cases")
     policy.allowMethod(HttpVerb.GET, "/upload")
     # Finally, build the policy
     authResponse = policy.build()

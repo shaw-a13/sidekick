@@ -128,7 +128,7 @@ const Upload = () => {
           <Button
             className="m-2"
             onClick={() => {
-              putCase(clientInfo, caseInfo);
+              addCase(clientInfo, caseInfo);
             }}
           >
             Upload

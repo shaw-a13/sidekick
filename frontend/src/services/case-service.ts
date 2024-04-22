@@ -28,21 +28,21 @@ export class CaseService {
     }
 
     public async addClient(token: string, clientInfo: Client) {
-        const formData = new FormData();
-
-        formData.append("clientId", uuidv4());
-        formData.append("firstName", clientInfo.firstName);
-        formData.append("lastName", clientInfo.lastName);
-        formData.append("addressLine1", clientInfo.addressLine1);
-        formData.append("addressLine2   ", clientInfo.addressLine2);
-        formData.append("postcode", clientInfo.postcode);
-        formData.append("county", clientInfo.county);
-        formData.append("city", clientInfo.city);
-        formData.append("phoneNumber", clientInfo.phoneNumber);
-        formData.append("email", clientInfo.email);
+        const data = {
+            clientId: uuidv4(),
+            firstName: clientInfo.firstName,
+            lastName: clientInfo.lastName,
+            addressLine1: clientInfo.addressLine1,
+            addressLine2: clientInfo.addressLine2,
+            postcode: clientInfo.postcode,
+            county: clientInfo.county,
+            city: clientInfo.city,
+            phoneNumber: clientInfo.phoneNumber,
+            email: clientInfo.email
+        }
 
         try {
-            return await axios.post(`${this.baseUrl}/cases`, formData, {
+            return await axios.post(`${this.baseUrl}/cases`, data, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },

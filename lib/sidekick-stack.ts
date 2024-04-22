@@ -44,7 +44,7 @@ export class SidekickStack extends cdk.Stack {
 
     caseApiLambda.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
-      actions: ['dynamodb:Scan'],
+      actions: ['dynamodb:Scan', 'dynamodb:PutItem'],
       resources: [sidekickTable.tableArn]
     }))
 
@@ -141,6 +141,7 @@ export class SidekickStack extends cdk.Stack {
       }
     });
     cases.addMethod('GET');
+    cases.addMethod('POST');
 
     const singleCase = cases.addResource('{case}');
     singleCase.addMethod('GET');

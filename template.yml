@@ -42,7 +42,9 @@ Resources:
     Properties:
       PolicyDocument:
         Statement:
-          - Action: dynamodb:Scan
+          - Action:
+              - dynamodb:PutItem
+              - dynamodb:Scan
             Effect: Allow
             Resource:
               Fn::GetAtt:
@@ -59,7 +61,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 4833ab93ae313b10e8882fea75611a35770d5227a67f678f18faf51a843880bd.zip
+        S3Key: d85698a8b8929bfa315533b1318b868d79c3e8cee420113fbffb605ff386a609.zip
       Handler: index.handler
       Role:
         Fn::GetAtt:
@@ -71,7 +73,7 @@ Resources:
       - caseApiLambdaServiceRole2618F57C
     Metadata:
       aws:cdk:path: SideKickStack/caseApiLambda/Resource
-      aws:asset:path: asset.4833ab93ae313b10e8882fea75611a35770d5227a67f678f18faf51a843880bd
+      aws:asset:path: asset.d85698a8b8929bfa315533b1318b868d79c3e8cee420113fbffb605ff386a609
       aws:asset:is-bundled: true
       aws:asset:property: Code
   AuthorizerLogGroup2583BEC8:
@@ -105,7 +107,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: e356d89afadf536e6ad1b835bca65e1b5dc7b5f046a7e85ae0f82c9dca94f5de.zip
+        S3Key: 43544b3334a12c7300f5468eb9a7293986e8b815019eacb6df4e04bb934b803c.zip
       Handler: index.handler
       LoggingConfig:
         LogGroup:
@@ -119,7 +121,7 @@ Resources:
       - AuthorizerLambdaServiceRole30885946
     Metadata:
       aws:cdk:path: SideKickStack/AuthorizerLambda/Resource
-      aws:asset:path: asset.e356d89afadf536e6ad1b835bca65e1b5dc7b5f046a7e85ae0f82c9dca94f5de
+      aws:asset:path: asset.43544b3334a12c7300f5468eb9a7293986e8b815019eacb6df4e04bb934b803c
       aws:asset:is-bundled: true
       aws:asset:property: Code
   AuthorizerLambdaSideKickStackApiAuthorizer429ED155Permissions48A76F73:
@@ -320,7 +322,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - fcbb9a61deb68586bf6191031ea47e09123380ae466d64e5acf60e3255a658b5.zip
+        - eb76b44e25d8dc27f3abee96002c5fe7b5f728537154cd269a2f8544aaa52323.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -528,7 +530,7 @@ Resources:
       Name: caseApi
     Metadata:
       aws:cdk:path: SideKickStack/caseApi/Resource
-  caseApiDeployment083907F3da73a8ec1919252070a3808c60e98d4d:
+  caseApiDeployment083907F3ed562712a9a5f54cc22794a2108b31ad:
     Type: AWS::ApiGateway::Deployment
     Properties:
       Description: Automatically created by the RestApi construct
@@ -541,6 +543,7 @@ Resources:
       - caseApicasescase46203A39
       - caseApicasesGETFDFC3D16
       - caseApicasesOPTIONSA3955B9F
+      - caseApicasesPOST4FBE3F7F
       - caseApicases3EFC55DB
       - caseApiOPTIONS309871CA
       - caseApiuploadGET7EA666CB
@@ -552,7 +555,7 @@ Resources:
     Type: AWS::ApiGateway::Stage
     Properties:
       DeploymentId:
-        Ref: caseApiDeployment083907F3da73a8ec1919252070a3808c60e98d4d
+        Ref: caseApiDeployment083907F3ed562712a9a5f54cc22794a2108b31ad
       RestApiId:
         Ref: caseApi6724F033
       StageName: prod
@@ -688,6 +691,66 @@ Resources:
         Ref: caseApi6724F033
     Metadata:
       aws:cdk:path: SideKickStack/caseApi/Default/cases/GET/Resource
+  caseApicasesPOSTApiPermissionSideKickStackcaseApi1380630CPOSTcases5C33A2F5:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - caseApiLambda8B1F541B
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: caseApi6724F033
+            - /
+            - Ref: caseApiDeploymentStageprod343269DB
+            - /POST/cases
+    Metadata:
+      aws:cdk:path: SideKickStack/caseApi/Default/cases/POST/ApiPermission.SideKickStackcaseApi1380630C.POST..cases
+  caseApicasesPOSTApiPermissionTestSideKickStackcaseApi1380630CPOSTcasesA9D30E8E:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - caseApiLambda8B1F541B
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: caseApi6724F033
+            - /test-invoke-stage/POST/cases
+    Metadata:
+      aws:cdk:path: SideKickStack/caseApi/Default/cases/POST/ApiPermission.Test.SideKickStackcaseApi1380630C.POST..cases
+  caseApicasesPOST4FBE3F7F:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: CUSTOM
+      AuthorizerId:
+        Ref: ApiAuthorizer68095F41
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - caseApiLambda8B1F541B
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: caseApicases3EFC55DB
+      RestApiId:
+        Ref: caseApi6724F033
+    Metadata:
+      aws:cdk:path: SideKickStack/caseApi/Default/cases/POST/Resource
   caseApicasescase46203A39:
     Type: AWS::ApiGateway::Resource
     Properties:
