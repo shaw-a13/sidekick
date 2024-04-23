@@ -13,6 +13,7 @@ import { ClientService } from "../../services/client-service";
 const Upload = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
+  const caseService = new CaseService();
   const clientService = new ClientService();
 
   const getAccessToken = async () => {
@@ -37,9 +38,9 @@ const Upload = () => {
         try {
           await clientService.addClient(accessToken, clientInfo).then((res) => {
             if (res) {
-              console.log(res)
-            }
+              console.log(res)            }
           });
+          // await caseService.addCase(accessToken, caseInfo)
         } catch (e) {
           console.log(e);
         }

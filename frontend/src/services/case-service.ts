@@ -12,7 +12,7 @@ export class CaseService {
     private readonly baseUrl: string
 
     constructor() {
-        this.baseUrl = 'https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/'
+        this.baseUrl = 'https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod'
     }
     public async getAllCases(token: string) {
         try {
@@ -27,30 +27,30 @@ export class CaseService {
         }
     }
 
-    public async addCase(token: string, clientInfo: Client) {
-        const data = {
-            clientId: uuidv4(),
-            firstName: clientInfo.firstName,
-            lastName: clientInfo.lastName,
-            addressLine1: clientInfo.addressLine1,
-            addressLine2: clientInfo.addressLine2,
-            postcode: clientInfo.postcode,
-            county: clientInfo.county,
-            city: clientInfo.city,
-            phoneNumber: clientInfo.phoneNumber,
-            email: clientInfo.email
-        }
+    // public async addCase(token: string, caseInfo: CaseRecord) {
+    //     const data = {
+    //         caseId: uuidv4(),
+    //         firstName: clientInfo.firstName,
+    //         lastName: clientInfo.lastName,
+    //         addressLine1: clientInfo.addressLine1,
+    //         addressLine2: clientInfo.addressLine2,
+    //         postcode: clientInfo.postcode,
+    //         county: clientInfo.county,
+    //         city: clientInfo.city,
+    //         phoneNumber: clientInfo.phoneNumber,
+    //         email: clientInfo.email
+    //     }
 
-        try {
-            return await axios.post(`${this.baseUrl}/cases`, data, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-            });
-        } catch (error) {
-            console.log('error')
-            console.error(error);
-        }
-    }
+    //     try {
+    //         return await axios.post(`${this.baseUrl}/cases`, data, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`
+    //             },
+    //         });
+    //     } catch (error) {
+    //         console.log('error')
+    //         console.error(error);
+    //     }
+    // }
 
 }

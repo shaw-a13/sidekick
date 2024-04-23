@@ -6,7 +6,7 @@ export class ClientService {
     private readonly baseUrl: string
 
     constructor() {
-        this.baseUrl = 'https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/'
+        this.baseUrl = 'https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod'
     }
 
     public async addClient(token: string, clientInfo: Client) {

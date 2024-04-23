@@ -65,12 +65,15 @@ def handler(event, context):
                     }
                 }
             )
-        return {
-            'statusCode': response['ResponseMetadata']['HTTPStatusCode'],
-            'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
-            },
-        }
+            print(response)
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    "Access-Control-Allow-Credentials": True,
+                },
+                'body': json.dumps({
+                    'clientId': data['clientId']
+                })
+            }
 
