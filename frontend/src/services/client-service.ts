@@ -2,32 +2,14 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { Client } from '../pages/upload/interfaces/client';
 
-export interface CaseRecord {
-    customerName: string;
-    SK: string;
-    Status: string;
-}
-
-export class CaseService {
+export class ClientService {
     private readonly baseUrl: string
 
     constructor() {
         this.baseUrl = 'https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/'
     }
-    public async getAllCases(token: string) {
-        try {
-            return await axios.get<CaseRecord[]>(`${this.baseUrl}/cases`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-        } catch (error) {
-            console.log('error')
-            console.error(error);
-        }
-    }
 
-    public async addCase(token: string, clientInfo: Client) {
+    public async addClient(token: string, clientInfo: Client) {
         const data = {
             clientId: uuidv4(),
             firstName: clientInfo.firstName,
@@ -42,7 +24,7 @@ export class CaseService {
         }
 
         try {
-            return await axios.post(`${this.baseUrl}/cases`, data, {
+            return await axios.post(`${this.baseUrl}/clients`, data, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },

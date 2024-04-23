@@ -19,7 +19,7 @@ Resources:
     DeletionPolicy: Retain
     Metadata:
       aws:cdk:path: SideKickStack/sidekickTable/Resource
-  caseApiLambdaServiceRole2618F57C:
+  sidekickApiLambdaServiceRole55313979:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -36,8 +36,8 @@ Resources:
               - Ref: AWS::Partition
               - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
     Metadata:
-      aws:cdk:path: SideKickStack/caseApiLambda/ServiceRole/Resource
-  caseApiLambdaServiceRoleDefaultPolicy86BCAE1B:
+      aws:cdk:path: SideKickStack/sidekickApiLambda/ServiceRole/Resource
+  sidekickApiLambdaServiceRoleDefaultPolicy7950B24D:
     Type: AWS::IAM::Policy
     Properties:
       PolicyDocument:
@@ -51,29 +51,29 @@ Resources:
                 - sidekickTableFDBE0BEC
                 - Arn
         Version: "2012-10-17"
-      PolicyName: caseApiLambdaServiceRoleDefaultPolicy86BCAE1B
+      PolicyName: sidekickApiLambdaServiceRoleDefaultPolicy7950B24D
       Roles:
-        - Ref: caseApiLambdaServiceRole2618F57C
+        - Ref: sidekickApiLambdaServiceRole55313979
     Metadata:
-      aws:cdk:path: SideKickStack/caseApiLambda/ServiceRole/DefaultPolicy/Resource
-  caseApiLambda8B1F541B:
+      aws:cdk:path: SideKickStack/sidekickApiLambda/ServiceRole/DefaultPolicy/Resource
+  sidekickApiLambda9B98FB90:
     Type: AWS::Lambda::Function
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: d85698a8b8929bfa315533b1318b868d79c3e8cee420113fbffb605ff386a609.zip
+        S3Key: 78620eac6265e6369ef6c82473dd2cdcba788e16a52a67ad146d360421b65eb2.zip
       Handler: index.handler
       Role:
         Fn::GetAtt:
-          - caseApiLambdaServiceRole2618F57C
+          - sidekickApiLambdaServiceRole55313979
           - Arn
       Runtime: python3.9
     DependsOn:
-      - caseApiLambdaServiceRoleDefaultPolicy86BCAE1B
-      - caseApiLambdaServiceRole2618F57C
+      - sidekickApiLambdaServiceRoleDefaultPolicy7950B24D
+      - sidekickApiLambdaServiceRole55313979
     Metadata:
-      aws:cdk:path: SideKickStack/caseApiLambda/Resource
-      aws:asset:path: asset.d85698a8b8929bfa315533b1318b868d79c3e8cee420113fbffb605ff386a609
+      aws:cdk:path: SideKickStack/sidekickApiLambda/Resource
+      aws:asset:path: asset.78620eac6265e6369ef6c82473dd2cdcba788e16a52a67ad146d360421b65eb2
       aws:asset:is-bundled: true
       aws:asset:property: Code
   AuthorizerLogGroup2583BEC8:
@@ -107,7 +107,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 43544b3334a12c7300f5468eb9a7293986e8b815019eacb6df4e04bb934b803c.zip
+        S3Key: ad85cc82aa92518ddf598a6d52afad4c7b260f73d2aa6e35b991c3d55a5310ce.zip
       Handler: index.handler
       LoggingConfig:
         LogGroup:
@@ -121,7 +121,7 @@ Resources:
       - AuthorizerLambdaServiceRole30885946
     Metadata:
       aws:cdk:path: SideKickStack/AuthorizerLambda/Resource
-      aws:asset:path: asset.43544b3334a12c7300f5468eb9a7293986e8b815019eacb6df4e04bb934b803c
+      aws:asset:path: asset.ad85cc82aa92518ddf598a6d52afad4c7b260f73d2aa6e35b991c3d55a5310ce
       aws:asset:is-bundled: true
       aws:asset:property: Code
   AuthorizerLambdaSideKickStackApiAuthorizer429ED155Permissions48A76F73:
@@ -137,7 +137,7 @@ Resources:
         Fn::Join:
           - ""
           - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: caseApi6724F033
+            - Ref: sidekickApi0AE7347E
             - /authorizers/
             - Ref: ApiAuthorizer68095F41
     Metadata:
@@ -322,7 +322,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - eb76b44e25d8dc27f3abee96002c5fe7b5f728537154cd269a2f8544aaa52323.zip
+        - e3944017d7069b4af6d57ac7e1ade582c7d9c862aa8c20a4163407684e2260b2.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -520,48 +520,50 @@ Resources:
       IdentitySource: method.request.header.Authorization
       Name: SideKickStackApiAuthorizer429ED155
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
       Type: TOKEN
     Metadata:
       aws:cdk:path: SideKickStack/ApiAuthorizer/Resource
-  caseApi6724F033:
+  sidekickApi0AE7347E:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: caseApi
+      Name: sidekickApi
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Resource
-  caseApiDeployment083907F3ed562712a9a5f54cc22794a2108b31ad:
+      aws:cdk:path: SideKickStack/sidekickApi/Resource
+  sidekickApiDeploymentAB9EE9828d6c9761ae60f3dd149dd335b3082c8b:
     Type: AWS::ApiGateway::Deployment
     Properties:
       Description: Automatically created by the RestApi construct
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
     DependsOn:
       - ApiAuthorizer68095F41
-      - caseApicasescaseGETBF6E3B17
-      - caseApicasescaseOPTIONS4E928E59
-      - caseApicasescase46203A39
-      - caseApicasesGETFDFC3D16
-      - caseApicasesOPTIONSA3955B9F
-      - caseApicasesPOST4FBE3F7F
-      - caseApicases3EFC55DB
-      - caseApiOPTIONS309871CA
-      - caseApiuploadGET7EA666CB
-      - caseApiuploadOPTIONS4B34DFFF
-      - caseApiupload09926022
+      - sidekickApicasescaseGETB2B413F1
+      - sidekickApicasescaseOPTIONS654ED7E9
+      - sidekickApicasescaseED3D69DA
+      - sidekickApicasesGET02507037
+      - sidekickApicasesOPTIONS03B350A6
+      - sidekickApicases90E71DBC
+      - sidekickApiclientsOPTIONS096E472B
+      - sidekickApiclientsPOSTB25767AA
+      - sidekickApiclients000D105A
+      - sidekickApiOPTIONS7B71AC7C
+      - sidekickApiuploadGET4C9BFAAE
+      - sidekickApiuploadOPTIONSE8FC28C9
+      - sidekickApiupload924CAD0F
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Deployment/Resource
-  caseApiDeploymentStageprod343269DB:
+      aws:cdk:path: SideKickStack/sidekickApi/Deployment/Resource
+  sidekickApiDeploymentStageprodB57F21F2:
     Type: AWS::ApiGateway::Stage
     Properties:
       DeploymentId:
-        Ref: caseApiDeployment083907F3ed562712a9a5f54cc22794a2108b31ad
+        Ref: sidekickApiDeploymentAB9EE9828d6c9761ae60f3dd149dd335b3082c8b
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
       StageName: prod
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/DeploymentStage.prod/Resource
-  caseApiOPTIONS309871CA:
+      aws:cdk:path: SideKickStack/sidekickApi/DeploymentStage.prod/Resource
+  sidekickApiOPTIONS7B71AC7C:
     Type: AWS::ApiGateway::Method
     Properties:
       ApiKeyRequired: false
@@ -585,25 +587,25 @@ Resources:
           StatusCode: "204"
       ResourceId:
         Fn::GetAtt:
-          - caseApi6724F033
+          - sidekickApi0AE7347E
           - RootResourceId
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/OPTIONS/Resource
-  caseApicases3EFC55DB:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/OPTIONS/Resource
+  sidekickApicases90E71DBC:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId:
         Fn::GetAtt:
-          - caseApi6724F033
+          - sidekickApi0AE7347E
           - RootResourceId
       PathPart: cases
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/Resource
-  caseApicasesOPTIONSA3955B9F:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/Resource
+  sidekickApicasesOPTIONS03B350A6:
     Type: AWS::ApiGateway::Method
     Properties:
       ApiKeyRequired: false
@@ -626,48 +628,48 @@ Resources:
             method.response.header.Access-Control-Allow-Methods: true
           StatusCode: "204"
       ResourceId:
-        Ref: caseApicases3EFC55DB
+        Ref: sidekickApicases90E71DBC
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/OPTIONS/Resource
-  caseApicasesGETApiPermissionSideKickStackcaseApi1380630CGETcases7A727F12:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/OPTIONS/Resource
+  sidekickApicasesGETApiPermissionSideKickStacksidekickApiA2901C09GETcases3D61E2FA:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName:
         Fn::GetAtt:
-          - caseApiLambda8B1F541B
+          - sidekickApiLambda9B98FB90
           - Arn
       Principal: apigateway.amazonaws.com
       SourceArn:
         Fn::Join:
           - ""
           - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: caseApi6724F033
+            - Ref: sidekickApi0AE7347E
             - /
-            - Ref: caseApiDeploymentStageprod343269DB
+            - Ref: sidekickApiDeploymentStageprodB57F21F2
             - /GET/cases
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/GET/ApiPermission.SideKickStackcaseApi1380630C.GET..cases
-  caseApicasesGETApiPermissionTestSideKickStackcaseApi1380630CGETcases2F201084:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/GET/ApiPermission.SideKickStacksidekickApiA2901C09.GET..cases
+  sidekickApicasesGETApiPermissionTestSideKickStacksidekickApiA2901C09GETcases3D6F371B:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName:
         Fn::GetAtt:
-          - caseApiLambda8B1F541B
+          - sidekickApiLambda9B98FB90
           - Arn
       Principal: apigateway.amazonaws.com
       SourceArn:
         Fn::Join:
           - ""
           - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: caseApi6724F033
+            - Ref: sidekickApi0AE7347E
             - /test-invoke-stage/GET/cases
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/GET/ApiPermission.Test.SideKickStackcaseApi1380630C.GET..cases
-  caseApicasesGETFDFC3D16:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/GET/ApiPermission.Test.SideKickStacksidekickApiA2901C09.GET..cases
+  sidekickApicasesGET02507037:
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: CUSTOM
@@ -682,52 +684,190 @@ Resources:
             - ""
             - - arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/
               - Fn::GetAtt:
-                  - caseApiLambda8B1F541B
+                  - sidekickApiLambda9B98FB90
                   - Arn
               - /invocations
       ResourceId:
-        Ref: caseApicases3EFC55DB
+        Ref: sidekickApicases90E71DBC
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/GET/Resource
-  caseApicasesPOSTApiPermissionSideKickStackcaseApi1380630CPOSTcases5C33A2F5:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/GET/Resource
+  sidekickApicasescaseED3D69DA:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: sidekickApicases90E71DBC
+      PathPart: "{case}"
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/{case}/Resource
+  sidekickApicasescaseOPTIONS654ED7E9:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Ref: sidekickApicasescaseED3D69DA
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/{case}/OPTIONS/Resource
+  sidekickApicasescaseGETApiPermissionSideKickStacksidekickApiA2901C09GETcasescase1AF5F4D7:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName:
         Fn::GetAtt:
-          - caseApiLambda8B1F541B
+          - sidekickApiLambda9B98FB90
           - Arn
       Principal: apigateway.amazonaws.com
       SourceArn:
         Fn::Join:
           - ""
           - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: caseApi6724F033
+            - Ref: sidekickApi0AE7347E
             - /
-            - Ref: caseApiDeploymentStageprod343269DB
-            - /POST/cases
+            - Ref: sidekickApiDeploymentStageprodB57F21F2
+            - /GET/cases/*
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/POST/ApiPermission.SideKickStackcaseApi1380630C.POST..cases
-  caseApicasesPOSTApiPermissionTestSideKickStackcaseApi1380630CPOSTcasesA9D30E8E:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/{case}/GET/ApiPermission.SideKickStacksidekickApiA2901C09.GET..cases.{case}
+  sidekickApicasescaseGETApiPermissionTestSideKickStacksidekickApiA2901C09GETcasescaseE8071799:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName:
         Fn::GetAtt:
-          - caseApiLambda8B1F541B
+          - sidekickApiLambda9B98FB90
           - Arn
       Principal: apigateway.amazonaws.com
       SourceArn:
         Fn::Join:
           - ""
           - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: caseApi6724F033
-            - /test-invoke-stage/POST/cases
+            - Ref: sidekickApi0AE7347E
+            - /test-invoke-stage/GET/cases/*
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/POST/ApiPermission.Test.SideKickStackcaseApi1380630C.POST..cases
-  caseApicasesPOST4FBE3F7F:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/{case}/GET/ApiPermission.Test.SideKickStacksidekickApiA2901C09.GET..cases.{case}
+  sidekickApicasescaseGETB2B413F1:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: CUSTOM
+      AuthorizerId:
+        Ref: ApiAuthorizer68095F41
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - sidekickApiLambda9B98FB90
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: sidekickApicasescaseED3D69DA
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/cases/{case}/GET/Resource
+  sidekickApiclients000D105A:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - sidekickApi0AE7347E
+          - RootResourceId
+      PathPart: clients
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/clients/Resource
+  sidekickApiclientsOPTIONS096E472B:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Ref: sidekickApiclients000D105A
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/clients/OPTIONS/Resource
+  sidekickApiclientsPOSTApiPermissionSideKickStacksidekickApiA2901C09POSTclientsF76A3D0B:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - sidekickApiLambda9B98FB90
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: sidekickApi0AE7347E
+            - /
+            - Ref: sidekickApiDeploymentStageprodB57F21F2
+            - /POST/clients
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/clients/POST/ApiPermission.SideKickStacksidekickApiA2901C09.POST..clients
+  sidekickApiclientsPOSTApiPermissionTestSideKickStacksidekickApiA2901C09POSTclients069D87D3:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - sidekickApiLambda9B98FB90
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: sidekickApi0AE7347E
+            - /test-invoke-stage/POST/clients
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/clients/POST/ApiPermission.Test.SideKickStacksidekickApiA2901C09.POST..clients
+  sidekickApiclientsPOSTB25767AA:
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: CUSTOM
@@ -742,126 +882,28 @@ Resources:
             - ""
             - - arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/
               - Fn::GetAtt:
-                  - caseApiLambda8B1F541B
+                  - sidekickApiLambda9B98FB90
                   - Arn
               - /invocations
       ResourceId:
-        Ref: caseApicases3EFC55DB
+        Ref: sidekickApiclients000D105A
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/POST/Resource
-  caseApicasescase46203A39:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      ParentId:
-        Ref: caseApicases3EFC55DB
-      PathPart: "{case}"
-      RestApiId:
-        Ref: caseApi6724F033
-    Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/{case}/Resource
-  caseApicasescaseOPTIONS4E928E59:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      ApiKeyRequired: false
-      AuthorizationType: NONE
-      HttpMethod: OPTIONS
-      Integration:
-        IntegrationResponses:
-          - ResponseParameters:
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
-            StatusCode: "204"
-        RequestTemplates:
-          application/json: "{ statusCode: 200 }"
-        Type: MOCK
-      MethodResponses:
-        - ResponseParameters:
-            method.response.header.Access-Control-Allow-Headers: true
-            method.response.header.Access-Control-Allow-Origin: true
-            method.response.header.Access-Control-Allow-Methods: true
-          StatusCode: "204"
-      ResourceId:
-        Ref: caseApicasescase46203A39
-      RestApiId:
-        Ref: caseApi6724F033
-    Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/{case}/OPTIONS/Resource
-  caseApicasescaseGETApiPermissionSideKickStackcaseApi1380630CGETcasescase86021C99:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName:
-        Fn::GetAtt:
-          - caseApiLambda8B1F541B
-          - Arn
-      Principal: apigateway.amazonaws.com
-      SourceArn:
-        Fn::Join:
-          - ""
-          - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: caseApi6724F033
-            - /
-            - Ref: caseApiDeploymentStageprod343269DB
-            - /GET/cases/*
-    Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/{case}/GET/ApiPermission.SideKickStackcaseApi1380630C.GET..cases.{case}
-  caseApicasescaseGETApiPermissionTestSideKickStackcaseApi1380630CGETcasescaseBCB28D93:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName:
-        Fn::GetAtt:
-          - caseApiLambda8B1F541B
-          - Arn
-      Principal: apigateway.amazonaws.com
-      SourceArn:
-        Fn::Join:
-          - ""
-          - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: caseApi6724F033
-            - /test-invoke-stage/GET/cases/*
-    Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/{case}/GET/ApiPermission.Test.SideKickStackcaseApi1380630C.GET..cases.{case}
-  caseApicasescaseGETBF6E3B17:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      AuthorizationType: CUSTOM
-      AuthorizerId:
-        Ref: ApiAuthorizer68095F41
-      HttpMethod: GET
-      Integration:
-        IntegrationHttpMethod: POST
-        Type: AWS_PROXY
-        Uri:
-          Fn::Join:
-            - ""
-            - - arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/
-              - Fn::GetAtt:
-                  - caseApiLambda8B1F541B
-                  - Arn
-              - /invocations
-      ResourceId:
-        Ref: caseApicasescase46203A39
-      RestApiId:
-        Ref: caseApi6724F033
-    Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/cases/{case}/GET/Resource
-  caseApiupload09926022:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/clients/POST/Resource
+  sidekickApiupload924CAD0F:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId:
         Fn::GetAtt:
-          - caseApi6724F033
+          - sidekickApi0AE7347E
           - RootResourceId
       PathPart: upload
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/upload/Resource
-  caseApiuploadOPTIONS4B34DFFF:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/Resource
+  sidekickApiuploadOPTIONSE8FC28C9:
     Type: AWS::ApiGateway::Method
     Properties:
       ApiKeyRequired: false
@@ -884,12 +926,12 @@ Resources:
             method.response.header.Access-Control-Allow-Methods: true
           StatusCode: "204"
       ResourceId:
-        Ref: caseApiupload09926022
+        Ref: sidekickApiupload924CAD0F
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/upload/OPTIONS/Resource
-  caseApiuploadGETApiPermissionSideKickStackcaseApi1380630CGETupload3776EC88:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/OPTIONS/Resource
+  sidekickApiuploadGETApiPermissionSideKickStacksidekickApiA2901C09GETupload4DC9902B:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
@@ -902,13 +944,13 @@ Resources:
         Fn::Join:
           - ""
           - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: caseApi6724F033
+            - Ref: sidekickApi0AE7347E
             - /
-            - Ref: caseApiDeploymentStageprod343269DB
+            - Ref: sidekickApiDeploymentStageprodB57F21F2
             - /GET/upload
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/upload/GET/ApiPermission.SideKickStackcaseApi1380630C.GET..upload
-  caseApiuploadGETApiPermissionTestSideKickStackcaseApi1380630CGETupload770C3933:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/GET/ApiPermission.SideKickStacksidekickApiA2901C09.GET..upload
+  sidekickApiuploadGETApiPermissionTestSideKickStacksidekickApiA2901C09GETupload9A69B243:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
@@ -921,11 +963,11 @@ Resources:
         Fn::Join:
           - ""
           - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: caseApi6724F033
+            - Ref: sidekickApi0AE7347E
             - /test-invoke-stage/GET/upload
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/upload/GET/ApiPermission.Test.SideKickStackcaseApi1380630C.GET..upload
-  caseApiuploadGET7EA666CB:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/GET/ApiPermission.Test.SideKickStacksidekickApiA2901C09.GET..upload
+  sidekickApiuploadGET4C9BFAAE:
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: CUSTOM
@@ -944,11 +986,11 @@ Resources:
                   - Arn
               - /invocations
       ResourceId:
-        Ref: caseApiupload09926022
+        Ref: sidekickApiupload924CAD0F
       RestApiId:
-        Ref: caseApi6724F033
+        Ref: sidekickApi0AE7347E
     Metadata:
-      aws:cdk:path: SideKickStack/caseApi/Default/upload/GET/Resource
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/GET/Resource
   caseBucketC8DD2304:
     Type: AWS::S3::Bucket
     Properties:
@@ -1097,16 +1139,16 @@ Resources:
     Metadata:
       aws:cdk:path: SideKickStack/CDKMetadata/Default
 Outputs:
-  caseApiEndpointBFE79F3F:
+  sidekickApiEndpoint683E4901:
     Value:
       Fn::Join:
         - ""
         - - https://
-          - Ref: caseApi6724F033
+          - Ref: sidekickApi0AE7347E
           - .execute-api.eu-west-1.
           - Ref: AWS::URLSuffix
           - /
-          - Ref: caseApiDeploymentStageprod343269DB
+          - Ref: sidekickApiDeploymentStageprodB57F21F2
           - /
   CloudFrontURL:
     Description: The distribution URL
@@ -1128,11 +1170,11 @@ Outputs:
       Fn::Join:
         - ""
         - - https://
-          - Ref: caseApi6724F033
+          - Ref: sidekickApi0AE7347E
           - .execute-api.eu-west-1.
           - Ref: AWS::URLSuffix
           - /
-          - Ref: caseApiDeploymentStageprod343269DB
+          - Ref: sidekickApiDeploymentStageprodB57F21F2
           - /
     Export:
       Name: CaseApiUrl

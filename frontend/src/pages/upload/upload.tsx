@@ -8,11 +8,12 @@ import DocumentUploadStep from "./steps/documentUploadStep";
 import CaseInfoStep from "./steps/caseInfoStep";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Client } from "./interfaces/client";
+import { ClientService } from "../../services/client-service";
 
 const Upload = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
-  const caseService = new CaseService();
+  const clientService = new ClientService();
 
   const getAccessToken = async () => {
     try {
@@ -34,7 +35,7 @@ const Upload = () => {
       const accessToken = res;
       if (accessToken) {
         try {
-          await caseService.addClient(accessToken, clientInfo).then((res) => {
+          await clientService.addClient(accessToken, clientInfo).then((res) => {
             if (res) {
               console.log(res)
             }

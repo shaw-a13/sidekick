@@ -28,8 +28,8 @@ export class SidekickStack extends cdk.Stack {
       }
     });
 
-    const caseApiLambda = new lambda.Function(this, 'caseApiLambda', {
-      code: lambda.Code.fromAsset(('lambda/case_api'), {
+    const sidekickApiLambda = new lambda.Function(this, 'sidekickApiLambda', {
+      code: lambda.Code.fromAsset(('lambda/sidekick_api'), {
         bundling: {
           image: lambda.Runtime.PYTHON_3_9.bundlingImage,
           command: [
@@ -42,7 +42,7 @@ export class SidekickStack extends cdk.Stack {
       handler: 'index.handler',
     });
 
-    caseApiLambda.addToRolePolicy(new iam.PolicyStatement({
+    sidekickApiLambda.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: ['dynamodb:Scan', 'dynamodb:PutItem'],
       resources: [sidekickTable.tableArn]
@@ -124,8 +124,8 @@ export class SidekickStack extends cdk.Stack {
       handler: authorizerLambda,
     });
 
-    const caseApi = new apiGateway.LambdaRestApi(this, 'caseApi', {
-      handler: caseApiLambda,
+    const sidekickApi = new apiGateway.LambdaRestApi(this, 'sidekickApi', {
+      handler: sidekickApiLambda,
       proxy: false,
       defaultMethodOptions: {
         authorizer
@@ -135,13 +135,20 @@ export class SidekickStack extends cdk.Stack {
       }
     });
 
-    const cases = caseApi.root.addResource('cases', {
+    const cases = sidekickApi.root.addResource('cases', {
       defaultCorsPreflightOptions: {
         allowOrigins: apiGateway.Cors.ALL_ORIGINS
       }
     });
     cases.addMethod('GET');
-    cases.addMethod('POST');
+
+    const clients = sidekickApi.root.addResource('clients', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apiGateway.Cors.ALL_ORIGINS
+      }
+    });
+
+    clients.addMethod('POST');
 
     const singleCase = cases.addResource('{case}');
     singleCase.addMethod('GET');
@@ -179,7 +186,7 @@ export class SidekickStack extends cdk.Stack {
       effect: iam.Effect.ALLOW
     }))
 
-    const upload = caseApi.root.addResource('upload', {
+    const upload = sidekickApi.root.addResource('upload', {
       defaultCorsPreflightOptions: {
         allowOrigins: apiGateway.Cors.ALL_ORIGINS
       }
@@ -199,7 +206,7 @@ export class SidekickStack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, 'CaseApiUrl', {
-      value: caseApi.url,
+      value: sidekickApi.url,
       description: 'The case api URL',
       exportName: 'CaseApiUrl',
     });
