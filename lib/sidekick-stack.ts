@@ -44,7 +44,7 @@ export class SidekickStack extends cdk.Stack {
 
     sidekickApiLambda.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
-      actions: ['dynamodb:Scan', 'dynamodb:PutItem'],
+      actions: ['dynamodb:DescribeTable','dynamodb:Scan','dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
       resources: [sidekickTable.tableArn]
     }))
 
@@ -141,17 +141,25 @@ export class SidekickStack extends cdk.Stack {
       }
     });
     cases.addMethod('GET');
+    cases.addMethod('POST');
+
+    const singleCase = cases.addResource('{case}');
+    singleCase.addMethod('GET');
+    singleCase.addMethod('PUT');
+    singleCase.addMethod('DELETE');
 
     const clients = sidekickApi.root.addResource('clients', {
       defaultCorsPreflightOptions: {
         allowOrigins: apiGateway.Cors.ALL_ORIGINS
       }
     });
-
+    clients.addMethod('GET');
     clients.addMethod('POST');
 
-    const singleCase = cases.addResource('{case}');
-    singleCase.addMethod('GET');
+    const singleClient = clients.addResource('{client}');
+    singleClient.addMethod('GET');
+    singleClient.addMethod('PUT');
+    singleClient.addMethod('DELETE');
 
     const caseBucket = new s3.Bucket(this, 'caseBucket', {
       bucketName: 'sidekick-cases',
