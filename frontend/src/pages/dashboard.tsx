@@ -8,7 +8,7 @@ import {
   InputGroup,
   Form,
 } from "react-bootstrap";
-import { CaseService, CaseRecord } from "../services/case-service";
+import { CaseService, CaseRecord } from "../services/case.service";
 import { AxiosResponse } from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faUndo } from "@fortawesome/free-solid-svg-icons";

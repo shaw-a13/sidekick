@@ -1,14 +1,9 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { Client } from '../pages/upload/interfaces/client';
+import { Client } from '../interfaces/client/client.interface';
+import { BaseService } from './base.service';
 
-export class ClientService {
-    private readonly baseUrl: string
-
-    constructor() {
-        this.baseUrl = 'https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod'
-    }
-
+export class ClientService extends BaseService {
     public async addClient(token: string, clientInfo: Client) {
         const data = {
             clientId: uuidv4(),

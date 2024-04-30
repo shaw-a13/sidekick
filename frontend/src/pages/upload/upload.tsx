@@ -1,14 +1,14 @@
 import axios from "axios";
 import { useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
-import { CaseService, CaseRecord } from "../../services/case-service";
+import { CaseService, CaseRecord } from "../../services/case.service";
 import CaseTypeStep from "./steps/caseTypeStep";
 import ClientInfoStep from "./steps/clientInfoStep";
 import DocumentUploadStep from "./steps/documentUploadStep";
 import CaseInfoStep from "./steps/caseInfoStep";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Client } from "./interfaces/client";
-import { ClientService } from "../../services/client-service";
+import { Client } from "../../interfaces/client/client.interface";
+import { ClientService } from "../../services/client.service";
 
 const Upload = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
