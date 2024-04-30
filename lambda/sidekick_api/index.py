@@ -45,6 +45,12 @@ def handler(event, context):
             response = update_dynamo_item(client, 'CASE', caseId, data)
             print(response)
             data = response['Attributes']
+        elif event['httpMethod'] == 'DELETE':
+            print('Deleting a single case...')
+            case = event['pathParameters']['case']
+            response = delete_dynamo_item(client, 'CASE', case)
+            print(response)
+            data = response
 
     elif event['resource'] == '/clients':
         if event['httpMethod'] == 'GET':
@@ -83,6 +89,12 @@ def handler(event, context):
             response = update_dynamo_item(client, 'CLIENT', clientId, data)
             print(response)
             data = response['Attributes']
+        elif event['httpMethod'] == 'DELETE':
+            print('Deleting a single client...')
+            clientId = event['pathParameters']['client']
+            response = delete_dynamo_item(client, 'CLIENT', clientId)
+            print(response)
+            data = response
     return {
             'statusCode': response['ResponseMetadata']['HTTPStatusCode'],
             'headers': {
@@ -152,4 +164,17 @@ def update_dynamo_item(client, partition_key: str, sort_key: str, data: dict):
         ReturnValues='ALL_NEW',
         TableName=TABLENAME,
         UpdateExpression=update_expr
+    )
+
+def delete_dynamo_item(client, partition_key: str, sort_key: str):
+    return client.delete_item(
+        Key={
+            'PK': {
+                'S': partition_key
+            },
+            'SK': {
+                'S': sort_key
+            }
+        },
+        TableName=TABLENAME
     )
