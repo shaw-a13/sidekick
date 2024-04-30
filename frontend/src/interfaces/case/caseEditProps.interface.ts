@@ -1,4 +1,4 @@
-interface CaseEditProps {
+export interface CaseEditProps {
     customerName?: string;
     status?: string;
     description?: string;

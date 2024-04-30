@@ -2,6 +2,7 @@ import axios from 'axios';
 import { BaseService } from './base.service';
 import { Case } from '../interfaces/case/case.interface';
 import { DynamoEditProps } from '../interfaces/dynamoEditProps.interface';
+import { CaseEditProps } from '../interfaces/case/caseEditProps.interface';
 
 export class CaseService extends BaseService{
 
@@ -66,7 +67,7 @@ export class CaseService extends BaseService{
         }
     }
 
-    public async editCase(token: string, caseEdits: CaseEditProps) {
+    public async editCase(token: string, caseEdits: CaseEditProps, caseId: string) {
         let data: DynamoEditProps = {
             props: []
         }
@@ -76,7 +77,7 @@ export class CaseService extends BaseService{
 
         console.log(data)
         try {
-            return await axios.put(`${this.baseUrl}/cases`, data, {
+            return await axios.put(`${this.baseUrl}/cases/${caseId}`, data, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

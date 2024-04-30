@@ -1,4 +1,5 @@
 export interface Client {
+    SK: string;
     firstName: string;
     lastName: string;
     addressLine1: string;
