@@ -31,7 +31,8 @@ const Dashboard = () => {
     data: [
       {
         SK: "REF12336",
-        customerName: "Jayne Salter",
+        clientId: '922884',
+        clientName: "Jayne Salter",
         status: "CLOSED",
         description: "Test desc",
         nature: "Property",
@@ -39,7 +40,8 @@ const Dashboard = () => {
       },
       {
         SK: "REF12345",
-        customerName: "John Smith",
+        clientId: '00988',
+        clientName: "John Smith",
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
@@ -47,7 +49,8 @@ const Dashboard = () => {
       },
       {
         SK: "REF44332",
-        customerName: "Jack Doe",
+        clientId: '4799',
+        clientName: "Jack Doe",
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
@@ -55,15 +58,17 @@ const Dashboard = () => {
       },
       {
         SK: "REF55744",
-        customerName: "Louise Smith",
+        clientId: '78900',
+        clientName: "Louise Smith",
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
         date: "04/05/2024"
       },
       {
-        customerName: "Jane Doe",
         SK: "REF67899",
+        clientId: '65432',
+        clientName: "Jane Doe",
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
@@ -121,7 +126,7 @@ const Dashboard = () => {
   const filterByClient = (search: string) => {
     setCases(
       cases.filter((caseRecord) => {
-        return caseRecord.customerName === search;
+        return caseRecord.clientName === search;
       })
     );
   };
@@ -238,7 +243,7 @@ const Dashboard = () => {
             {cases.map((caseRecord) => (
               <tr>
                 <td>{caseRecord.SK}</td>
-                <td>{caseRecord.customerName}</td>
+                <td>{caseRecord.clientName}</td>
                 <td>
                   <Badge
                     bg={statuses[caseRecord.status]}

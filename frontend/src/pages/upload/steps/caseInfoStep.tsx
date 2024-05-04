@@ -4,12 +4,15 @@ import { useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Case } from "../../../interfaces/case/case.interface";
 import { v4 as uuid } from 'uuid';
+import { CaseStatus } from "../../../enums/caseStatus";
 
 
 const services = ['Property', 'Family', 'Civil', 'Criminal']
 
 const CaseInfoStep = (props: {
   stepSetter: React.Dispatch<React.SetStateAction<number>>;
+  clientName: string;
+  clientId: string;
   caseInfo: Case;
   caseInfoSetter: React.Dispatch<React.SetStateAction<Case>>;
 }) => {
@@ -31,6 +34,9 @@ const CaseInfoStep = (props: {
     setValidated(true);
     event.preventDefault();
     if(form.checkValidity() === true) {
+      props.caseInfo.clientName = props.clientName;
+      props.caseInfo.clientId = props.clientId;
+      props.caseInfo.status = CaseStatus.OPEN;
       props.caseInfo.SK = uuid();
       props.stepSetter(3)
     }

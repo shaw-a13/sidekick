@@ -59,7 +59,8 @@ const Upload = () => {
 
   const initialCaseFormState: Case = {
     SK: '',
-    customerName: "",
+    clientId: "",
+    clientName: "",
     status: "",
     description: "",
     nature: "Property",
@@ -89,6 +90,8 @@ const Upload = () => {
       component: (
         <CaseInfoStep
           stepSetter={setStep}
+          clientId={clientInfo.SK}
+          clientName={`${clientInfo.firstName} ${clientInfo.lastName}`}
           caseInfo={caseInfo}
           caseInfoSetter={setCaseInfo}
         />

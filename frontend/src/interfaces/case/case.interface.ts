@@ -1,6 +1,7 @@
 export interface Case {
     SK: string;
-    customerName: string;
+    clientId: string;
+    clientName: string;
     status: string;
     description: string;
     nature: string;
