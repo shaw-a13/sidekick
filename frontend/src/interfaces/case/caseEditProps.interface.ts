@@ -1,4 +1,5 @@
 export interface CaseEditProps {
+    clientName?: string;
     clientId?: string;
     status?: string;
     description?: string;
