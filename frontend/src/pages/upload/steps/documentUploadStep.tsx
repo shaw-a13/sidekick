@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 
 import {
@@ -7,13 +8,15 @@ import {
   Form,
 } from "react-bootstrap";
 
-const uploadDocument = async (document: any) => {
+
+const uploadDocument = async (document: any, token: string) => {
+    
     // GET request: presigned URL
     const response = await axios({
       method: "GET",
-      url: "https://0lsi10z5ki.execute-api.eu-west-1.amazonaws.com/prod/upload",
+      url: "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/upload",
       headers: {
-        Authorization: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkdqQ3pUVFVrQVNESlMxWkhiR3BESCJ9.eyJpc3MiOiJodHRwczovL2Rldi1sb292eHg0Znd1em9oaThrLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJDYkhGYlVvNzJ0SGR0cmVzSWdvWkpGMlE2WkVXdjQ5U0BjbGllbnRzIiwiYXVkIjoiaHR0cHM6Ly9zaWRla2ljay1hcGkuY29tIiwiaWF0IjoxNzEyNzY2MTY0LCJleHAiOjE3MTI4NTI1NjQsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyIsImF6cCI6IkNiSEZiVW83MnRIZHRyZXNJZ29aSkYyUTZaRVd2NDlTIn0.eu_eTp0zBSaxYoWOWOLELawt9DI5A9tUmckJtbXsIIy75xJr4IVGxBqUhtwA94uRFrFRxjw4zezsXNBEm2gDsAI-ZQH7JQpdK0OLwIzdsgs_4XAmHUG5X5_hGnFOGas5eNvvJbNV9aoZwEgumsbrVErT0mMnU8jgcmaYI5i-JWhYS6DWYW3OHkM3aKRXc7KifG9BY3SZNkY15DLD_bX_NEk3ZZIC3poPXNbQYFO6IYNtVQO6oLurEv28weFZUWUDYQcLZp2w6rQBMIIhXQEDgw0siqHqgkGdzZMWsofjIn8G_sz4SMCicDo4jvXgaezwOPSULuSdtYd6hh33GvV4GA`,
+        Authorization: `Bearer ${token}`,
       },
     });
     const presignedUrl = response.data.presignedUrl;
@@ -30,7 +33,8 @@ const uploadDocument = async (document: any) => {
 
 const DocumentUploadStep = (props: {
   uploadFile: any;
-  uploadFileSetter: React.Dispatch<React.SetStateAction<any>>;
+  uploadFileSetter: React.Dispatch<React.SetStateAction<any>>,
+  token: string
 }) => {
   return (
     <Container>
@@ -49,7 +53,7 @@ const DocumentUploadStep = (props: {
         <Button
           className="m-2"
           onClick={() => {
-            uploadDocument(props.uploadFile);
+            uploadDocument(props.uploadFile, props.token);
           }}
         >
           Upload

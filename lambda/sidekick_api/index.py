@@ -18,7 +18,6 @@ def handler(event, context):
             data = json.loads(event['body'])
             response = put_dynamo_item(client, 'CASE', data)
             print(response)
-            data = response['Items']
             return {
                 'statusCode': response['ResponseMetadata']['HTTPStatusCode'],
                 'headers': {
@@ -30,7 +29,6 @@ def handler(event, context):
                     'Id': data['SK']
                 })
             }
-        
     elif event['resource'] == '/cases/{case}':
         if event['httpMethod'] == 'GET':
             print('Getting a single case...')

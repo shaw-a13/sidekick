@@ -9,23 +9,14 @@ import {
   Form,
   Row,
 } from "react-bootstrap";
+import { Client } from "../../../interfaces/client/client.interface";
+import { v4 as uuid } from 'uuid';
 
-type clientInfo = {
-  firstName: string;
-  lastName: string;
-  addressLine1: string;
-  addressLine2: string;
-  postcode: string;
-  county: string;
-  city: string;
-  phoneNumber: string;
-  email: string;
-};
 
 const ClientInfoStep = (props: {
   stepSetter: React.Dispatch<React.SetStateAction<number>>;
-  clientInfo: clientInfo;
-  clientInfoSetter: React.Dispatch<React.SetStateAction<clientInfo>>;
+  clientInfo: Client;
+  clientInfoSetter: React.Dispatch<React.SetStateAction<Client>>;
 }) => {
   const [validated, setValidated] = useState(false);
 
@@ -45,6 +36,7 @@ const ClientInfoStep = (props: {
     setValidated(true);
     event.preventDefault();
     if(form.checkValidity() === true) {
+      props.clientInfo.SK = uuid();
       props.stepSetter(2)
     }
     console.log("Values are", props.clientInfo);

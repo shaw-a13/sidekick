@@ -47,7 +47,6 @@ export class ClientService extends BaseService {
 
     public async addClient(token: string, clientInfo: Client) {
         // const data = {
-        //     clientId: uuidv4(),
         //     firstName: clientInfo.firstName,
         //     lastName: clientInfo.lastName,
         //     addressLine1: clientInfo.addressLine1,
@@ -58,6 +57,8 @@ export class ClientService extends BaseService {
         //     phoneNumber: clientInfo.phoneNumber,
         //     email: clientInfo.email
         // }
+
+        console.log(clientInfo)
 
         try {
             return await axios.post(`${this.baseUrl}/clients`, clientInfo, {

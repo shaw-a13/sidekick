@@ -8,10 +8,11 @@ import {
   InputGroup,
   Form,
 } from "react-bootstrap";
-import { CaseService, CaseRecord } from "../services/case.service";
+import { CaseService } from "../services/case.service";
 import { AxiosResponse } from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { Case } from "../interfaces/case/case.interface";
 
 const statuses: { [key: string]: string } = {
   ACTIVE: "success",
@@ -21,7 +22,7 @@ const statuses: { [key: string]: string } = {
 
 const Dashboard = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
-  const [cases, setCases] = useState<CaseRecord[]>([]);
+  const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [refSearch, setRefSearch] = useState("");
   const [clientSearch, setClientSearch] = useState("");
@@ -29,34 +30,44 @@ const Dashboard = () => {
   const caseRes = {
     data: [
       {
-        customerName: "Jayne Salter",
         SK: "REF12336",
-        Status: "CLOSED",
-        PK: "CASE",
+        customerName: "Jayne Salter",
+        status: "CLOSED",
+        description: "Test desc",
+        nature: "Property",
+        date: "04/05/2024"
       },
       {
-        customerName: "John Smith",
         SK: "REF12345",
-        Status: "ACTIVE",
-        PK: "CASE",
+        customerName: "John Smith",
+        status: "ACTIVE",
+        description: "Test desc",
+        nature: "Property",
+        date: "04/05/2024"
       },
       {
-        customerName: "Jack Doe",
         SK: "REF44332",
-        Status: "ACTIVE",
-        PK: "CASE",
+        customerName: "Jack Doe",
+        status: "ACTIVE",
+        description: "Test desc",
+        nature: "Property",
+        date: "04/05/2024"
       },
       {
-        customerName: "Louise Smith",
         SK: "REF55744",
-        Status: "ACTIVE",
-        PK: "CASE",
+        customerName: "Louise Smith",
+        status: "ACTIVE",
+        description: "Test desc",
+        nature: "Property",
+        date: "04/05/2024"
       },
       {
         customerName: "Jane Doe",
         SK: "REF67899",
-        Status: "ACTIVE",
-        PK: "CASE",
+        status: "ACTIVE",
+        description: "Test desc",
+        nature: "Property",
+        date: "04/05/2024"
       },
     ],
     status: 200,
@@ -94,7 +105,7 @@ const Dashboard = () => {
   const filterByStatus = (status: string) => {
     setCases(
       cases.filter((caseRecord) => {
-        return caseRecord.Status === status;
+        return caseRecord.status === status;
       })
     );
   };
@@ -230,10 +241,10 @@ const Dashboard = () => {
                 <td>{caseRecord.customerName}</td>
                 <td>
                   <Badge
-                    bg={statuses[caseRecord.Status]}
+                    bg={statuses[caseRecord.status]}
                     text="light"
                   >
-                    {caseRecord.Status}
+                    {caseRecord.status}
                   </Badge>
                 </td>
                 <td>

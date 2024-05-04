@@ -5,5 +5,4 @@ export class BaseService {
     constructor() {
         this.baseUrl = 'https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod'
     }
-
 }

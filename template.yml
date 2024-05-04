@@ -65,7 +65,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 5ab9557596a28990bc632056db926024212c1e76ab679198f82e3c314f6d4da7.zip
+        S3Key: 507ff006f56355860bf927b3941a76787591e5c0ebca5f423a39593648ae2279.zip
       Handler: index.handler
       Role:
         Fn::GetAtt:
@@ -77,7 +77,7 @@ Resources:
       - sidekickApiLambdaServiceRole55313979
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApiLambda/Resource
-      aws:asset:path: asset.5ab9557596a28990bc632056db926024212c1e76ab679198f82e3c314f6d4da7
+      aws:asset:path: asset.507ff006f56355860bf927b3941a76787591e5c0ebca5f423a39593648ae2279
       aws:asset:is-bundled: true
       aws:asset:property: Code
   AuthorizerLogGroup2583BEC8:
@@ -326,7 +326,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - c98ffcef0cc40cac8f9c9b754e96d94c90b88dbea0b9968dda65c2eaf8a37c02.zip
+        - d82dc26b785712907fc6418a21370dc42e17db1cc4a26533692936af28d67634.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true

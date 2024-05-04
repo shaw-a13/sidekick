@@ -2,19 +2,16 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import { Case } from "../../../interfaces/case/case.interface";
+import { v4 as uuid } from 'uuid';
 
-type caseInfo = {
-  description: string;
-  nature: string;
-  date: string;
-};
 
 const services = ['Property', 'Family', 'Civil', 'Criminal']
 
 const CaseInfoStep = (props: {
   stepSetter: React.Dispatch<React.SetStateAction<number>>;
-  caseInfo: caseInfo;
-  caseInfoSetter: React.Dispatch<React.SetStateAction<caseInfo>>;
+  caseInfo: Case;
+  caseInfoSetter: React.Dispatch<React.SetStateAction<Case>>;
 }) => {
   const [validated, setValidated] = useState(false);
 
@@ -34,6 +31,7 @@ const CaseInfoStep = (props: {
     setValidated(true);
     event.preventDefault();
     if(form.checkValidity() === true) {
+      props.caseInfo.SK = uuid();
       props.stepSetter(3)
     }
     console.log("Values are", props.caseInfo);
