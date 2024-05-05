@@ -242,7 +242,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: b7f33614a69548d6bafe224d751a7ef238cde19097415e553fe8b63a4c8fd8a6.zip
+        S3Key: 2eb6a831b107939f63cfebf68e6316e1a40f79fc99cae0fee9b333bac8d29bc4.zip
       Timeout: 900
       MemorySize: 128
       Handler: index.handler
@@ -261,7 +261,7 @@ Resources:
       - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
     Metadata:
       aws:cdk:path: SideKickStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler
-      aws:asset:path: asset.b7f33614a69548d6bafe224d751a7ef238cde19097415e553fe8b63a4c8fd8a6
+      aws:asset:path: asset.2eb6a831b107939f63cfebf68e6316e1a40f79fc99cae0fee9b333bac8d29bc4
       aws:asset:property: Code
   CloudfrontDistributionOrigin1S3Origin80C6EA5F:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
@@ -326,7 +326,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - d82dc26b785712907fc6418a21370dc42e17db1cc4a26533692936af28d67634.zip
+        - 46e35fdc61d8773b4bce5ab53b7d63aa7aec58082299fd9f7a94edfbb4563158.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -407,7 +407,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: e976a796f036a5efbf44b99e44cfb5a961df08d8dbf7cd37e60bf216fb982a00.zip
+        S3Key: 2d56e153cac88d3e0c2f842e8e6f6783b8725bf91f95e0673b4725448a56e96d.zip
       Environment:
         Variables:
           AWS_CA_BUNDLE: /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
@@ -425,7 +425,7 @@ Resources:
       - CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265
     Metadata:
       aws:cdk:path: SideKickStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource
-      aws:asset:path: asset.e976a796f036a5efbf44b99e44cfb5a961df08d8dbf7cd37e60bf216fb982a00
+      aws:asset:path: asset.2d56e153cac88d3e0c2f842e8e6f6783b8725bf91f95e0673b4725448a56e96d
       aws:asset:is-bundled: false
       aws:asset:property: Code
   PoolD3F588B8:
@@ -534,7 +534,7 @@ Resources:
       Name: sidekickApi
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApi/Resource
-  sidekickApiDeploymentAB9EE9826f53eb49715f20e125453f09e0ca9ed3:
+  sidekickApiDeploymentAB9EE982a7effdbc93376c1966da5532cb14b9b4:
     Type: AWS::ApiGateway::Deployment
     Properties:
       Description: Automatically created by the RestApi construct
@@ -561,7 +561,9 @@ Resources:
       - sidekickApiclientsPOSTB25767AA
       - sidekickApiclients000D105A
       - sidekickApiOPTIONS7B71AC7C
-      - sidekickApiuploadGET4C9BFAAE
+      - sidekickApiuploadcaseIdGET2F462E84
+      - sidekickApiuploadcaseIdOPTIONS82A374BF
+      - sidekickApiuploadcaseId67236B47
       - sidekickApiuploadOPTIONSE8FC28C9
       - sidekickApiupload924CAD0F
     Metadata:
@@ -570,7 +572,7 @@ Resources:
     Type: AWS::ApiGateway::Stage
     Properties:
       DeploymentId:
-        Ref: sidekickApiDeploymentAB9EE9826f53eb49715f20e125453f09e0ca9ed3
+        Ref: sidekickApiDeploymentAB9EE982a7effdbc93376c1966da5532cb14b9b4
       RestApiId:
         Ref: sidekickApi0AE7347E
       StageName: prod
@@ -1402,7 +1404,45 @@ Resources:
         Ref: sidekickApi0AE7347E
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApi/Default/upload/OPTIONS/Resource
-  sidekickApiuploadGETApiPermissionSideKickStacksidekickApiA2901C09GETupload4DC9902B:
+  sidekickApiuploadcaseId67236B47:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: sidekickApiupload924CAD0F
+      PathPart: "{caseId}"
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/{caseId}/Resource
+  sidekickApiuploadcaseIdOPTIONS82A374BF:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Ref: sidekickApiuploadcaseId67236B47
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/{caseId}/OPTIONS/Resource
+  sidekickApiuploadcaseIdGETApiPermissionSideKickStacksidekickApiA2901C09GETuploadcaseIdE28DC5C1:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
@@ -1418,10 +1458,10 @@ Resources:
             - Ref: sidekickApi0AE7347E
             - /
             - Ref: sidekickApiDeploymentStageprodB57F21F2
-            - /GET/upload
+            - /GET/upload/*
     Metadata:
-      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/GET/ApiPermission.SideKickStacksidekickApiA2901C09.GET..upload
-  sidekickApiuploadGETApiPermissionTestSideKickStacksidekickApiA2901C09GETupload9A69B243:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/{caseId}/GET/ApiPermission.SideKickStacksidekickApiA2901C09.GET..upload.{caseId}
+  sidekickApiuploadcaseIdGETApiPermissionTestSideKickStacksidekickApiA2901C09GETuploadcaseIdF05A731E:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
@@ -1435,10 +1475,10 @@ Resources:
           - ""
           - - "arn:aws:execute-api:eu-west-1:339712865666:"
             - Ref: sidekickApi0AE7347E
-            - /test-invoke-stage/GET/upload
+            - /test-invoke-stage/GET/upload/*
     Metadata:
-      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/GET/ApiPermission.Test.SideKickStacksidekickApiA2901C09.GET..upload
-  sidekickApiuploadGET4C9BFAAE:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/{caseId}/GET/ApiPermission.Test.SideKickStacksidekickApiA2901C09.GET..upload.{caseId}
+  sidekickApiuploadcaseIdGET2F462E84:
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: CUSTOM
@@ -1457,11 +1497,11 @@ Resources:
                   - Arn
               - /invocations
       ResourceId:
-        Ref: sidekickApiupload924CAD0F
+        Ref: sidekickApiuploadcaseId67236B47
       RestApiId:
         Ref: sidekickApi0AE7347E
     Metadata:
-      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/GET/Resource
+      aws:cdk:path: SideKickStack/sidekickApi/Default/upload/{caseId}/GET/Resource
   caseBucketC8DD2304:
     Type: AWS::S3::Bucket
     Properties:
@@ -1584,7 +1624,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 5c30493a63e3229527685b4bbf128694bb2a802d9f247460e4687ab68f3ffaac.zip
+        S3Key: e4dc1f3cc95792d95db605c34aa199d70cc2d5c49117128c2343d3e1cb2d89f2.zip
       Environment:
         Variables:
           S3_BUCKET:
@@ -1600,13 +1640,13 @@ Resources:
       - GeneratePresignedUrlLambdaServiceRoleD3347AFA
     Metadata:
       aws:cdk:path: SideKickStack/GeneratePresignedUrlLambda/Resource
-      aws:asset:path: asset.5c30493a63e3229527685b4bbf128694bb2a802d9f247460e4687ab68f3ffaac
+      aws:asset:path: asset.e4dc1f3cc95792d95db605c34aa199d70cc2d5c49117128c2343d3e1cb2d89f2
       aws:asset:is-bundled: true
       aws:asset:property: Code
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/3VS0W7bMAz8lr4r6poBQ1/dBB0GZGiQbnsNFIn12MiiIUoNPMP/Pkl2EqNoAQM8kqej5ONS3i2/yS836sQLbY4LiwfZPweljyKV9r3pnGrIpOIvdbAgVi+ugEFY1RyMkv1jdDogudya4y34BpmnbKM68H/Al/wZXW0h0IU/CFSN7Hc0TihxSxZ1V5QKGgR/3feKGQLLKgdhoLXUNeCCfIj6CGF9KWS27Mfqg2IQI8xyExrDdco8T6+jmmW/ofq7p9iWF0x4ENpSNC+e0th+jRw8HmJ59ZPHGl2lNTD/MOkWGIr0Kh94zAc+Y8xl0gCqHQaS/W8GvyWymXLBZ7CymATmralyTtfUKHRzwlgZhGqxVgFOqku+0hFcFcNf8vgPfKbPsk1xeQccqhaLNxO8/upy/2uWlqcuLo4g8Sl6DcWEn5CETW5O6NydlAsehmu5+JyF0saIVeRAzUdH3rW2nt7QgC8zxz3d27yA+7TT2qKsTpz+VdnJLPMUQxvTyjgyIF/59u3uXqZvefPKiAsfk00NyN0Y/wOF7DmdMgMAAA==
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VSXW/bMAz8LX1X1K897NVN0GJAigZpt9dAkViPjSwaotTAM/zfJ8lOYgwrYIBH8nSUfLyTt99u5M2VOvJCm8PC4l72r0Hpg0ilXW86pxoyqfim9hbE8t0VMAirmr1Rsn+MTgckl1tzvAHfIPOUrVUH/hf4kr+iqy0EOvMHgaqR/ZbGCSVuyKLuilJBg+D7Xa+YIbCschAGWktdAy7Ih6gPEFbnQmbLfqw+KAYxwiw3oTFcpszz9DqqWfZrqp88xba8YMKD0JaiefeUxvYr5OBxH8urXzzW6CqtgfmHSbfAUKSX+cBjPvAVYy6TBlDtMJDsfzL4DZHNlDM+gaXFJDBvTZVTuqJGoZsTxsogVIu1CnBUXfKVDuCqGH6Txz/gM32WrYvLW+BQtVi8meDlV5f7X7K0PHVxcQSJT9FrKCY8QxI2uTmhU3dSLngYLuXicxZKGyOWkQM1/zvyT2vj6RMN+DJz3NOdzQu4SzutLcrqyOlflZ3MMi8xtDGtjCMD8oOvP2+/y/TdXX0w4sLHZFMDcjvGv16v1UIyAwAA
     Metadata:
       aws:cdk:path: SideKickStack/CDKMetadata/Default
 Outputs:

@@ -32,11 +32,13 @@ const ClientInfoStep = (props: {
       console.log('not valid')
       event.preventDefault();
       event.stopPropagation();
+      document.getElementById('step2')!.style.pointerEvents = "none"
     }
     setValidated(true);
     event.preventDefault();
     if(form.checkValidity() === true) {
       props.clientInfo.SK = uuid();
+      document.getElementById('step2')!.style.pointerEvents = "auto"
       props.stepSetter(2)
     }
     console.log("Values are", props.clientInfo);

@@ -46,17 +46,6 @@ export class CaseService extends BaseService{
     }
 
     public async addCase(token: string, caseInfo: Case) {
-        // const data: Case = {
-        //     SK: caseInfo.SK,
-        //     customerName: caseInfo.customerName,
-        //     status: caseInfo.status,
-        //     description: caseInfo.description,
-        //     nature: caseInfo.nature,
-        //     date: caseInfo.date
-        // }
-
-        console.log(caseInfo)
-
         try {
             return await axios.post(`${this.baseUrl}/cases`, caseInfo, {
                 headers: {

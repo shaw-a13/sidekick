@@ -1,40 +1,50 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import axios from "axios";
-
 import {
   Button,
   Card,
   Container,
   Form,
 } from "react-bootstrap";
+import { Client } from "../../../interfaces/client/client.interface";
+import { CaseService } from "../../../services/case.service";
+import { ClientService } from "../../../services/client.service";
+import { DocumentService } from "../../../services/document.service";
+import { Case } from "../../../interfaces/case/case.interface";
 
-
-const uploadDocument = async (document: any, token: string) => {
+const uploadDocument = async (document: any, token: string, caseId: string) => {
+  const documentService = new DocumentService()
     
     // GET request: presigned URL
-    const response = await axios({
-      method: "GET",
-      url: "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/upload",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const presignedUrl = response.data.presignedUrl;
-    console.log(presignedUrl);
-  
-    // Upload file to pre-signed URL
-    const uploadResponse = await axios.put(presignedUrl, document, {
-      headers: {
-        "Content-Type": "application/pdf",
-      },
-    });
-    console.log(uploadResponse);
-  };
+    documentService.getPresignedUrl(token, caseId).then(
+      res => {
+        const presignedUrl = res?.data.presignedUrl
+        console.log(presignedUrl);
+        if (presignedUrl){
+          documentService.uploadDocument(presignedUrl, document).then(
+            res => console.log(res)
+          )
+        }        
+      }
+    )
+};
+
+const addCase = async (clientInfo: Client, caseInfo: Case, accessToken: string) => {
+  const clientService = new ClientService();
+  const caseService = new CaseService();
+
+  try {
+    await clientService.addClient(accessToken, clientInfo)
+    await caseService.addCase(accessToken, caseInfo)
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 const DocumentUploadStep = (props: {
-  uploadFile: any;
+  clientInfo: Client,
+  caseInfo: Case,
+  accessToken: string,
+  uploadFile: any,
   uploadFileSetter: React.Dispatch<React.SetStateAction<any>>,
-  token: string
 }) => {
   return (
     <Container>
@@ -47,18 +57,20 @@ const DocumentUploadStep = (props: {
             onChange={(event) => {
               const target = event.target as HTMLInputElement;
               props.uploadFileSetter((target.files as FileList)[0]);
+              document.getElementById('submitCaseBtn')!.classList.remove('d-none')
             }}
           />
         </Form.Group>
-        <Button
-          className="m-2"
-          onClick={() => {
-            uploadDocument(props.uploadFile, props.token);
-          }}
-        >
-          Upload
-        </Button>
       </Card.Text>
+      <Button
+          className="m-2 d-none"
+          id="submitCaseBtn"
+          onClick={() => {
+            addCase(props.clientInfo, props.caseInfo, props.accessToken)
+            uploadDocument(props.uploadFile, props.accessToken, props.caseInfo.SK);
+          }}>
+          Submit Case
+        </Button>
     </Container>
   );
 };

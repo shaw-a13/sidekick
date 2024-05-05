@@ -30,6 +30,7 @@ const CaseInfoStep = (props: {
       console.log('not valid')
       event.preventDefault();
       event.stopPropagation();
+      document.getElementById('step3')!.style.pointerEvents = "none"
     }
     setValidated(true);
     event.preventDefault();
@@ -38,6 +39,7 @@ const CaseInfoStep = (props: {
       props.caseInfo.clientId = props.clientId;
       props.caseInfo.status = CaseStatus.OPEN;
       props.caseInfo.SK = uuid();
+      document.getElementById('step3')!.style.pointerEvents = "auto"
       props.stepSetter(3)
     }
     console.log("Values are", props.caseInfo);

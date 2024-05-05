@@ -15,6 +15,7 @@ const CaseTypeStep = (props: {
         <Button
           className="m-2"
           onClick={() => {
+            document.getElementById('step1')!.style.pointerEvents = "auto"
             props.caseSetter("new");
             props.stepSetter(1);
           }}
@@ -24,6 +25,7 @@ const CaseTypeStep = (props: {
         <Button
           className="m-2"
           onClick={() => {
+            document.getElementById('step1')!.style.pointerEvents = "auto"
             props.caseSetter("existing");
             props.stepSetter(1);
           }}

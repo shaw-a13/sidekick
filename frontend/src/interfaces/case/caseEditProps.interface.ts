@@ -5,4 +5,5 @@ export interface CaseEditProps {
     description?: string;
     nature?: string;
     date?: string;
+    assignee?: string;
 }

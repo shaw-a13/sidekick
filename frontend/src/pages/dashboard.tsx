@@ -36,7 +36,8 @@ const Dashboard = () => {
         status: "CLOSED",
         description: "Test desc",
         nature: "Property",
-        date: "04/05/2024"
+        date: "04/05/2024",
+        assignee: "Jane Sawer"
       },
       {
         SK: "REF12345",
@@ -45,7 +46,8 @@ const Dashboard = () => {
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
-        date: "04/05/2024"
+        date: "04/05/2024",
+        assignee: "Jane Sawer"
       },
       {
         SK: "REF44332",
@@ -54,7 +56,8 @@ const Dashboard = () => {
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
-        date: "04/05/2024"
+        date: "04/05/2024",
+        assignee: "Jane Sawer"
       },
       {
         SK: "REF55744",
@@ -63,7 +66,8 @@ const Dashboard = () => {
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
-        date: "04/05/2024"
+        date: "04/05/2024",
+        assignee: "Jane Sawer"
       },
       {
         SK: "REF67899",
@@ -72,7 +76,8 @@ const Dashboard = () => {
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
-        date: "04/05/2024"
+        date: "04/05/2024",
+        assignee: "Jane Sawer"
       },
     ],
     status: 200,

@@ -9,6 +9,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Client } from "../../interfaces/client/client.interface";
 import { ClientService } from "../../services/client.service";
 import { Case } from "../../interfaces/case/case.interface";
+import { DocumentService } from "../../services/document.service";
 
 const Upload = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -29,18 +30,6 @@ const Upload = () => {
       console.log(e.message);
     }
   };
-
-  const addCase = async (clientInfo: Client, caseInfo: any) => {
-        try {
-          await clientService.addClient(accessToken, clientInfo).then((res) => {
-            if (res) {
-              console.log(res)            }
-          });
-          await caseService.addCase(accessToken, caseInfo)
-        } catch (e) {
-          console.log(e);
-        }
-  }
 
   const [step, setStep] = useState(0);
   const [caseType, setCaseType] = useState("");
@@ -65,6 +54,7 @@ const Upload = () => {
     description: "",
     nature: "Property",
     date: "",
+    assignee: ""
   };
 
   const [clientInfo, setClientInfo] = useState(initialClientFormState);
@@ -101,9 +91,11 @@ const Upload = () => {
       stepName: "documentUpload",
       component: (
         <DocumentUploadStep
+          clientInfo={clientInfo}
+          caseInfo={caseInfo}
           uploadFile={uploadFile}
+          accessToken={accessToken}
           uploadFileSetter={setUploadFile}
-          token={accessToken}
         />
       ),
     },
@@ -117,28 +109,20 @@ const Upload = () => {
       <Row md={2} className="justify-content-md-center pt-5">
         <Card>
           <Card.Header>
-            <Button className="rounded-circle m-2" onClick={() => setStep(0)}>
+            <Button className="rounded-circle m-2" id="step0" onClick={() => setStep(0)}>
               1
             </Button>
-            <Button className="rounded-circle m-2" onClick={() => setStep(1)}>
+            <Button className="rounded-circle m-2" style={{pointerEvents: "none"}} id="step1" onClick={() => setStep(1)}>
               2
             </Button>
-            <Button className="rounded-circle m-2" onClick={() => setStep(2)}>
+            <Button className="rounded-circle m-2" style={{pointerEvents: "none"}} id="step2" onClick={() => setStep(2)}>
               3
             </Button>
-            <Button className="rounded-circle m-2" onClick={() => setStep(3)}>
+            <Button className="rounded-circle m-2" style={{pointerEvents: "none"}} id="step3" onClick={() => setStep(3)}>
               4
             </Button>
           </Card.Header>
           <Card.Body className="text-center">{steps[step].component}</Card.Body>
-          <Button
-            className="m-2"
-            onClick={() => {
-              addCase(clientInfo, caseInfo);
-            }}
-          >
-            Upload
-          </Button>
         </Card>
       </Row>
     </Container>
