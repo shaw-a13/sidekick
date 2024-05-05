@@ -9,10 +9,11 @@ s3 = boto3.client('s3')
 
 def handler(event, context):
     print(event)
-    print(event['headers']['origin'])
+    print(event['headers'])
+    caseId = event['pathParameters']['caseId']
     # Get the bucket name from environment variable
     bucket_name = env['S3_BUCKET']
-    key = f'{uuid.uuid4()}.pdf'      # Generate a unique key for the object
+    key = f'{caseId}/{uuid.uuid4()}.pdf'      # Generate a unique key for the object
 
     # Generate pre-signed URL
     presigned_url = s3.generate_presigned_url(

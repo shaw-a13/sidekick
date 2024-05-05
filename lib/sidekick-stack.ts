@@ -197,9 +197,11 @@ export class SidekickStack extends cdk.Stack {
     const upload = sidekickApi.root.addResource('upload', {
       defaultCorsPreflightOptions: {
         allowOrigins: apiGateway.Cors.ALL_ORIGINS
-      }
+      },
     });
-    upload.addMethod('GET', new apiGateway.LambdaIntegration(generatePresignedUrlLambda));
+
+    const documentUpload = upload.addResource('{caseId}')
+    documentUpload.addMethod('GET', new apiGateway.LambdaIntegration(generatePresignedUrlLambda));
     
     new cdk.CfnOutput(this, 'CloudFrontURL', {
       value: distribution.domainName,
