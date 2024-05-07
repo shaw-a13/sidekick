@@ -9,7 +9,6 @@ import {
   Form,
 } from "react-bootstrap";
 import { CaseService } from "../services/case.service";
-import { AxiosResponse } from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { Case } from "../interfaces/case/case.interface";

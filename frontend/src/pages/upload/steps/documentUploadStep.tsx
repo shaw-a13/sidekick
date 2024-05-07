@@ -4,11 +4,13 @@ import {
   Container,
   Form,
 } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { Client } from "../../../interfaces/client/client.interface";
 import { CaseService } from "../../../services/case.service";
 import { ClientService } from "../../../services/client.service";
 import { DocumentService } from "../../../services/document.service";
 import { Case } from "../../../interfaces/case/case.interface";
+
 
 const uploadDocument = async (document: any, token: string, caseId: string) => {
   const documentService = new DocumentService()
@@ -46,6 +48,8 @@ const DocumentUploadStep = (props: {
   uploadFile: any,
   uploadFileSetter: React.Dispatch<React.SetStateAction<any>>,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <Container>
       <Card.Title>Document Upload</Card.Title>
@@ -67,7 +71,8 @@ const DocumentUploadStep = (props: {
           id="submitCaseBtn"
           onClick={() => {
             addCase(props.clientInfo, props.caseInfo, props.accessToken)
-            uploadDocument(props.uploadFile, props.accessToken, props.caseInfo.SK);
+            uploadDocument(props.uploadFile, props.accessToken, props.caseInfo.SK)
+            navigate(`../case/${props.caseInfo.SK}`)
           }}>
           Submit Case
         </Button>

@@ -101,7 +101,7 @@ const Upload = () => {
     },
   ];
   useEffect(() => {
-    getAccessToken().then(token => setAccessToken(token!))
+    getAccessToken().then(token => {setAccessToken(token!); console.log(accessToken)})
   });
 
   return (
