@@ -158,7 +158,9 @@ const Dashboard = () => {
     getAccessToken().then(async (res) => {
       accessToken = res;
       if (accessToken) {
+        setLoading(true)
         setCases(caseRes.data);
+        setLoading(false)
         // setLoading(true);
         // try {
         //   await caseService.getAllCases(accessToken).then((res) => {
@@ -176,7 +178,7 @@ const Dashboard = () => {
   }, [getAccessTokenSilently, user?.sub]);
 
   return (
-    <Container className="pt-5">
+    <Container style={{paddingTop: "8rem"}}>
       <h2>Dashboard</h2>
       <p>{clientSearch}</p>
       <Container className="pt-5">

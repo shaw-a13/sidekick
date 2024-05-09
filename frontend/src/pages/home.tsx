@@ -10,6 +10,7 @@ import {
   faBoxOpen,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth0 } from "@auth0/auth0-react";
+import './styles/home.css'
 
 const Home = () => {
   const { loginWithRedirect } = useAuth0();
@@ -19,14 +20,7 @@ const Home = () => {
       <Row>
         <img src={banner} alt="" style={{ height: "35rem", padding: "0px" }} />
         <div
-          style={{
-            backgroundColor: "#3d5a80",
-            position: "absolute",
-            top: "25rem",
-            left: "20rem",
-            width: "30rem",
-            color: "white",
-          }}
+          className="shadow home-blurb"
         >
           <div className="m-2">
             <h5>Sidekick</h5>
@@ -37,7 +31,7 @@ const Home = () => {
             </p>
             <div className="text-center">
               <Button
-                style={{ backgroundColor: "#e0fbfc", color: "black" }}
+                style={{ backgroundColor: "#CF7650", border: "none"}}
                 onClick={() => loginWithRedirect()}
               >
                 Get started
@@ -47,10 +41,10 @@ const Home = () => {
         </div>
       </Row>
       <Row>
-        <div style={{ backgroundColor: "#3d5a80" }}>
+        <div style={{ backgroundColor: "#162836" }}>
           <Row className="text-center m-4">
             <Col>
-              <FontAwesomeIcon icon={faGaugeHigh} size="8x" color="#e0fbfc" />
+              <FontAwesomeIcon icon={faGaugeHigh} size="8x" color="#CF7650" />
               <div style={{ color: "white" }}>
                 <h6 className="m-2">Speedy document processing</h6>
                 <p>
@@ -61,7 +55,7 @@ const Home = () => {
               </div>
             </Col>
             <Col>
-              <FontAwesomeIcon icon={faMicrochip} size="8x" color="#e0fbfc" />
+              <FontAwesomeIcon icon={faMicrochip} size="8x" color="#CF7650" />
               <div style={{ color: "white" }}>
                 <h6 className="m-2">Intelligent extractions</h6>
                 <p>
@@ -71,7 +65,7 @@ const Home = () => {
               </div>
             </Col>
             <Col>
-              <FontAwesomeIcon icon={faBoxOpen} size="8x" color="#e0fbfc" />
+              <FontAwesomeIcon icon={faBoxOpen} size="8x" color="#CF7650" />
               <div style={{ color: "white" }}>
                 <h6 className="m-2">Reliable storage</h6>
                 <p>
@@ -90,8 +84,8 @@ const Home = () => {
           <Row>
             <Col>
               <Card
-                className="h-100"
-                style={{ backgroundColor: "#3d5a80", color: "white" }}
+                className="h-100 shadow"
+                style={{ backgroundColor: "#162836", color: "white" }}
               >
                 <Card.Img
                   variant="bottom"
@@ -110,8 +104,8 @@ const Home = () => {
             </Col>
             <Col>
               <Card
-                className="h-100"
-                style={{ backgroundColor: "#3d5a80", color: "white" }}
+                className="h-100 shadow"
+                style={{ backgroundColor: "#162836", color: "white" }}
               >
                 <Card.Img
                   variant="bottom"
@@ -130,8 +124,8 @@ const Home = () => {
             </Col>
             <Col>
               <Card
-                className="h-100"
-                style={{ backgroundColor: "#3d5a80", color: "white" }}
+                className="h-100 shadow"
+                style={{ backgroundColor: "#162836", color: "white" }}
               >
                 <Card.Img
                   variant="bottom"
@@ -158,7 +152,7 @@ const Home = () => {
         </Col>
         <Col className="mt-2">
           <Button
-            style={{ backgroundColor: "#e0fbfc", color: "black" }}
+            style={{ backgroundColor: "#CF7650", border: "none"}}
             onClick={() => loginWithRedirect()}
           >
             Get started

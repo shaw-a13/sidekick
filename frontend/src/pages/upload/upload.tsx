@@ -106,7 +106,7 @@ const Upload = () => {
 
   return (
     <Container>
-      <Row md={2} className="justify-content-md-center pt-5">
+      <Row md={2} style={{paddingTop: "8rem"}} className="justify-content-md-center">
         <Card>
           <Card.Header>
             <Button className="rounded-circle m-2" id="step0" onClick={() => setStep(0)}>

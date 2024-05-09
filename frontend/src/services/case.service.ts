@@ -3,6 +3,7 @@ import { BaseService } from './base.service';
 import { Case } from '../interfaces/case/case.interface';
 import { DynamoEditProps } from '../interfaces/dynamoEditProps.interface';
 import { CaseEditProps } from '../interfaces/case/caseEditProps.interface';
+import { CaseDynamo } from '../interfaces/case/caseDynamo.interface';
 
 export class CaseService extends BaseService{
 
@@ -21,7 +22,7 @@ export class CaseService extends BaseService{
 
     public async getSingleCase(token: string, caseId: string) {
         try {
-            return await axios.get<Case>(`${this.baseUrl}/cases/${caseId}`, {
+            return await axios.get<CaseDynamo[]>(`${this.baseUrl}/cases/${caseId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

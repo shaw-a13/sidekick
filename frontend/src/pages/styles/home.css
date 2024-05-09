@@ -1,0 +1,12 @@
+.home-blurb {
+    background-color: #162836 !important;
+    color: white;
+    position: absolute;
+    top: 20rem;
+    left: 20rem;
+    width: 30rem !important;
+}
+
+@media only screen and (max-width: 1300px) {
+    .home-blurb {width: 100% !important; position: relative !important; top: auto !important; left: auto !important;}
+  }
