@@ -3,9 +3,34 @@ import { CaseService } from "../services/case.service";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { CaseDynamo } from "../interfaces/case/caseDynamo.interface";
-import { Button, Card, Col, Container, Row, Spinner } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Row,
+  Spinner,
+  Table,
+} from "react-bootstrap";
+
+interface ExtractionResult {
+  key: string;
+  locations: {
+    filename: string;
+    key: {};
+    pageNumber: number;
+    value: {};
+  };
+  score: number;
+  source: string;
+  value: string;
+}
 
 const Case = () => {
+  let results = require("./processedResults.json");
+
+  console.log(results);
+
   const mockDocs = [
     "https://www.clickdimensions.com/links/TestPDFfile.pdf",
     "https://s29.q4cdn.com/175625835/files/doc_downloads/test.pdf",
@@ -75,7 +100,7 @@ const Case = () => {
   }, []);
 
   return (
-    <div style={{paddingTop: "8rem"}}>
+    <div style={{ paddingTop: "8rem" }}>
       <div>
         {loading && (
           <div>
@@ -111,7 +136,7 @@ const Case = () => {
                         <iframe
                           title="pdf-viewer"
                           src={mockDocs[docNo]}
-                          width="750"
+                          width="700"
                           height="600"
                         ></iframe>
                       </Card.Subtitle>
@@ -146,6 +171,37 @@ const Case = () => {
                       <Card.Subtitle className="mb-2 text-muted">
                         Client ID: {caseInfo?.clientId.S}
                       </Card.Subtitle>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Card>
+                    <Card.Body>
+                      <Card.Title>Document Extractions</Card.Title>
+                      <Table striped bordered hover>
+                        <thead>
+                          <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Page Number</th>
+                            <th>Score</th>
+                            <th>Source</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {results.map((result: ExtractionResult) => (
+                            <tr>
+                              <td>{result.key}</td>
+                              <td>{result.value}</td>
+                              <td>{result.locations.pageNumber}</td>
+                              <td>{result.score}</td>
+                              <td>{result.source}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
                     </Card.Body>
                   </Card>
                 </Col>

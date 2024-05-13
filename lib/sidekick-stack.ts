@@ -169,6 +169,27 @@ export class SidekickStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    const textractResponseParser = new lambda.Function(this, 'textractResponseParser', {
+      code: lambda.Code.fromAsset(('lambda/textract_response_parser'), {
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_9.bundlingImage,
+          command: [
+            'bash', '-c',
+            'pip install -r requirements.txt -t /asset-output && rsync -r . /asset-output'
+          ],
+        },
+      }),
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'index.handler',
+      timeout: cdk.Duration.seconds(60)
+    });
+
+    textractResponseParser.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['s3:GetObject','s3:PutObject'],
+      resources: [caseBucket.bucketArn, `${caseBucket.bucketArn}/*`]
+    }))
+
     const generatePresignedUrlLambda = new lambda.Function(this, 'GeneratePresignedUrlLambda', {
       code: lambda.Code.fromAsset(('lambda/generate_presigned_url'), {
         bundling: {
