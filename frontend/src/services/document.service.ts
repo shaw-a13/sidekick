@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BaseService } from "./base.service";
+import { DocumentResultResponse } from "../interfaces/document/documentResultResponse.interface";
 
 interface PresignedUrlResponse {
     presignedUrl: string;
@@ -38,7 +39,7 @@ export class DocumentService extends BaseService {
 
     public async getDocuments(token: string, caseId: string) {
         try {
-            return await axios.get<any>(`${this.baseUrl}/download/${caseId}`, {
+            return await axios.get<DocumentResultResponse>(`${this.baseUrl}/download/${caseId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },

@@ -326,7 +326,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - a2301d1b857eed4669f5a458a34ff537d47c3cd751148e896b74ec1b2869c700.zip
+        - 5dd8a100c03204ed0ac49e601cf172269a6d31ca6468c083a0b6b8501ba9e98c.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -1655,6 +1655,7 @@ Resources:
               - "*"
             AllowedMethods:
               - PUT
+              - GET
             AllowedOrigins:
               - Fn::Join:
                   - ""
@@ -1898,7 +1899,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 78b19e66b2f7c5f832dbc1c3f28ef66ca809386ac79273cfb27cd75a88e2658d.zip
+        S3Key: 00e678b6117b9be39644e330110d7353e10ecd938cb9299b50c1b5de10d3ced6.zip
       Environment:
         Variables:
           S3_BUCKET:
@@ -1914,7 +1915,7 @@ Resources:
       - DownloadLambdaServiceRole386AE6B2
     Metadata:
       aws:cdk:path: SideKickStack/DownloadLambda/Resource
-      aws:asset:path: asset.78b19e66b2f7c5f832dbc1c3f28ef66ca809386ac79273cfb27cd75a88e2658d
+      aws:asset:path: asset.00e678b6117b9be39644e330110d7353e10ecd938cb9299b50c1b5de10d3ced6
       aws:asset:is-bundled: true
       aws:asset:property: Code
   CDKMetadata:

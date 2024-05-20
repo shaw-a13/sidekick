@@ -24,11 +24,11 @@ def handler(event, context):
 
     print(docs)
 
-    urls = [{doc: {"original": "", "processed": ""}} for doc in docs]
+    urls = [{"id": doc, "original": "", "processed": ""} for doc in docs]
 
     for i, url in enumerate(urls):
         # Generate pre-signed URL
-        url[docs[i]]["original"] = s3.generate_presigned_url(
+        url["original"] = s3.generate_presigned_url(
             ClientMethod="get_object",
             Params={
                 "Bucket": bucket_name,
@@ -38,7 +38,7 @@ def handler(event, context):
             HttpMethod="GET",  # Only allow GET requests on the url
         )
 
-        url[docs[i]]["processed"] = s3.generate_presigned_url(
+        url["processed"] = s3.generate_presigned_url(
             ClientMethod="get_object",
             Params={
                 "Bucket": bucket_name,

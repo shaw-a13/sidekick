@@ -165,7 +165,7 @@ export class SidekickStack extends cdk.Stack {
       bucketName: 'sidekick-cases',
       autoDeleteObjects: true,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      cors: [{ allowedHeaders: ['*'], allowedMethods: [s3.HttpMethods.PUT], allowedOrigins: [`https://${distribution.domainName}`, 'http://localhost:3000'] }],
+      cors: [{ allowedHeaders: ['*'], allowedMethods: [s3.HttpMethods.PUT, s3.HttpMethods.GET], allowedOrigins: [`https://${distribution.domainName}`, 'http://localhost:3000'] }],
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
