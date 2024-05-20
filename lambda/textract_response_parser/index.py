@@ -26,13 +26,14 @@ def handler(event, context):
             if result is not None:
                 results.append(result)
 
-    processedResult = s3.Object(BUCKETNAME, f'{case_id}/processedResults/processedResults.json')
+    key = f'{case_id}/processedResults/processedResults.json'
+
+    processedResult = s3.Object(BUCKETNAME, key)
     processedResult.put(
         Body=(bytes(json.dumps(results).encode('UTF-8')))
     )
         
-
-    print('Success')
+    return key
 
 
 def build_entity(attribute_name: str, value: str, locations: dict, source: str, score) -> Dict[str, str]:

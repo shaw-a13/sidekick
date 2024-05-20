@@ -1,52 +1,52 @@
-import {
-  Button,
-  Card,
-  Container,
-  Form,
-} from "react-bootstrap";
+import { Button, Card, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Client } from "../../../interfaces/client/client.interface";
 import { CaseService } from "../../../services/case.service";
 import { ClientService } from "../../../services/client.service";
 import { DocumentService } from "../../../services/document.service";
 import { Case } from "../../../interfaces/case/case.interface";
-
+import { faUndo } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const uploadDocument = async (document: any, token: string, caseId: string) => {
-  const documentService = new DocumentService()
-    
-    // GET request: presigned URL
-    documentService.getPresignedUrl(token, caseId).then(
-      res => {
-        const presignedUrl = res?.data.presignedUrl
-        console.log(presignedUrl);
-        if (presignedUrl){
-          documentService.uploadDocument(presignedUrl, document).then(
-            res => console.log(res)
-          )
-        }        
-      }
-    )
+  const documentService = new DocumentService();
+
+  // GET request: presigned URL
+  documentService.getPresignedUrl(token, caseId).then((res) => {
+    const presignedUrl = res?.data.presignedUrl;
+    console.log(presignedUrl);
+    if (presignedUrl) {
+      documentService
+        .uploadDocument(presignedUrl, document)
+        .then((res) => console.log(res));
+    }
+  });
 };
 
-const addCase = async (clientInfo: Client, caseInfo: Case, accessToken: string) => {
+const addCase = async (
+  clientInfo: Client,
+  caseInfo: Case,
+  accessToken: string
+) => {
   const clientService = new ClientService();
   const caseService = new CaseService();
 
   try {
-    await clientService.addClient(accessToken, clientInfo)
-    await caseService.addCase(accessToken, caseInfo)
+    await clientService.addClient(accessToken, clientInfo);
+    await caseService.addCase(accessToken, caseInfo);
   } catch (e) {
     console.log(e);
   }
-}
+};
 
 const DocumentUploadStep = (props: {
-  clientInfo: Client,
-  caseInfo: Case,
-  accessToken: string,
-  uploadFile: any,
-  uploadFileSetter: React.Dispatch<React.SetStateAction<any>>,
+  clientInfo?: Client;
+  caseInfo?: Case;
+  caseId?: string;
+  accessToken: string;
+  uploadFile: any;
+  newCase: boolean;
+  uploadFileSetter: React.Dispatch<React.SetStateAction<any>>;
 }) => {
   const navigate = useNavigate();
 
@@ -61,23 +61,47 @@ const DocumentUploadStep = (props: {
             onChange={(event) => {
               const target = event.target as HTMLInputElement;
               props.uploadFileSetter((target.files as FileList)[0]);
-              document.getElementById('submitCaseBtn')!.classList.remove('d-none')
+              document
+                .getElementById("submitCaseBtn")!
+                .classList.remove("d-none");
             }}
           />
         </Form.Group>
       </Card.Text>
       <Button
-          className="m-2 d-none"
-          id="submitCaseBtn"
-          onClick={() => {
-            addCase(props.clientInfo, props.caseInfo, props.accessToken)
-            uploadDocument(props.uploadFile, props.accessToken, props.caseInfo.SK)
-            navigate(`../case/${props.caseInfo.SK}`)
-          }}>
-          Submit Case
-        </Button>
+        className="m-2"
+        id="reset"
+        onClick={() => window.location.reload()}
+      >
+        <FontAwesomeIcon icon={faUndo} />
+      </Button>
+      <Button
+        className="m-2 d-none"
+        id="submitCaseBtn"
+        onClick={() => {
+          if (props.newCase)
+            addCase(props.clientInfo!, props.caseInfo!, props.accessToken);
+          if (props.caseInfo) {
+            uploadDocument(
+              props.uploadFile,
+              props.accessToken,
+              props.caseInfo!.SK
+            );
+            navigate(`../case/${props.caseInfo!.SK}`);
+          } else {
+            uploadDocument(
+              props.uploadFile,
+              props.accessToken,
+              props.caseId!
+            );
+            navigate(`../case/${props.caseId!}`);
+          }
+        }}
+      >
+        Submit Case
+      </Button>
     </Container>
   );
 };
 
-export default DocumentUploadStep
+export default DocumentUploadStep;

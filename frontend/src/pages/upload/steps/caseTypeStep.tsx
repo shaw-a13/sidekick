@@ -27,7 +27,7 @@ const CaseTypeStep = (props: {
           onClick={() => {
             document.getElementById('step1')!.style.pointerEvents = "auto"
             props.caseSetter("existing");
-            props.stepSetter(1);
+            // props.stepSetter(1);
           }}
         >
           Existing

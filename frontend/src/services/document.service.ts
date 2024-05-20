@@ -36,4 +36,18 @@ export class DocumentService extends BaseService {
 
     }
 
+    public async getDocuments(token: string, caseId: string) {
+        try {
+            return await axios.get<any>(`${this.baseUrl}/download/${caseId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+        } catch (error) {
+            console.log('error')
+            console.error(error);
+        }
+
+    }
+
 }

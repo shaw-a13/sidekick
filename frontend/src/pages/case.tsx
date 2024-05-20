@@ -12,6 +12,7 @@ import {
   Spinner,
   Table,
 } from "react-bootstrap";
+import { DocumentService } from "../services/document.service";
 
 interface ExtractionResult {
   key: string;
@@ -64,13 +65,34 @@ const Case = () => {
       },
     },
   ];
+
+  const mockDocRes = {
+    "urls": [
+        {
+            "14414744-a8b7-4fa1-977c-19c4247126e3": {
+                "original": "https://sidekick-cases.s3.amazonaws.com/b9a8a137-5802-43b3-ae8a-653869f761c1/14414744-a8b7-4fa1-977c-19c4247126e3/original/14414744-a8b7-4fa1-977c-19c4247126e3.pdf?AWSAccessKeyId=ASIAU6GDW6WBB675GTBK&Signature=EeLIoYuTBTNac%2BQ4jwf7t1WRUnI%3D&x-amz-security-token=IQoJb3JpZ2luX2VjELb%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCWV1LXdlc3QtMSJHMEUCIAW9l512yc44999FdvSxNARCtNBJdK%2BDWcDjuC5uf7CeAiEAzA%2BmsZGpxmb7hf1FVTUg5%2BLK8PFKzwQJ7u1R2Ldt25kqtwMILxAAGgwzMzk3MTI4NjU2NjYiDPm74MW0hyeL6rLzMSqUA1CoqSyGfGz8%2BnDby8Fu2WA7Hb6VAAWtk3KcxWEtqkXHZm%2B4BqDcot%2FDfEQINgrQaOPMYsbwxooIuLhWKzo%2FDn4sr2i4HXA6j0sV6%2BIOCuTGJTON6FgR4Ods%2BnNtMVPXvIQZWfk1AZCnRc%2FdAYSLGz4ncbkulOVlvNPO3n0ncIR3aDLaOZofwAo9SYaLgjCTW6%2FUt0OPeyOZ%2BLCYd34bWyU0qYRvM8aVlHUnwANzn%2BMkZ3mrit8StVXaAEH4hKFttV6CUH2rkQA%2F8ol8AeDnlGsklffXGCDuMsh4EJe0i0XSjVj76E%2Bl2N6lgNuQcGrWxTwBUE7CvlthKM27Jti7YFpuN8Jus06hHgDiV%2Bs8p5JX1vtJlKeHUawrImB0KfRwOA01rwJ%2FAi%2BIB%2FIyrK%2B3zNNHp6L1K7l9Igf1watT4HAX9zkqcyLxsna%2BZu1VQJmIZzYjJAwhMrLewaJ%2BBMS%2BSUNgxjNtuapETTxJdGRk%2F69ORuZLImmdkDHbVRSIJHQy04JP3ecRhz61P7a37jdSbvMo6nDpMJqurbIGOp4BB9RTtDA7YWrL5gfrQRUQIW9gJiIRUPH1TjdGYaSSlBs7pt6N6hNGvhDBjW%2B93k6Aq%2BG%2F2Un02JY6yJuclCmbfgxrOYqKILN8LdfA%2FXcDq2cON3a%2FBBbNbrgekOSbiEnQWbVENGpHB6o1K93Rwj3tSsP%2F1SaAhHDGkPdVySpAHLiFbER19H%2FZ1JzqeBBpKw8GOQWqIDxt1G9lG1fORlc%3D&Expires=1716217131",
+                "processed": "https://sidekick-cases.s3.amazonaws.com/b9a8a137-5802-43b3-ae8a-653869f761c1/14414744-a8b7-4fa1-977c-19c4247126e3/processedResults/processedResults.json?AWSAccessKeyId=ASIAU6GDW6WBB675GTBK&Signature=wiFXE4HiVU%2B0Jgv3A3jYyTC5CzQ%3D&x-amz-security-token=IQoJb3JpZ2luX2VjELb%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCWV1LXdlc3QtMSJHMEUCIAW9l512yc44999FdvSxNARCtNBJdK%2BDWcDjuC5uf7CeAiEAzA%2BmsZGpxmb7hf1FVTUg5%2BLK8PFKzwQJ7u1R2Ldt25kqtwMILxAAGgwzMzk3MTI4NjU2NjYiDPm74MW0hyeL6rLzMSqUA1CoqSyGfGz8%2BnDby8Fu2WA7Hb6VAAWtk3KcxWEtqkXHZm%2B4BqDcot%2FDfEQINgrQaOPMYsbwxooIuLhWKzo%2FDn4sr2i4HXA6j0sV6%2BIOCuTGJTON6FgR4Ods%2BnNtMVPXvIQZWfk1AZCnRc%2FdAYSLGz4ncbkulOVlvNPO3n0ncIR3aDLaOZofwAo9SYaLgjCTW6%2FUt0OPeyOZ%2BLCYd34bWyU0qYRvM8aVlHUnwANzn%2BMkZ3mrit8StVXaAEH4hKFttV6CUH2rkQA%2F8ol8AeDnlGsklffXGCDuMsh4EJe0i0XSjVj76E%2Bl2N6lgNuQcGrWxTwBUE7CvlthKM27Jti7YFpuN8Jus06hHgDiV%2Bs8p5JX1vtJlKeHUawrImB0KfRwOA01rwJ%2FAi%2BIB%2FIyrK%2B3zNNHp6L1K7l9Igf1watT4HAX9zkqcyLxsna%2BZu1VQJmIZzYjJAwhMrLewaJ%2BBMS%2BSUNgxjNtuapETTxJdGRk%2F69ORuZLImmdkDHbVRSIJHQy04JP3ecRhz61P7a37jdSbvMo6nDpMJqurbIGOp4BB9RTtDA7YWrL5gfrQRUQIW9gJiIRUPH1TjdGYaSSlBs7pt6N6hNGvhDBjW%2B93k6Aq%2BG%2F2Un02JY6yJuclCmbfgxrOYqKILN8LdfA%2FXcDq2cON3a%2FBBbNbrgekOSbiEnQWbVENGpHB6o1K93Rwj3tSsP%2F1SaAhHDGkPdVySpAHLiFbER19H%2FZ1JzqeBBpKw8GOQWqIDxt1G9lG1fORlc%3D&Expires=1716217131"
+            }
+        },
+        {
+            "2cfe7f88-da2b-411c-be0f-4e736e6703db": {
+                "original": "https://sidekick-cases.s3.amazonaws.com/b9a8a137-5802-43b3-ae8a-653869f761c1/2cfe7f88-da2b-411c-be0f-4e736e6703db/original/2cfe7f88-da2b-411c-be0f-4e736e6703db.pdf?AWSAccessKeyId=ASIAU6GDW6WBB675GTBK&Signature=Ec8VjPwHHUSoPzSluXAXAEIhoAc%3D&x-amz-security-token=IQoJb3JpZ2luX2VjELb%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCWV1LXdlc3QtMSJHMEUCIAW9l512yc44999FdvSxNARCtNBJdK%2BDWcDjuC5uf7CeAiEAzA%2BmsZGpxmb7hf1FVTUg5%2BLK8PFKzwQJ7u1R2Ldt25kqtwMILxAAGgwzMzk3MTI4NjU2NjYiDPm74MW0hyeL6rLzMSqUA1CoqSyGfGz8%2BnDby8Fu2WA7Hb6VAAWtk3KcxWEtqkXHZm%2B4BqDcot%2FDfEQINgrQaOPMYsbwxooIuLhWKzo%2FDn4sr2i4HXA6j0sV6%2BIOCuTGJTON6FgR4Ods%2BnNtMVPXvIQZWfk1AZCnRc%2FdAYSLGz4ncbkulOVlvNPO3n0ncIR3aDLaOZofwAo9SYaLgjCTW6%2FUt0OPeyOZ%2BLCYd34bWyU0qYRvM8aVlHUnwANzn%2BMkZ3mrit8StVXaAEH4hKFttV6CUH2rkQA%2F8ol8AeDnlGsklffXGCDuMsh4EJe0i0XSjVj76E%2Bl2N6lgNuQcGrWxTwBUE7CvlthKM27Jti7YFpuN8Jus06hHgDiV%2Bs8p5JX1vtJlKeHUawrImB0KfRwOA01rwJ%2FAi%2BIB%2FIyrK%2B3zNNHp6L1K7l9Igf1watT4HAX9zkqcyLxsna%2BZu1VQJmIZzYjJAwhMrLewaJ%2BBMS%2BSUNgxjNtuapETTxJdGRk%2F69ORuZLImmdkDHbVRSIJHQy04JP3ecRhz61P7a37jdSbvMo6nDpMJqurbIGOp4BB9RTtDA7YWrL5gfrQRUQIW9gJiIRUPH1TjdGYaSSlBs7pt6N6hNGvhDBjW%2B93k6Aq%2BG%2F2Un02JY6yJuclCmbfgxrOYqKILN8LdfA%2FXcDq2cON3a%2FBBbNbrgekOSbiEnQWbVENGpHB6o1K93Rwj3tSsP%2F1SaAhHDGkPdVySpAHLiFbER19H%2FZ1JzqeBBpKw8GOQWqIDxt1G9lG1fORlc%3D&Expires=1716217131",
+                "processed": "https://sidekick-cases.s3.amazonaws.com/b9a8a137-5802-43b3-ae8a-653869f761c1/2cfe7f88-da2b-411c-be0f-4e736e6703db/processedResults/processedResults.json?AWSAccessKeyId=ASIAU6GDW6WBB675GTBK&Signature=dXloIuqYqnE9hvNB5bwJm5y71X4%3D&x-amz-security-token=IQoJb3JpZ2luX2VjELb%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCWV1LXdlc3QtMSJHMEUCIAW9l512yc44999FdvSxNARCtNBJdK%2BDWcDjuC5uf7CeAiEAzA%2BmsZGpxmb7hf1FVTUg5%2BLK8PFKzwQJ7u1R2Ldt25kqtwMILxAAGgwzMzk3MTI4NjU2NjYiDPm74MW0hyeL6rLzMSqUA1CoqSyGfGz8%2BnDby8Fu2WA7Hb6VAAWtk3KcxWEtqkXHZm%2B4BqDcot%2FDfEQINgrQaOPMYsbwxooIuLhWKzo%2FDn4sr2i4HXA6j0sV6%2BIOCuTGJTON6FgR4Ods%2BnNtMVPXvIQZWfk1AZCnRc%2FdAYSLGz4ncbkulOVlvNPO3n0ncIR3aDLaOZofwAo9SYaLgjCTW6%2FUt0OPeyOZ%2BLCYd34bWyU0qYRvM8aVlHUnwANzn%2BMkZ3mrit8StVXaAEH4hKFttV6CUH2rkQA%2F8ol8AeDnlGsklffXGCDuMsh4EJe0i0XSjVj76E%2Bl2N6lgNuQcGrWxTwBUE7CvlthKM27Jti7YFpuN8Jus06hHgDiV%2Bs8p5JX1vtJlKeHUawrImB0KfRwOA01rwJ%2FAi%2BIB%2FIyrK%2B3zNNHp6L1K7l9Igf1watT4HAX9zkqcyLxsna%2BZu1VQJmIZzYjJAwhMrLewaJ%2BBMS%2BSUNgxjNtuapETTxJdGRk%2F69ORuZLImmdkDHbVRSIJHQy04JP3ecRhz61P7a37jdSbvMo6nDpMJqurbIGOp4BB9RTtDA7YWrL5gfrQRUQIW9gJiIRUPH1TjdGYaSSlBs7pt6N6hNGvhDBjW%2B93k6Aq%2BG%2F2Un02JY6yJuclCmbfgxrOYqKILN8LdfA%2FXcDq2cON3a%2FBBbNbrgekOSbiEnQWbVENGpHB6o1K93Rwj3tSsP%2F1SaAhHDGkPdVySpAHLiFbER19H%2FZ1JzqeBBpKw8GOQWqIDxt1G9lG1fORlc%3D&Expires=1716217131"
+            }
+        }
+    ]
+}
+
+
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [caseInfo, setCaseInfo] = useState<CaseDynamo>();
   const [accessToken, setAccessToken] = useState("");
   const [loading, setLoading] = useState(true);
   const [docNo, setDocNo] = useState(0);
+  const [documentData, setDocumentData] = useState([])
 
   const caseService = new CaseService();
+  const documentService = new DocumentService();
   const { id } = useParams();
 
   const getCase = async (token: string) => {
@@ -92,9 +114,11 @@ const Case = () => {
       }
     };
     // getAccessToken().then(token => {getCase(token!).then(res => {setLoading(true); setCaseInfo(res?.data[0]); setLoading(false)});})
-    getAccessToken().then((token) => {
+    getAccessToken().then(async (token) => {
       setLoading(true);
       setCaseInfo(mockRes[0]);
+      // const result = await documentService.getDocuments(token!, id!)
+      // console.log(result)
       setLoading(false);
     });
   }, []);

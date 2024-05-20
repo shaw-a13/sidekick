@@ -1,17 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  Row,
-} from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Client } from "../../../interfaces/client/client.interface";
-import { v4 as uuid } from 'uuid';
-
+import { v4 as uuid } from "uuid";
 
 const ClientInfoStep = (props: {
   stepSetter: React.Dispatch<React.SetStateAction<number>>;
@@ -29,17 +21,17 @@ const ClientInfoStep = (props: {
   const handleSubmit = (event: any) => {
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      console.log('not valid')
+      console.log("not valid");
       event.preventDefault();
       event.stopPropagation();
-      document.getElementById('step2')!.style.pointerEvents = "none"
+      document.getElementById("step1")!.style.pointerEvents = "none";
     }
     setValidated(true);
     event.preventDefault();
-    if(form.checkValidity() === true) {
+    if (form.checkValidity() === true) {
       props.clientInfo.SK = uuid();
-      document.getElementById('step2')!.style.pointerEvents = "auto"
-      props.stepSetter(2)
+      document.getElementById("step1")!.style.pointerEvents = "auto";
+      props.stepSetter(1);
     }
     console.log("Values are", props.clientInfo);
   };
@@ -178,7 +170,16 @@ const ClientInfoStep = (props: {
               </Form.Control.Feedback>
             </Form.Group>
           </Row>
-          <Button type="submit"><FontAwesomeIcon icon={faArrowRight} /></Button>
+          <Button
+            className="m-2"
+            id="reset"
+            onClick={() => window.location.reload()}
+          >
+            <FontAwesomeIcon icon={faUndo} />
+          </Button>
+          <Button type="submit">
+            <FontAwesomeIcon icon={faArrowRight} />
+          </Button>
         </Form>
       </Card.Text>
     </Container>

@@ -223,6 +223,43 @@ export class SidekickStack extends cdk.Stack {
 
     const documentUpload = upload.addResource('{caseId}')
     documentUpload.addMethod('GET', new apiGateway.LambdaIntegration(generatePresignedUrlLambda));
+
+
+    const downloadLambda = new lambda.Function(this, 'DownloadLambda', {
+      code: lambda.Code.fromAsset(('lambda/download_s3_file'), {
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_9.bundlingImage,
+          command: [
+            'bash', '-c',
+            'pip install -r requirements.txt -t /asset-output && rsync -r . /asset-output'
+          ],
+        },
+      }),
+      environment: {
+        S3_BUCKET: caseBucket.bucketName
+      },
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'index.handler',
+    });
+
+    downloadLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: [
+        's3:GetObject',
+        's3:ListBucket',
+      ],
+      resources: [caseBucket.bucketArn, `${caseBucket.bucketArn}/*`],
+      effect: iam.Effect.ALLOW
+    }))
+
+    const download = sidekickApi.root.addResource('download', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apiGateway.Cors.ALL_ORIGINS
+      },
+    });
+
+    const documentDownload = download.addResource('{caseId}')
+    documentDownload.addMethod('GET', new apiGateway.LambdaIntegration(downloadLambda));
+
     
     new cdk.CfnOutput(this, 'CloudFrontURL', {
       value: distribution.domainName,

@@ -326,7 +326,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - 58d927ec2afcdc6f35083e8f0824aab72e47d75e4c331e30190fd3074982e0a8.zip
+        - a2301d1b857eed4669f5a458a34ff537d47c3cd751148e896b74ec1b2869c700.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -534,7 +534,7 @@ Resources:
       Name: sidekickApi
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApi/Resource
-  sidekickApiDeploymentAB9EE982a7effdbc93376c1966da5532cb14b9b4:
+  sidekickApiDeploymentAB9EE98243bd93a3eb9b364ce071b25add2ff6e3:
     Type: AWS::ApiGateway::Deployment
     Properties:
       Description: Automatically created by the RestApi construct
@@ -560,6 +560,11 @@ Resources:
       - sidekickApiclientsOPTIONS096E472B
       - sidekickApiclientsPOSTB25767AA
       - sidekickApiclients000D105A
+      - sidekickApidownloadcaseIdGET08765CDF
+      - sidekickApidownloadcaseIdOPTIONS3C598760
+      - sidekickApidownloadcaseId190C43B8
+      - sidekickApidownloadOPTIONSDA872758
+      - sidekickApidownload5A3A6B4C
       - sidekickApiOPTIONS7B71AC7C
       - sidekickApiuploadcaseIdGET2F462E84
       - sidekickApiuploadcaseIdOPTIONS82A374BF
@@ -572,7 +577,7 @@ Resources:
     Type: AWS::ApiGateway::Stage
     Properties:
       DeploymentId:
-        Ref: sidekickApiDeploymentAB9EE982a7effdbc93376c1966da5532cb14b9b4
+        Ref: sidekickApiDeploymentAB9EE98243bd93a3eb9b364ce071b25add2ff6e3
       RestApiId:
         Ref: sidekickApi0AE7347E
       StageName: prod
@@ -1502,6 +1507,144 @@ Resources:
         Ref: sidekickApi0AE7347E
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApi/Default/upload/{caseId}/GET/Resource
+  sidekickApidownload5A3A6B4C:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - sidekickApi0AE7347E
+          - RootResourceId
+      PathPart: download
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/download/Resource
+  sidekickApidownloadOPTIONSDA872758:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Ref: sidekickApidownload5A3A6B4C
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/download/OPTIONS/Resource
+  sidekickApidownloadcaseId190C43B8:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: sidekickApidownload5A3A6B4C
+      PathPart: "{caseId}"
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/download/{caseId}/Resource
+  sidekickApidownloadcaseIdOPTIONS3C598760:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Ref: sidekickApidownloadcaseId190C43B8
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/download/{caseId}/OPTIONS/Resource
+  sidekickApidownloadcaseIdGETApiPermissionSideKickStacksidekickApiA2901C09GETdownloadcaseId4E1C8013:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - DownloadLambdaD45F379F
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: sidekickApi0AE7347E
+            - /
+            - Ref: sidekickApiDeploymentStageprodB57F21F2
+            - /GET/download/*
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/download/{caseId}/GET/ApiPermission.SideKickStacksidekickApiA2901C09.GET..download.{caseId}
+  sidekickApidownloadcaseIdGETApiPermissionTestSideKickStacksidekickApiA2901C09GETdownloadcaseId3A7F16B5:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - DownloadLambdaD45F379F
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: sidekickApi0AE7347E
+            - /test-invoke-stage/GET/download/*
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/download/{caseId}/GET/ApiPermission.Test.SideKickStacksidekickApiA2901C09.GET..download.{caseId}
+  sidekickApidownloadcaseIdGET08765CDF:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: CUSTOM
+      AuthorizerId:
+        Ref: ApiAuthorizer68095F41
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - DownloadLambdaD45F379F
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: sidekickApidownloadcaseId190C43B8
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/download/{caseId}/GET/Resource
   caseBucketC8DD2304:
     Type: AWS::S3::Bucket
     Properties:
@@ -1626,7 +1769,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 4b25cb874c930b97bdf506b8e2746231cd808d0ec281c1ce8177f08dfc962fd3.zip
+        S3Key: d3b057e4b72e0269320385843cde9a52b5cb9ae64ccc0cd8161e89565e9fccab.zip
       Handler: index.handler
       Role:
         Fn::GetAtt:
@@ -1639,7 +1782,7 @@ Resources:
       - textractResponseParserServiceRoleE942AC8E
     Metadata:
       aws:cdk:path: SideKickStack/textractResponseParser/Resource
-      aws:asset:path: asset.4b25cb874c930b97bdf506b8e2746231cd808d0ec281c1ce8177f08dfc962fd3
+      aws:asset:path: asset.d3b057e4b72e0269320385843cde9a52b5cb9ae64ccc0cd8161e89565e9fccab
       aws:asset:is-bundled: true
       aws:asset:property: Code
   GeneratePresignedUrlLambdaServiceRoleD3347AFA:
@@ -1688,7 +1831,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: e4dc1f3cc95792d95db605c34aa199d70cc2d5c49117128c2343d3e1cb2d89f2.zip
+        S3Key: ac66b61561acf8458a488a43b722c33a4f30a7653ad3d087fc27be29ac47a413.zip
       Environment:
         Variables:
           S3_BUCKET:
@@ -1704,7 +1847,74 @@ Resources:
       - GeneratePresignedUrlLambdaServiceRoleD3347AFA
     Metadata:
       aws:cdk:path: SideKickStack/GeneratePresignedUrlLambda/Resource
-      aws:asset:path: asset.e4dc1f3cc95792d95db605c34aa199d70cc2d5c49117128c2343d3e1cb2d89f2
+      aws:asset:path: asset.ac66b61561acf8458a488a43b722c33a4f30a7653ad3d087fc27be29ac47a413
+      aws:asset:is-bundled: true
+      aws:asset:property: Code
+  DownloadLambdaServiceRole386AE6B2:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: SideKickStack/DownloadLambda/ServiceRole/Resource
+  DownloadLambdaServiceRoleDefaultPolicy08B1482A:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject
+              - s3:ListBucket
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - caseBucketC8DD2304
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - caseBucketC8DD2304
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+      PolicyName: DownloadLambdaServiceRoleDefaultPolicy08B1482A
+      Roles:
+        - Ref: DownloadLambdaServiceRole386AE6B2
+    Metadata:
+      aws:cdk:path: SideKickStack/DownloadLambda/ServiceRole/DefaultPolicy/Resource
+  DownloadLambdaD45F379F:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
+        S3Key: 78b19e66b2f7c5f832dbc1c3f28ef66ca809386ac79273cfb27cd75a88e2658d.zip
+      Environment:
+        Variables:
+          S3_BUCKET:
+            Ref: caseBucketC8DD2304
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - DownloadLambdaServiceRole386AE6B2
+          - Arn
+      Runtime: python3.9
+    DependsOn:
+      - DownloadLambdaServiceRoleDefaultPolicy08B1482A
+      - DownloadLambdaServiceRole386AE6B2
+    Metadata:
+      aws:cdk:path: SideKickStack/DownloadLambda/Resource
+      aws:asset:path: asset.78b19e66b2f7c5f832dbc1c3f28ef66ca809386ac79273cfb27cd75a88e2658d
       aws:asset:is-bundled: true
       aws:asset:property: Code
   CDKMetadata:
