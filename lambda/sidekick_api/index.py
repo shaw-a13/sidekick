@@ -40,7 +40,7 @@ def handler(event, context):
             print('Updating a single case...')
             data = json.loads(event['body'])
             caseId = event['pathParameters']['case']
-            response = update_dynamo_item(client, 'CASE', caseId, data)
+            response = update_dynamo_item(client, 'CASE', caseId, data["props"])
             print(response)
             data = response['Attributes']
         elif event['httpMethod'] == 'DELETE':
@@ -84,7 +84,7 @@ def handler(event, context):
             print('Updating a single client...')
             data = json.loads(event['body'])
             clientId = event['pathParameters']['client']
-            response = update_dynamo_item(client, 'CLIENT', clientId, data)
+            response = update_dynamo_item(client, 'CLIENT', clientId, data["props"])
             print(response)
             data = response['Attributes']
         elif event['httpMethod'] == 'DELETE':
