@@ -108,6 +108,7 @@ const Case = () => {
   const documentService = new DocumentService();
   const { id } = useParams();
   const [editCaseDetails, setEditCaseDetails] = useState(false);
+  const [editCaseDescription, setEditCaseDescription] = useState(false);
 
   const getAccessToken = async () => {
     try {
@@ -1518,8 +1519,8 @@ const Case = () => {
         )}
         {!loading && (
           <div>
-            <Container className="mt-5">
-              <Row>
+            <Container>
+              <Row className="mb-3">
                 <Col>
                   <Card>
                     <Card.Body>
@@ -1550,7 +1551,7 @@ const Case = () => {
                     </Card.Body>
                   </Card>
                 </Col>
-                <Col>
+                <Col sm={4}>
                   <Card>
                     <Card.Body>
                       <Card.Title>
@@ -1702,14 +1703,58 @@ const Case = () => {
                 </Col>
               </Row>
               <Row>
-                <Col className="mt-5">
+                <Col className="mt-3 mb-5">
                   <Card>
                     <Card.Body>
-                      <Card.Title>Case Description</Card.Title>
+                      <Card.Title>
+                        Case Description{" "}
+                        <Button
+                          style={{ backgroundColor: "#CF7650", border: "none" }}
+                          onClick={() => {
+                            setEditCaseDescription(!editCaseDescription);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      </Card.Title>
                       <hr />
-                      <Card.Subtitle className="mb-2 text-muted">
-                        {caseInfo?.description.S}
-                      </Card.Subtitle>
+                      {!editCaseDescription && (
+                        <Card.Subtitle className="mb-2 text-muted">
+                          {caseInfo?.description.S}
+                        </Card.Subtitle>
+                      )}
+                      {editCaseDescription && (
+                        <div>
+                          <Form>
+                            <Form.Group controlId="formClientName">
+                              <Form.Control
+                                as="textarea"
+                                required
+                                type="text"
+                                placeholder=""
+                                name="description"
+                                defaultValue={caseEditInfo.description.toString()}
+                                onChange={handleCaseEditChange}
+                              />
+                            </Form.Group>
+                            <div className="text-center">
+                              <Button
+                                className="m-2"
+                                style={{
+                                  backgroundColor: "#CF7650",
+                                  border: "none",
+                                }}
+                                onClick={() => {
+                                  submitCaseEdit(caseEditInfo);
+                                  setEditCaseDescription(!editCaseDescription)
+                                }}
+                              >
+                                Submit
+                              </Button>
+                            </div>
+                          </Form>
+                        </div>
+                      )}
                     </Card.Body>
                   </Card>
                 </Col>
