@@ -34,8 +34,15 @@ def handler(event, context):
             print('Getting a single case...')
             case = event['pathParameters']['case']
             response = get_single_dynamo_item(client, 'CASE', case)
-            print(response)
-            data = response['Items']
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                },
+                'body': json.dumps(response)
+            }
         elif event['httpMethod'] == 'PUT':
             print('Updating a single case...')
             data = json.loads(event['body'])
@@ -78,8 +85,15 @@ def handler(event, context):
             print('Getting a single client...')
             clientId = event['pathParameters']['client']
             response = get_single_dynamo_item(client, 'CLIENT', clientId)
-            print(response)
-            data = response['Items']
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                },
+                'body': json.dumps(response)
+            }
         elif event['httpMethod'] == 'PUT':
             print('Updating a single client...')
             data = json.loads(event['body'])
@@ -116,7 +130,7 @@ def get_all_dynamo_items(client, partition_key):
     )
 
 def get_single_dynamo_item(client, partition_key: str, sort_key: str):
-    return client.query(
+    res = client.query(
         ExpressionAttributeValues={
             ':pk': {
                 'S': partition_key
@@ -127,7 +141,11 @@ def get_single_dynamo_item(client, partition_key: str, sort_key: str):
         },
         KeyConditionExpression='PK = :pk AND SK = :sk',
         TableName=TABLENAME
-    )
+    )['Items'][0]
+    keys = list(res.keys())
+    vals = list(res.values())
+
+    return {key: vals[i]['S'] for i, key in enumerate(keys)} 
 
 def put_dynamo_item(client, primary_key: str, data: dict):
     item = {
