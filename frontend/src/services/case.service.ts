@@ -21,7 +21,7 @@ export class CaseService extends BaseService{
 
     public async getSingleCase(token: string, caseId: string) {
         try {
-            return await axios.get<Case[]>(`${this.baseUrl}/cases/${caseId}`, {
+            return await axios.get<Case>(`${this.baseUrl}/cases/${caseId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

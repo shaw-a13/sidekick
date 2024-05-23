@@ -31,26 +31,17 @@ interface ExtractionResult {
 }
 
 const Case = () => {
-  
-  const [caseEditInfo, setCaseEditInfo] = useState({
-    clientId: '',
-    clientName: '',
-    status: '',
-    description:'',
-    nature:'',
-    date: '',
-    assignee: '',
-  });
 
   const handleCaseEditChange = (event: any) => {
     console.log(event.target);
     const { name, value } = event.target;
 
-    // setCaseEditInfo({ ...caseInfo, [name]: value });
+    setCaseEditInfo({ ...caseEditInfo!, [name]: value });
   };
 
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [caseInfo, setCaseInfo] = useState<CaseInfo>();
+  const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
   const [accessToken, setAccessToken] = useState("");
   const [loading, setLoading] = useState(true);
   const [docNo, setDocNo] = useState(0);
@@ -103,20 +94,21 @@ const Case = () => {
 
   useEffect(() => {
     getAccessToken().then(async (token) => {
-      // await getCase(token!).then((res) => {
-      //   setCaseInfo(res?.data[0])
-      // })
-      // await documentService.getDocuments(token!, id!).then(async (res) => {
-      //   console.log(res);
-      //   setDocApiData(res?.data);
-      //   setDocumentData(res?.data.urls[docNo].original!);
-      //   await axios
-      //     .get<ExtractionResult[]>(res?.data.urls[docNo].processed!)
-      //     .then((res) => {
-      //       setExtractionData(res.data);
-      //       console.log(res.data);
-      //     });
-      // });
+      await getCase(token!).then((res) => {
+        console.log(res?.data)
+        setCaseInfo(res?.data)
+      })
+      await documentService.getDocuments(token!, id!).then(async (res) => {
+        console.log(res);
+        setDocApiData(res?.data);
+        setDocumentData(res?.data.urls[docNo].original!);
+        await axios
+          .get<ExtractionResult[]>(res?.data.urls[docNo].processed!)
+          .then((res) => {
+            setExtractionData(res.data);
+            console.log(res.data);
+          });
+      });
 
       setLoading(false);
     });
@@ -149,6 +141,7 @@ const Case = () => {
                         {docApiData!.urls.map((doc, index) => (
                           <Button
                             className="rounded-circle m-2"
+                            style={{ backgroundColor: "#CF7650", border: "none" }}
                             onClick={() => {
                               updateExtractionData(index);
                               setDocumentData(docApiData!.urls[index].original);
@@ -188,27 +181,27 @@ const Case = () => {
                       {!editCaseDetails && (
                         <div>
                           <Card.Subtitle className="mb-2 text-muted">
-                            Client Name: {caseInfo?.clientName}
+                            Client Name: {caseInfo!.clientName}
                           </Card.Subtitle>
                           <hr />
                           <Card.Subtitle className="mb-2 text-muted">
-                            Nature: {caseInfo?.nature}
+                            Nature: {caseInfo!.nature}
                           </Card.Subtitle>
                           <hr />
                           <Card.Subtitle className="mb-2 text-muted">
-                            Date: {caseInfo?.date}
+                            Date: {caseInfo!.date}
                           </Card.Subtitle>
                           <hr />
                           <Card.Subtitle className="mb-2 text-muted">
-                            Status: {caseInfo?.status}
+                            Status: {caseInfo!.status}
                           </Card.Subtitle>
                           <hr />
                           <Card.Subtitle className="mb-2 text-muted">
-                            Assignee: {caseInfo?.assignee}
+                            Assignee: {caseInfo!.assignee}
                           </Card.Subtitle>
                           <hr />
                           <Card.Subtitle className="mb-2 text-muted">
-                            Client ID: {caseInfo?.clientId}
+                            Client ID: {caseInfo!.clientId}
                           </Card.Subtitle>
                         </div>
                       )}
@@ -229,6 +222,7 @@ const Case = () => {
                               <Form.Label>Nature</Form.Label>
                               <Form.Control
                                 type="text"
+                                name="nature"
                                 placeholder="Enter nature"
                                 defaultValue={caseInfo!.nature}
                                 onChange={handleCaseEditChange}
@@ -238,6 +232,7 @@ const Case = () => {
                               <Form.Label>Date</Form.Label>
                               <Form.Control
                                 type="date"
+                                name="date"
                                 defaultValue={caseInfo!.date}
                                 onChange={handleCaseEditChange}
                               />
@@ -246,6 +241,7 @@ const Case = () => {
                               <Form.Label>Status</Form.Label>
                               <Form.Control
                                 type="text"
+                                name="status"
                                 placeholder="Enter status"
                                 defaultValue={caseInfo!.status}
                                 onChange={handleCaseEditChange}
@@ -255,6 +251,7 @@ const Case = () => {
                               <Form.Label>Assignee</Form.Label>
                               <Form.Control
                                 type="text"
+                                name="assignee"
                                 placeholder="Enter assignee"
                                 defaultValue={caseInfo!.assignee}
                                 onChange={handleCaseEditChange}
@@ -264,6 +261,7 @@ const Case = () => {
                               <Form.Label>Client ID</Form.Label>
                               <Form.Control
                                 type="text"
+                                name="clientId"
                                 placeholder="Enter client ID"
                                 defaultValue={caseInfo!.clientId}
                                 onChange={handleCaseEditChange}
@@ -277,7 +275,7 @@ const Case = () => {
                                   border: "none",
                                 }}
                                 onClick={() => {
-                                  submitCaseEdit(caseEditInfo);
+                                  submitCaseEdit(caseEditInfo!);
                                 }}
                               >
                                 Submit
@@ -339,7 +337,7 @@ const Case = () => {
                       <hr />
                       {!editCaseDescription && (
                         <Card.Subtitle className="mb-2 text-muted">
-                          {caseInfo?.description}
+                          {caseInfo!.description}
                         </Card.Subtitle>
                       )}
                       {editCaseDescription && (
@@ -364,7 +362,7 @@ const Case = () => {
                                   border: "none",
                                 }}
                                 onClick={() => {
-                                  submitCaseEdit(caseEditInfo);
+                                  submitCaseEdit(caseEditInfo!);
                                 }}
                               >
                                 Submit
