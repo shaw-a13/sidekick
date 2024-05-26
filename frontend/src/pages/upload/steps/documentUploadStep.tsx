@@ -12,13 +12,23 @@ const uploadDocument = async (document: any, token: string, caseId: string) => {
   const documentService = new DocumentService();
 
   // GET request: presigned URL
-  documentService.getPresignedUrl(token, caseId).then((res) => {
+  documentService.getPresignedUrl(token, caseId).then(async (res) => {
     const presignedUrl = res?.data.presignedUrl;
+    const key = res?.data.key;
     console.log(presignedUrl);
+    console.log(key);
     if (presignedUrl) {
-      documentService
+      await documentService
         .uploadDocument(presignedUrl, document)
-        .then((res) => console.log(res));
+        .then(async () => {
+          await documentService.triggerIngestion(
+            token,
+            caseId,
+            key!
+          ).then(async (ingeRes) => {
+            console.log(`IngesRes: ${ingeRes?.data.executionArn}`)
+          });
+        });
     }
   });
 };
@@ -89,12 +99,8 @@ const DocumentUploadStep = (props: {
             );
             navigate(`../case/${props.caseInfo!.SK}`);
           } else {
-            uploadDocument(
-              props.uploadFile,
-              props.accessToken,
-              props.caseId!
-            );
-            navigate(`../case/${props.caseId!}`);
+            uploadDocument(props.uploadFile, props.accessToken, props.caseId!);
+            // navigate(`../case/${props.caseId!}`);
           }
         }}
       >

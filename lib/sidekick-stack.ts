@@ -8,14 +8,22 @@ import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as apiGateway from 'aws-cdk-lib/aws-apigateway';
+import * as events from 'aws-cdk-lib/aws-events';
 import { Construct } from 'constructs';
 import path = require('path');
+import { IngestionSfnConstruct } from './constructs/ingestion-sfn-construct';
 
 const REACT_APP = 'resources/build';
 
 export class SidekickStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    const sidekickBus = new events.EventBus(this, 'sidekickBus', {
+      eventBusName: 'SidekickBus'
+    });
+
+    const ingestionSfn = new IngestionSfnConstruct(this, 'ingestion-state-machine', sidekickBus);
 
     const sidekickTable = new dynamodb.Table(this, 'sidekickTable', {
       partitionKey: {
@@ -40,12 +48,21 @@ export class SidekickStack extends cdk.Stack {
       }),
       runtime: lambda.Runtime.PYTHON_3_9,
       handler: 'index.handler',
+      environment: {
+        INGESTION_SFN: ingestionSfn.stateMachine.stateMachineArn
+      }
     });
 
     sidekickApiLambda.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: ['dynamodb:DescribeTable','dynamodb:Scan','dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
       resources: [sidekickTable.tableArn]
+    }))
+
+    sidekickApiLambda.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['states:StartExecution'],
+      resources: [ingestionSfn.stateMachine.stateMachineArn]
     }))
 
     const authorizerLambda = new lambda.Function(this, 'AuthorizerLambda', {
@@ -160,6 +177,13 @@ export class SidekickStack extends cdk.Stack {
     singleClient.addMethod('GET');
     singleClient.addMethod('PUT');
     singleClient.addMethod('DELETE');
+
+    const ingestion = sidekickApi.root.addResource('ingestion', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apiGateway.Cors.ALL_ORIGINS
+      }
+    });
+    ingestion.addMethod('POST');
 
     const caseBucket = new s3.Bucket(this, 'caseBucket', {
       bucketName: 'sidekick-cases',

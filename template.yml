@@ -1,4 +1,82 @@
 Resources:
+  sidekickBus3BCAB053:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: SidekickBus
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickBus/Resource
+  ingestionstatemachineStateMachineRole3043E50A:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/Role/Resource
+  ingestionstatemachineStateMachineFBFFBA38:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString: '{"StartAt":"StartState","States":{"StartState":{"Type":"Pass","End":true}}}'
+      RoleArn:
+        Fn::GetAtt:
+          - ingestionstatemachineStateMachineRole3043E50A
+          - Arn
+    DependsOn:
+      - ingestionstatemachineStateMachineRole3043E50A
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/Resource
+  ingestionstatemachineStateMachineEventsRole6AF5B0D7:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/EventsRole/Resource
+  ingestionstatemachineStateMachineEventsRoleDefaultPolicyADFFF3A8:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: states:StartExecution
+            Effect: Allow
+            Resource:
+              Ref: ingestionstatemachineStateMachineFBFFBA38
+        Version: "2012-10-17"
+      PolicyName: ingestionstatemachineStateMachineEventsRoleDefaultPolicyADFFF3A8
+      Roles:
+        - Ref: ingestionstatemachineStateMachineEventsRole6AF5B0D7
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/EventsRole/DefaultPolicy/Resource
+  ingestionstatemachinesfnrule80009270:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName:
+        Ref: sidekickBus3BCAB053
+      EventPattern:
+        detail-type:
+          - START-DOCUMENT-EXTRACTION
+      State: ENABLED
+      Targets:
+        - Arn:
+            Ref: ingestionstatemachineStateMachineFBFFBA38
+          Id: Target0
+          RoleArn:
+            Fn::GetAtt:
+              - ingestionstatemachineStateMachineEventsRole6AF5B0D7
+              - Arn
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/sfn-rule/Resource
   sidekickTableFDBE0BEC:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -54,6 +132,10 @@ Resources:
               Fn::GetAtt:
                 - sidekickTableFDBE0BEC
                 - Arn
+          - Action: states:StartExecution
+            Effect: Allow
+            Resource:
+              Ref: ingestionstatemachineStateMachineFBFFBA38
         Version: "2012-10-17"
       PolicyName: sidekickApiLambdaServiceRoleDefaultPolicy7950B24D
       Roles:
@@ -65,7 +147,11 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 83a7e098f79c9c3af791cf5383f64cbc0de2cb999c8a0bb7d52ae5e8486889ba.zip
+        S3Key: f7edb6e1c70027b1185ef1a2db7bb0700c5734c50316ba0ba9ed366a652c920e.zip
+      Environment:
+        Variables:
+          INGESTION_SFN:
+            Ref: ingestionstatemachineStateMachineFBFFBA38
       Handler: index.handler
       Role:
         Fn::GetAtt:
@@ -77,7 +163,7 @@ Resources:
       - sidekickApiLambdaServiceRole55313979
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApiLambda/Resource
-      aws:asset:path: asset.83a7e098f79c9c3af791cf5383f64cbc0de2cb999c8a0bb7d52ae5e8486889ba
+      aws:asset:path: asset.f7edb6e1c70027b1185ef1a2db7bb0700c5734c50316ba0ba9ed366a652c920e
       aws:asset:is-bundled: true
       aws:asset:property: Code
   AuthorizerLogGroup2583BEC8:
@@ -326,7 +412,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - 5233db166f2d38ff24398e0db2a4e39a0299297fcab8c7b3234cad527993a118.zip
+        - 2dc4b24c534b41a6bb9b331a0b84b8cca3982545ea7f14b16dd5956215949994.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -534,7 +620,7 @@ Resources:
       Name: sidekickApi
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApi/Resource
-  sidekickApiDeploymentAB9EE98243bd93a3eb9b364ce071b25add2ff6e3:
+  sidekickApiDeploymentAB9EE982d0bfcce1390130c70bcb523f7deb52ef:
     Type: AWS::ApiGateway::Deployment
     Properties:
       Description: Automatically created by the RestApi construct
@@ -565,6 +651,9 @@ Resources:
       - sidekickApidownloadcaseId190C43B8
       - sidekickApidownloadOPTIONSDA872758
       - sidekickApidownload5A3A6B4C
+      - sidekickApiingestionOPTIONS4602E075
+      - sidekickApiingestionPOST37261988
+      - sidekickApiingestion7F30836D
       - sidekickApiOPTIONS7B71AC7C
       - sidekickApiuploadcaseIdGET2F462E84
       - sidekickApiuploadcaseIdOPTIONS82A374BF
@@ -577,7 +666,7 @@ Resources:
     Type: AWS::ApiGateway::Stage
     Properties:
       DeploymentId:
-        Ref: sidekickApiDeploymentAB9EE98243bd93a3eb9b364ce071b25add2ff6e3
+        Ref: sidekickApiDeploymentAB9EE982d0bfcce1390130c70bcb523f7deb52ef
       RestApiId:
         Ref: sidekickApi0AE7347E
       StageName: prod
@@ -1369,6 +1458,106 @@ Resources:
         Ref: sidekickApi0AE7347E
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApi/Default/clients/{client}/DELETE/Resource
+  sidekickApiingestion7F30836D:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - sidekickApi0AE7347E
+          - RootResourceId
+      PathPart: ingestion
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/ingestion/Resource
+  sidekickApiingestionOPTIONS4602E075:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+            StatusCode: "204"
+        RequestTemplates:
+          application/json: "{ statusCode: 200 }"
+        Type: MOCK
+      MethodResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Methods: true
+          StatusCode: "204"
+      ResourceId:
+        Ref: sidekickApiingestion7F30836D
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/ingestion/OPTIONS/Resource
+  sidekickApiingestionPOSTApiPermissionSideKickStacksidekickApiA2901C09POSTingestion9D10D1B6:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - sidekickApiLambda9B98FB90
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: sidekickApi0AE7347E
+            - /
+            - Ref: sidekickApiDeploymentStageprodB57F21F2
+            - /POST/ingestion
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/ingestion/POST/ApiPermission.SideKickStacksidekickApiA2901C09.POST..ingestion
+  sidekickApiingestionPOSTApiPermissionTestSideKickStacksidekickApiA2901C09POSTingestion3BB49596:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - sidekickApiLambda9B98FB90
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: sidekickApi0AE7347E
+            - /test-invoke-stage/POST/ingestion
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/ingestion/POST/ApiPermission.Test.SideKickStacksidekickApiA2901C09.POST..ingestion
+  sidekickApiingestionPOST37261988:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: CUSTOM
+      AuthorizerId:
+        Ref: ApiAuthorizer68095F41
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - sidekickApiLambda9B98FB90
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: sidekickApiingestion7F30836D
+      RestApiId:
+        Ref: sidekickApi0AE7347E
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApi/Default/ingestion/POST/Resource
   sidekickApiupload924CAD0F:
     Type: AWS::ApiGateway::Resource
     Properties:
@@ -1921,7 +2110,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/3VSXW/bMAz8LX1X1K897NVN0GJAigZpt9dAkViPjSwaotTAM/zfJ8lOYgwrYIBH8nSUfLyTt99u5M2VOvJCm8PC4l72r0Hpg0ilXW86pxoyqfim9hbE8t0VMAirmr1Rsn+MTgckl1tzvAHfIPOUrVUH/hf4kr+iqy0EOvMHgaqR/ZbGCSVuyKLuilJBg+D7Xa+YIbCschAGWktdAy7Ih6gPEFbnQmbLfqw+KAYxwiw3oTFcpszz9DqqWfZrqp88xba8YMKD0JaiefeUxvYr5OBxH8urXzzW6CqtgfmHSbfAUKSX+cBjPvAVYy6TBlDtMJDsfzL4DZHNlDM+gaXFJDBvTZVTuqJGoZsTxsogVIu1CnBUXfKVDuCqGH6Txz/gM32WrYvLW+BQtVi8meDlV5f7X7K0PHVxcQSJT9FrKCY8QxI2uTmhU3dSLngYLuXicxZKGyOWkQM1/zvyT2vj6RMN+DJz3NOdzQu4SzutLcrqyOlflZ3MMi8xtDGtjCMD8oOvP2+/y/TdXX0w4sLHZFMDcjvGv16v1UIyAwAA
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VTTW/bMAz9Lb0rWtvtsKuTrMOAFDXSbddAkRmXjSwa+kjgGf7vo2QnMYYOMMBH8umREulH+fDlXt7fqbNf6Oq4MLiX/WtQ+ig4tOvhBDZ42X9Ldhm9WB3sFW+jgRRIdhA+QHuIVgckyydK5b1gpQDPSr+hzcy5PwhUjey3NIkkW5JB3SV3RIOoOqsaqrirn2o/MjMYhFHNvlKyf5pqptQcl+Aa9H7yNqoD9xtc9l/R1gYCXfnc/eddzx0DX7ZIRlTQGuoavqpcRn2EsL4GElv2Y3SpPIgRpjITGs3tNnOfO6eaH2hD9XdHsc3dTXgQ2lCsDo64bL9GHxzuY77Ri8MabaE1eP+j4i4wZOlVOvCUDvyPMZfhAlRbDCT7Xx5cSWQS5YovYGWQBeapKXJx19QotHPCGBmEarHmKZ9VxzOjI9gihjdy+Adcos+8TZ7gFnwoWsw7MMHbU+f+bx7vT31ZJAbMp+g05CE8AwtXKTmhS3ZSzngYbuE85yTE2yBW0QdqPjryT6p0dMIKXK457uDOpOXa8Q+jDcri7Pmt8r4lmZcY2sgrY6kC+e4/nR6+Sv4e79494sJFHlMDcjvavwQAcWqPAwAA
     Metadata:
       aws:cdk:path: SideKickStack/CDKMetadata/Default
 Outputs:

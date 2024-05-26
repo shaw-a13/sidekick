@@ -31,7 +31,6 @@ interface ExtractionResult {
 }
 
 const Case = () => {
-
   const handleCaseEditChange = (event: any) => {
     console.log(event.target);
     const { name, value } = event.target;
@@ -73,7 +72,9 @@ const Case = () => {
   const submitCaseEdit = (edit_obj: CaseEditProps) => {
     console.log(edit_obj);
     getAccessToken().then(async (token) => {
-      await caseService.editCase(token!, edit_obj, id!).then(() => window.location.reload());
+      await caseService
+        .editCase(token!, edit_obj, id!)
+        .then(() => window.location.reload());
     });
   };
 
@@ -95,9 +96,9 @@ const Case = () => {
   useEffect(() => {
     getAccessToken().then(async (token) => {
       await getCase(token!).then((res) => {
-        console.log(res?.data)
-        setCaseInfo(res?.data)
-      })
+        console.log(res?.data);
+        setCaseInfo(res?.data);
+      });
       await documentService.getDocuments(token!, id!).then(async (res) => {
         console.log(res);
         setDocApiData(res?.data);
@@ -135,13 +136,26 @@ const Case = () => {
                 <Col>
                   <Card>
                     <Card.Body>
-                      <Card.Title>Case Documents</Card.Title>
+                      <Card.Title>
+                        Case Documents{" "}
+                        <Button
+                          style={{ backgroundColor: "#CF7650", border: "none" }}
+                          onClick={() => {
+                            setEditCaseDetails(!editCaseDetails);
+                          }}
+                        >
+                          Upload
+                        </Button>
+                      </Card.Title>
                       <hr />
                       <div className="mb-2">
                         {docApiData!.urls.map((doc, index) => (
                           <Button
                             className="rounded-circle m-2"
-                            style={{ backgroundColor: "#CF7650", border: "none" }}
+                            style={{
+                              backgroundColor: "#CF7650",
+                              border: "none",
+                            }}
                             onClick={() => {
                               updateExtractionData(index);
                               setDocumentData(docApiData!.urls[index].original);

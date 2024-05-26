@@ -4,6 +4,11 @@ import { DocumentResultResponse } from "../interfaces/document/documentResultRes
 
 interface PresignedUrlResponse {
     presignedUrl: string;
+    key: string;
+}
+
+interface ingestionResponse {
+    executionArn: string;
 }
 
 
@@ -26,10 +31,10 @@ export class DocumentService extends BaseService {
         try {
             await axios.put(presignedUrl, document, {
                 headers: {
-                  "Content-Type": "application/pdf",
+                    "Content-Type": "application/pdf",
                 },
             });
-            
+
         } catch (error) {
             console.log('error')
             console.error(error)
@@ -51,4 +56,18 @@ export class DocumentService extends BaseService {
 
     }
 
+    public async triggerIngestion(token: string, caseId: string, key: string) {
+        try {
+            return await axios.post<ingestionResponse>(`${this.baseUrl}/ingestion`, { caseId: caseId, key: key }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+        } catch (error) {
+            console.log('error')
+            console.error(error)
+        }
+
+    }
 }
