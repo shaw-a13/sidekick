@@ -94,6 +94,12 @@ export class SidekickStack extends cdk.Stack {
       resources: [sidekickTable.tableArn]
     }))
 
+    sidekickApiLambda.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['states:StartExecution'],
+      resources: [ingestionSfn.stateMachine.stateMachineArn]
+    }))
+
     const authorizerLambda = new lambda.Function(this, 'AuthorizerLambda', {
       code: lambda.Code.fromAsset(('lambda/authorizer_lambda'), {
         bundling: {

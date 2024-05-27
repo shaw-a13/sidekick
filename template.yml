@@ -240,7 +240,7 @@ Resources:
     DeletionPolicy: Delete
     Metadata:
       aws:cdk:path: SideKickStack/caseBucket/AutoDeleteObjectsCustomResource/Default
-  ingestionstatemachinesidekickApiLambdaServiceRoleB350AB2E:
+  ingestionstatemachinetextractResponseParserServiceRole18A62317:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -257,39 +257,54 @@ Resources:
               - Ref: AWS::Partition
               - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
     Metadata:
-      aws:cdk:path: SideKickStack/ingestion-state-machine/sidekickApiLambda/ServiceRole/Resource
-  ingestionstatemachinesidekickApiLambdaServiceRoleDefaultPolicy40929AE6:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/textractResponseParser/ServiceRole/Resource
+  ingestionstatemachinetextractResponseParserServiceRoleDefaultPolicyA70798CF:
     Type: AWS::IAM::Policy
     Properties:
       PolicyDocument:
         Statement:
-          - Action: textract:*
+          - Action:
+              - s3:GetObject
+              - s3:PutObject
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - caseBucketC8DD2304
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - caseBucketC8DD2304
+                        - Arn
+                    - /*
+          - Action: textract:GetDocumentAnalysis
             Effect: Allow
             Resource: "*"
         Version: "2012-10-17"
-      PolicyName: ingestionstatemachinesidekickApiLambdaServiceRoleDefaultPolicy40929AE6
+      PolicyName: ingestionstatemachinetextractResponseParserServiceRoleDefaultPolicyA70798CF
       Roles:
-        - Ref: ingestionstatemachinesidekickApiLambdaServiceRoleB350AB2E
+        - Ref: ingestionstatemachinetextractResponseParserServiceRole18A62317
     Metadata:
-      aws:cdk:path: SideKickStack/ingestion-state-machine/sidekickApiLambda/ServiceRole/DefaultPolicy/Resource
-  ingestionstatemachinesidekickApiLambdaE5F3A3E6:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/textractResponseParser/ServiceRole/DefaultPolicy/Resource
+  ingestionstatemachinetextractResponseParser6843823D:
     Type: AWS::Lambda::Function
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 377efc1ac279ea540057e820abf764b20a090773669e0e3bf4ac13e565cd7ec4.zip
+        S3Key: 4c4c68d758ad481e5348f59b9a6cde070de8e4a5d99510f7a2fda58ab55c3a4e.zip
       Handler: index.handler
       Role:
         Fn::GetAtt:
-          - ingestionstatemachinesidekickApiLambdaServiceRoleB350AB2E
+          - ingestionstatemachinetextractResponseParserServiceRole18A62317
           - Arn
       Runtime: python3.9
+      Timeout: 60
     DependsOn:
-      - ingestionstatemachinesidekickApiLambdaServiceRoleDefaultPolicy40929AE6
-      - ingestionstatemachinesidekickApiLambdaServiceRoleB350AB2E
+      - ingestionstatemachinetextractResponseParserServiceRoleDefaultPolicyA70798CF
+      - ingestionstatemachinetextractResponseParserServiceRole18A62317
     Metadata:
-      aws:cdk:path: SideKickStack/ingestion-state-machine/sidekickApiLambda/Resource
-      aws:asset:path: asset.377efc1ac279ea540057e820abf764b20a090773669e0e3bf4ac13e565cd7ec4
+      aws:cdk:path: SideKickStack/ingestion-state-machine/textractResponseParser/Resource
+      aws:asset:path: asset.4c4c68d758ad481e5348f59b9a6cde070de8e4a5d99510f7a2fda58ab55c3a4e
       aws:asset:is-bundled: true
       aws:asset:property: Code
   ingestionstatemachineStateMachineRole3043E50A:
@@ -309,18 +324,35 @@ Resources:
     Properties:
       PolicyDocument:
         Statement:
-          - Action: lambda:InvokeFunction
+          - Action:
+              - s3:GetObject
+              - textract:startDocumentAnalysis
             Effect: Allow
             Resource:
               - Fn::GetAtt:
-                  - ingestionstatemachinesidekickApiLambdaE5F3A3E6
+                  - caseBucketC8DD2304
                   - Arn
               - Fn::Join:
                   - ""
                   - - Fn::GetAtt:
-                        - ingestionstatemachinesidekickApiLambdaE5F3A3E6
+                        - caseBucketC8DD2304
+                        - Arn
+                    - /*
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - ingestionstatemachinetextractResponseParser6843823D
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - ingestionstatemachinetextractResponseParser6843823D
                         - Arn
                     - :*
+          - Action: textract:StartDocumentAnalysis
+            Effect: Allow
+            Resource: "*"
         Version: "2012-10-17"
       PolicyName: ingestionstatemachineStateMachineRoleDefaultPolicy91CE380D
       Roles:
@@ -333,13 +365,17 @@ Resources:
       DefinitionString:
         Fn::Join:
           - ""
-          - - '{"StartAt":"StartState","States":{"StartState":{"Type":"Pass","Next":"Call Textract With Lambda"},"Call Textract With Lambda":{"End":true,"Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","Resource":"arn:'
+          - - '{"StartAt":"Call Textract","States":{"Call Textract":{"Next":"Wait for textract","Type":"Task","ResultPath":"$.textractResponse","Resource":"arn:'
+            - Ref: AWS::Partition
+            - :states:::aws-sdk:textract:startDocumentAnalysis","Parameters":{"DocumentLocation":{"S3Object":{"Bucket":"
+            - Ref: caseBucketC8DD2304
+            - '","Name.$":"$.key"}},"FeatureTypes":["FORMS"]}},"Wait for textract":{"Type":"Wait","Seconds":30,"Next":"Get Textract Results"},"Get Textract Results":{"Next":"Document Analysis Complete","Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","ResultPath":"$.textractResults","ResultSelector":{"processedResults.$":"$.Payload"},"Resource":"arn:'
             - Ref: AWS::Partition
             - :states:::lambda:invoke","Parameters":{"FunctionName":"
             - Fn::GetAtt:
-                - ingestionstatemachinesidekickApiLambdaE5F3A3E6
+                - ingestionstatemachinetextractResponseParser6843823D
                 - Arn
-            - '","Payload.$":"$"}}}}'
+            - '","Payload.$":"$"}},"Document Analysis Complete":{"Type":"Pass","End":true}}}'
       RoleArn:
         Fn::GetAtt:
           - ingestionstatemachineStateMachineRole3043E50A
@@ -432,6 +468,10 @@ Resources:
               Fn::GetAtt:
                 - sidekickTableFDBE0BEC
                 - Arn
+          - Action: states:StartExecution
+            Effect: Allow
+            Resource:
+              Ref: ingestionstatemachineStateMachineFBFFBA38
         Version: "2012-10-17"
       PolicyName: sidekickApiLambdaServiceRoleDefaultPolicy7950B24D
       Roles:
@@ -1992,70 +2032,6 @@ Resources:
         Ref: sidekickApi0AE7347E
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApi/Default/download/{caseId}/GET/Resource
-  textractResponseParserServiceRoleE942AC8E:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-        Version: "2012-10-17"
-      ManagedPolicyArns:
-        - Fn::Join:
-            - ""
-            - - "arn:"
-              - Ref: AWS::Partition
-              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-    Metadata:
-      aws:cdk:path: SideKickStack/textractResponseParser/ServiceRole/Resource
-  textractResponseParserServiceRoleDefaultPolicy6C69047F:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Action:
-              - s3:GetObject
-              - s3:PutObject
-            Effect: Allow
-            Resource:
-              - Fn::GetAtt:
-                  - caseBucketC8DD2304
-                  - Arn
-              - Fn::Join:
-                  - ""
-                  - - Fn::GetAtt:
-                        - caseBucketC8DD2304
-                        - Arn
-                    - /*
-        Version: "2012-10-17"
-      PolicyName: textractResponseParserServiceRoleDefaultPolicy6C69047F
-      Roles:
-        - Ref: textractResponseParserServiceRoleE942AC8E
-    Metadata:
-      aws:cdk:path: SideKickStack/textractResponseParser/ServiceRole/DefaultPolicy/Resource
-  textractResponseParser6D7F17BE:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code:
-        S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: d3b057e4b72e0269320385843cde9a52b5cb9ae64ccc0cd8161e89565e9fccab.zip
-      Handler: index.handler
-      Role:
-        Fn::GetAtt:
-          - textractResponseParserServiceRoleE942AC8E
-          - Arn
-      Runtime: python3.9
-      Timeout: 60
-    DependsOn:
-      - textractResponseParserServiceRoleDefaultPolicy6C69047F
-      - textractResponseParserServiceRoleE942AC8E
-    Metadata:
-      aws:cdk:path: SideKickStack/textractResponseParser/Resource
-      aws:asset:path: asset.d3b057e4b72e0269320385843cde9a52b5cb9ae64ccc0cd8161e89565e9fccab
-      aws:asset:is-bundled: true
-      aws:asset:property: Code
   GeneratePresignedUrlLambdaServiceRoleD3347AFA:
     Type: AWS::IAM::Role
     Properties:
@@ -2191,7 +2167,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/3VT227bMAz9lr4rWm8Pe3WSdSiQoka67TVQZMZlI4uGLgkyw/8+SnYSr9iAADwkj455y728e7yVtzfq6Ge62s8MbmX3FpTeCw5tOjiADV5235KdRy8WO3vB62ggBZLthX+Q3TzqPYQUG9FgSjKoT9fw6A/OXHl+rQ3FaufIBtkt0QeH2xiQrHh1WKMttAbvnyv+MoastEgPntKD/zGmMr0wqtlWSnZP0eoszIwpLsE16P3ordQJ3C9w2X9DWxsIdOH3AlUjuzWN/Sd77XFAaSCbTnkPPL8iGVFBa+jUcIVyaH15CTA7QLsb9f0mKL/3cpVrfrYH2sPfBNmVLC14UwFelH5HmyuZ+r2oTlY1VPFGf6jtUGoGPAyqWWJF9XdHsc0Nj5g3QbXFQLL76cGVRCalL/gMFga57GlqjJzdJTUK7ZQwRHqhWqy5zKM6cWHcmS1ieCeHv8El+sQb+l+DD0WLedIjvA4uL/rq8QDq8yQYMJ+i05BuTLwAC1cpOaJzdlTOuO/FIvpAzb+Sn1KlowNW4LJ6XnH6Kh/LVXm4uo1J57Thf5Q2KIuj51nlC0virzG0kQ/AUgXyw3853H2V/Lu/+fCIMxf5nhuQ68H+ATnzo42wAwAA
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VT227bMAz9lr4rWtvtYa+5rEOBFDWSXR4DRWZc1rJo6JIgM/zvo2QnMYoNMMDDq8hD+lE+fLmX93fq5Ge6rGcG97LbBqVrwaZdB0ewwcvuW5KL6MXyYK94Ew0kQ5K98J9lt4i6hpBsIxpEQQb1+WYe9UFZKM/Z2lAsD45skN0KfXC4jwHJileHFdq51uD9c8kvY8iVlinhKSX8L2JahtsL0B6i1Unzu6B8zWMtlTHzk9+CO6IGsVbNvlTP9kg1t2SyJrunMSvVnOICXIPej9pancH9Apf1LdrKQKBrfC9QNbLb0MhYkjdWBpQo3HXKe2DG50mIElpD54ZnkgNZq6vhw0Sy+60wiILTBe8vwIvSb2jza1O9F+XZqoZK3vMPtR/ayYAHporrrKn67ii2eagR836oshhIdj89uILIJPcVX8DSILc2dY2Wi7qiRqGdBgyWXqgWK27zpM7cGPNv5zG8kcM/4FL4RBu2tAEf5i1mNkd4Iyev/6YxAdWFCQYcT9FpSJcnXoALl8k5oot3rJxx34tl9IGafzk/uApHRyzB5ep5jelVPohb5eGydiadzI7/M21Q8hkyV/mKUvHXGNrIS7ZUgnz3n44PXyV/j3fvHnHmIl95A3IzyL91zH+OxgMAAA==
     Metadata:
       aws:cdk:path: SideKickStack/CDKMetadata/Default
 Outputs:
