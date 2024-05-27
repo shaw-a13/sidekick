@@ -5,233 +5,6 @@ Resources:
       Name: SidekickBus
     Metadata:
       aws:cdk:path: SideKickStack/sidekickBus/Resource
-  ingestionstatemachineStateMachineRole3043E50A:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: states.amazonaws.com
-        Version: "2012-10-17"
-    Metadata:
-      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/Role/Resource
-  ingestionstatemachineStateMachineFBFFBA38:
-    Type: AWS::StepFunctions::StateMachine
-    Properties:
-      DefinitionString: '{"StartAt":"StartState","States":{"StartState":{"Type":"Pass","End":true}}}'
-      RoleArn:
-        Fn::GetAtt:
-          - ingestionstatemachineStateMachineRole3043E50A
-          - Arn
-    DependsOn:
-      - ingestionstatemachineStateMachineRole3043E50A
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
-    Metadata:
-      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/Resource
-  ingestionstatemachineStateMachineEventsRole6AF5B0D7:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: events.amazonaws.com
-        Version: "2012-10-17"
-    Metadata:
-      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/EventsRole/Resource
-  ingestionstatemachineStateMachineEventsRoleDefaultPolicyADFFF3A8:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Action: states:StartExecution
-            Effect: Allow
-            Resource:
-              Ref: ingestionstatemachineStateMachineFBFFBA38
-        Version: "2012-10-17"
-      PolicyName: ingestionstatemachineStateMachineEventsRoleDefaultPolicyADFFF3A8
-      Roles:
-        - Ref: ingestionstatemachineStateMachineEventsRole6AF5B0D7
-    Metadata:
-      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/EventsRole/DefaultPolicy/Resource
-  ingestionstatemachinesfnrule80009270:
-    Type: AWS::Events::Rule
-    Properties:
-      EventBusName:
-        Ref: sidekickBus3BCAB053
-      EventPattern:
-        detail-type:
-          - START-DOCUMENT-EXTRACTION
-      State: ENABLED
-      Targets:
-        - Arn:
-            Ref: ingestionstatemachineStateMachineFBFFBA38
-          Id: Target0
-          RoleArn:
-            Fn::GetAtt:
-              - ingestionstatemachineStateMachineEventsRole6AF5B0D7
-              - Arn
-    Metadata:
-      aws:cdk:path: SideKickStack/ingestion-state-machine/sfn-rule/Resource
-  sidekickTableFDBE0BEC:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: PK
-          AttributeType: S
-        - AttributeName: SK
-          AttributeType: S
-      KeySchema:
-        - AttributeName: PK
-          KeyType: HASH
-        - AttributeName: SK
-          KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-    UpdateReplacePolicy: Retain
-    DeletionPolicy: Retain
-    Metadata:
-      aws:cdk:path: SideKickStack/sidekickTable/Resource
-  sidekickApiLambdaServiceRole55313979:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-        Version: "2012-10-17"
-      ManagedPolicyArns:
-        - Fn::Join:
-            - ""
-            - - "arn:"
-              - Ref: AWS::Partition
-              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-    Metadata:
-      aws:cdk:path: SideKickStack/sidekickApiLambda/ServiceRole/Resource
-  sidekickApiLambdaServiceRoleDefaultPolicy7950B24D:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Action:
-              - dynamodb:DeleteItem
-              - dynamodb:DescribeTable
-              - dynamodb:PutItem
-              - dynamodb:Query
-              - dynamodb:Scan
-              - dynamodb:UpdateItem
-            Effect: Allow
-            Resource:
-              Fn::GetAtt:
-                - sidekickTableFDBE0BEC
-                - Arn
-          - Action: states:StartExecution
-            Effect: Allow
-            Resource:
-              Ref: ingestionstatemachineStateMachineFBFFBA38
-        Version: "2012-10-17"
-      PolicyName: sidekickApiLambdaServiceRoleDefaultPolicy7950B24D
-      Roles:
-        - Ref: sidekickApiLambdaServiceRole55313979
-    Metadata:
-      aws:cdk:path: SideKickStack/sidekickApiLambda/ServiceRole/DefaultPolicy/Resource
-  sidekickApiLambda9B98FB90:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code:
-        S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: f7edb6e1c70027b1185ef1a2db7bb0700c5734c50316ba0ba9ed366a652c920e.zip
-      Environment:
-        Variables:
-          INGESTION_SFN:
-            Ref: ingestionstatemachineStateMachineFBFFBA38
-      Handler: index.handler
-      Role:
-        Fn::GetAtt:
-          - sidekickApiLambdaServiceRole55313979
-          - Arn
-      Runtime: python3.9
-    DependsOn:
-      - sidekickApiLambdaServiceRoleDefaultPolicy7950B24D
-      - sidekickApiLambdaServiceRole55313979
-    Metadata:
-      aws:cdk:path: SideKickStack/sidekickApiLambda/Resource
-      aws:asset:path: asset.f7edb6e1c70027b1185ef1a2db7bb0700c5734c50316ba0ba9ed366a652c920e
-      aws:asset:is-bundled: true
-      aws:asset:property: Code
-  AuthorizerLogGroup2583BEC8:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      RetentionInDays: 731
-    UpdateReplacePolicy: Retain
-    DeletionPolicy: Retain
-    Metadata:
-      aws:cdk:path: SideKickStack/AuthorizerLogGroup/Resource
-  AuthorizerLambdaServiceRole30885946:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-        Version: "2012-10-17"
-      ManagedPolicyArns:
-        - Fn::Join:
-            - ""
-            - - "arn:"
-              - Ref: AWS::Partition
-              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-    Metadata:
-      aws:cdk:path: SideKickStack/AuthorizerLambda/ServiceRole/Resource
-  AuthorizerLambda972EEEAB:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code:
-        S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 0728ebc161eaeabf2deb4de2862c4cd211eb26e7163aa1dd417f1afebd03f38c.zip
-      Handler: index.handler
-      LoggingConfig:
-        LogGroup:
-          Ref: AuthorizerLogGroup2583BEC8
-      Role:
-        Fn::GetAtt:
-          - AuthorizerLambdaServiceRole30885946
-          - Arn
-      Runtime: python3.9
-    DependsOn:
-      - AuthorizerLambdaServiceRole30885946
-    Metadata:
-      aws:cdk:path: SideKickStack/AuthorizerLambda/Resource
-      aws:asset:path: asset.0728ebc161eaeabf2deb4de2862c4cd211eb26e7163aa1dd417f1afebd03f38c
-      aws:asset:is-bundled: true
-      aws:asset:property: Code
-  AuthorizerLambdaSideKickStackApiAuthorizer429ED155Permissions48A76F73:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName:
-        Fn::GetAtt:
-          - AuthorizerLambda972EEEAB
-          - Arn
-      Principal: apigateway.amazonaws.com
-      SourceArn:
-        Fn::Join:
-          - ""
-          - - "arn:aws:execute-api:eu-west-1:339712865666:"
-            - Ref: sidekickApi0AE7347E
-            - /authorizers/
-            - Ref: ApiAuthorizer68095F41
-    Metadata:
-      aws:cdk:path: SideKickStack/AuthorizerLambda/SideKickStackApiAuthorizer429ED155:Permissions
   FrontendBucketEFE2E19C:
     Type: AWS::S3::Bucket
     Properties:
@@ -390,6 +163,391 @@ Resources:
                     - Ref: CloudfrontDistributionOrigin1S3Origin80C6EA5F
     Metadata:
       aws:cdk:path: SideKickStack/CloudfrontDistribution/Resource
+  caseBucketC8DD2304:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: sidekick-cases
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - PUT
+              - GET
+            AllowedOrigins:
+              - Fn::Join:
+                  - ""
+                  - - https://
+                    - Fn::GetAtt:
+                        - CloudfrontDistributionE1C514EC
+                        - DomainName
+              - http://localhost:3000
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: aws-cdk:auto-delete-objects
+          Value: "true"
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: SideKickStack/caseBucket/Resource
+  caseBucketPolicyA4B3F164:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: caseBucketC8DD2304
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:DeleteObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:PutBucketPolicy
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
+                  - Arn
+            Resource:
+              - Fn::GetAtt:
+                  - caseBucketC8DD2304
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - caseBucketC8DD2304
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: SideKickStack/caseBucket/Policy/Resource
+  caseBucketAutoDeleteObjectsCustomResourceE72D3F6E:
+    Type: Custom::S3AutoDeleteObjects
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F
+          - Arn
+      BucketName:
+        Ref: caseBucketC8DD2304
+    DependsOn:
+      - caseBucketPolicyA4B3F164
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: SideKickStack/caseBucket/AutoDeleteObjectsCustomResource/Default
+  ingestionstatemachinesidekickApiLambdaServiceRoleB350AB2E:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/sidekickApiLambda/ServiceRole/Resource
+  ingestionstatemachinesidekickApiLambdaServiceRoleDefaultPolicy40929AE6:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: textract:*
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: ingestionstatemachinesidekickApiLambdaServiceRoleDefaultPolicy40929AE6
+      Roles:
+        - Ref: ingestionstatemachinesidekickApiLambdaServiceRoleB350AB2E
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/sidekickApiLambda/ServiceRole/DefaultPolicy/Resource
+  ingestionstatemachinesidekickApiLambdaE5F3A3E6:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
+        S3Key: 377efc1ac279ea540057e820abf764b20a090773669e0e3bf4ac13e565cd7ec4.zip
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - ingestionstatemachinesidekickApiLambdaServiceRoleB350AB2E
+          - Arn
+      Runtime: python3.9
+    DependsOn:
+      - ingestionstatemachinesidekickApiLambdaServiceRoleDefaultPolicy40929AE6
+      - ingestionstatemachinesidekickApiLambdaServiceRoleB350AB2E
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/sidekickApiLambda/Resource
+      aws:asset:path: asset.377efc1ac279ea540057e820abf764b20a090773669e0e3bf4ac13e565cd7ec4
+      aws:asset:is-bundled: true
+      aws:asset:property: Code
+  ingestionstatemachineStateMachineRole3043E50A:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/Role/Resource
+  ingestionstatemachineStateMachineRoleDefaultPolicy91CE380D:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: lambda:InvokeFunction
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - ingestionstatemachinesidekickApiLambdaE5F3A3E6
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - ingestionstatemachinesidekickApiLambdaE5F3A3E6
+                        - Arn
+                    - :*
+        Version: "2012-10-17"
+      PolicyName: ingestionstatemachineStateMachineRoleDefaultPolicy91CE380D
+      Roles:
+        - Ref: ingestionstatemachineStateMachineRole3043E50A
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/Role/DefaultPolicy/Resource
+  ingestionstatemachineStateMachineFBFFBA38:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString:
+        Fn::Join:
+          - ""
+          - - '{"StartAt":"StartState","States":{"StartState":{"Type":"Pass","Next":"Call Textract With Lambda"},"Call Textract With Lambda":{"End":true,"Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","Resource":"arn:'
+            - Ref: AWS::Partition
+            - :states:::lambda:invoke","Parameters":{"FunctionName":"
+            - Fn::GetAtt:
+                - ingestionstatemachinesidekickApiLambdaE5F3A3E6
+                - Arn
+            - '","Payload.$":"$"}}}}'
+      RoleArn:
+        Fn::GetAtt:
+          - ingestionstatemachineStateMachineRole3043E50A
+          - Arn
+    DependsOn:
+      - ingestionstatemachineStateMachineRoleDefaultPolicy91CE380D
+      - ingestionstatemachineStateMachineRole3043E50A
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/Resource
+  ingestionstatemachineStateMachineEventsRole6AF5B0D7:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/EventsRole/Resource
+  ingestionstatemachineStateMachineEventsRoleDefaultPolicyADFFF3A8:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: states:StartExecution
+            Effect: Allow
+            Resource:
+              Ref: ingestionstatemachineStateMachineFBFFBA38
+        Version: "2012-10-17"
+      PolicyName: ingestionstatemachineStateMachineEventsRoleDefaultPolicyADFFF3A8
+      Roles:
+        - Ref: ingestionstatemachineStateMachineEventsRole6AF5B0D7
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/StateMachine/EventsRole/DefaultPolicy/Resource
+  ingestionstatemachinesfnrule80009270:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName:
+        Ref: sidekickBus3BCAB053
+      EventPattern:
+        detail-type:
+          - START-DOCUMENT-EXTRACTION
+      State: ENABLED
+      Targets:
+        - Arn:
+            Ref: ingestionstatemachineStateMachineFBFFBA38
+          Id: Target0
+          RoleArn:
+            Fn::GetAtt:
+              - ingestionstatemachineStateMachineEventsRole6AF5B0D7
+              - Arn
+    Metadata:
+      aws:cdk:path: SideKickStack/ingestion-state-machine/sfn-rule/Resource
+  sidekickApiLambdaServiceRole55313979:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApiLambda/ServiceRole/Resource
+  sidekickApiLambdaServiceRoleDefaultPolicy7950B24D:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - dynamodb:DeleteItem
+              - dynamodb:DescribeTable
+              - dynamodb:PutItem
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:UpdateItem
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - sidekickTableFDBE0BEC
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: sidekickApiLambdaServiceRoleDefaultPolicy7950B24D
+      Roles:
+        - Ref: sidekickApiLambdaServiceRole55313979
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApiLambda/ServiceRole/DefaultPolicy/Resource
+  sidekickApiLambda9B98FB90:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
+        S3Key: f7edb6e1c70027b1185ef1a2db7bb0700c5734c50316ba0ba9ed366a652c920e.zip
+      Environment:
+        Variables:
+          INGESTION_SFN:
+            Ref: ingestionstatemachineStateMachineFBFFBA38
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - sidekickApiLambdaServiceRole55313979
+          - Arn
+      Runtime: python3.9
+    DependsOn:
+      - sidekickApiLambdaServiceRoleDefaultPolicy7950B24D
+      - sidekickApiLambdaServiceRole55313979
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickApiLambda/Resource
+      aws:asset:path: asset.f7edb6e1c70027b1185ef1a2db7bb0700c5734c50316ba0ba9ed366a652c920e
+      aws:asset:is-bundled: true
+      aws:asset:property: Code
+  sidekickTableFDBE0BEC:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: SideKickStack/sidekickTable/Resource
+  AuthorizerLogGroup2583BEC8:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 731
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: SideKickStack/AuthorizerLogGroup/Resource
+  AuthorizerLambdaServiceRole30885946:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: SideKickStack/AuthorizerLambda/ServiceRole/Resource
+  AuthorizerLambda972EEEAB:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
+        S3Key: 0728ebc161eaeabf2deb4de2862c4cd211eb26e7163aa1dd417f1afebd03f38c.zip
+      Handler: index.handler
+      LoggingConfig:
+        LogGroup:
+          Ref: AuthorizerLogGroup2583BEC8
+      Role:
+        Fn::GetAtt:
+          - AuthorizerLambdaServiceRole30885946
+          - Arn
+      Runtime: python3.9
+    DependsOn:
+      - AuthorizerLambdaServiceRole30885946
+    Metadata:
+      aws:cdk:path: SideKickStack/AuthorizerLambda/Resource
+      aws:asset:path: asset.0728ebc161eaeabf2deb4de2862c4cd211eb26e7163aa1dd417f1afebd03f38c
+      aws:asset:is-bundled: true
+      aws:asset:property: Code
+  AuthorizerLambdaSideKickStackApiAuthorizer429ED155Permissions48A76F73:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - AuthorizerLambda972EEEAB
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:eu-west-1:339712865666:"
+            - Ref: sidekickApi0AE7347E
+            - /authorizers/
+            - Ref: ApiAuthorizer68095F41
+    Metadata:
+      aws:cdk:path: SideKickStack/AuthorizerLambda/SideKickStackApiAuthorizer429ED155:Permissions
   BucketDeploymentAwsCliLayerB018DCE1:
     Type: AWS::Lambda::LayerVersion
     Properties:
@@ -1834,83 +1992,6 @@ Resources:
         Ref: sidekickApi0AE7347E
     Metadata:
       aws:cdk:path: SideKickStack/sidekickApi/Default/download/{caseId}/GET/Resource
-  caseBucketC8DD2304:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: sidekick-cases
-      CorsConfiguration:
-        CorsRules:
-          - AllowedHeaders:
-              - "*"
-            AllowedMethods:
-              - PUT
-              - GET
-            AllowedOrigins:
-              - Fn::Join:
-                  - ""
-                  - - https://
-                    - Fn::GetAtt:
-                        - CloudfrontDistributionE1C514EC
-                        - DomainName
-              - http://localhost:3000
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      Tags:
-        - Key: aws-cdk:auto-delete-objects
-          Value: "true"
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
-    Metadata:
-      aws:cdk:path: SideKickStack/caseBucket/Resource
-  caseBucketPolicyA4B3F164:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket:
-        Ref: caseBucketC8DD2304
-      PolicyDocument:
-        Statement:
-          - Action:
-              - s3:DeleteObject*
-              - s3:GetBucket*
-              - s3:List*
-              - s3:PutBucketPolicy
-            Effect: Allow
-            Principal:
-              AWS:
-                Fn::GetAtt:
-                  - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
-                  - Arn
-            Resource:
-              - Fn::GetAtt:
-                  - caseBucketC8DD2304
-                  - Arn
-              - Fn::Join:
-                  - ""
-                  - - Fn::GetAtt:
-                        - caseBucketC8DD2304
-                        - Arn
-                    - /*
-        Version: "2012-10-17"
-    Metadata:
-      aws:cdk:path: SideKickStack/caseBucket/Policy/Resource
-  caseBucketAutoDeleteObjectsCustomResourceE72D3F6E:
-    Type: Custom::S3AutoDeleteObjects
-    Properties:
-      ServiceToken:
-        Fn::GetAtt:
-          - CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F
-          - Arn
-      BucketName:
-        Ref: caseBucketC8DD2304
-    DependsOn:
-      - caseBucketPolicyA4B3F164
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
-    Metadata:
-      aws:cdk:path: SideKickStack/caseBucket/AutoDeleteObjectsCustomResource/Default
   textractResponseParserServiceRoleE942AC8E:
     Type: AWS::IAM::Role
     Properties:
@@ -2110,7 +2191,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/3VTTW/bMAz9Lb0rWtvtsKuTrMOAFDXSbddAkRmXjSwa+kjgGf7vo2QnMYYOMMBH8umREulH+fDlXt7fqbNf6Oq4MLiX/WtQ+ig4tOvhBDZ42X9Ldhm9WB3sFW+jgRRIdhA+QHuIVgckyydK5b1gpQDPSr+hzcy5PwhUjey3NIkkW5JB3SV3RIOoOqsaqrirn2o/MjMYhFHNvlKyf5pqptQcl+Aa9H7yNqoD9xtc9l/R1gYCXfnc/eddzx0DX7ZIRlTQGuoavqpcRn2EsL4GElv2Y3SpPIgRpjITGs3tNnOfO6eaH2hD9XdHsc3dTXgQ2lCsDo64bL9GHxzuY77Ri8MabaE1eP+j4i4wZOlVOvCUDvyPMZfhAlRbDCT7Xx5cSWQS5YovYGWQBeapKXJx19QotHPCGBmEarHmKZ9VxzOjI9gihjdy+Adcos+8TZ7gFnwoWsw7MMHbU+f+bx7vT31ZJAbMp+g05CE8AwtXKTmhS3ZSzngYbuE85yTE2yBW0QdqPjryT6p0dMIKXK457uDOpOXa8Q+jDcri7Pmt8r4lmZcY2sgrY6kC+e4/nR6+Sv4e79494sJFHlMDcjvavwQAcWqPAwAA
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VT227bMAz9lr4rWm8Pe3WSdSiQoka67TVQZMZlI4uGLgkyw/8+SnYSr9iAADwkj455y728e7yVtzfq6Ge62s8MbmX3FpTeCw5tOjiADV5235KdRy8WO3vB62ggBZLthX+Q3TzqPYQUG9FgSjKoT9fw6A/OXHl+rQ3FaufIBtkt0QeH2xiQrHh1WKMttAbvnyv+MoastEgPntKD/zGmMr0wqtlWSnZP0eoszIwpLsE16P3ordQJ3C9w2X9DWxsIdOH3AlUjuzWN/Sd77XFAaSCbTnkPPL8iGVFBa+jUcIVyaH15CTA7QLsb9f0mKL/3cpVrfrYH2sPfBNmVLC14UwFelH5HmyuZ+r2oTlY1VPFGf6jtUGoGPAyqWWJF9XdHsc0Nj5g3QbXFQLL76cGVRCalL/gMFga57GlqjJzdJTUK7ZQwRHqhWqy5zKM6cWHcmS1ieCeHv8El+sQb+l+DD0WLedIjvA4uL/rq8QDq8yQYMJ+i05BuTLwAC1cpOaJzdlTOuO/FIvpAzb+Sn1KlowNW4LJ6XnH6Kh/LVXm4uo1J57Thf5Q2KIuj51nlC0virzG0kQ/AUgXyw3853H2V/Lu/+fCIMxf5nhuQ68H+ATnzo42wAwAA
     Metadata:
       aws:cdk:path: SideKickStack/CDKMetadata/Default
 Outputs:

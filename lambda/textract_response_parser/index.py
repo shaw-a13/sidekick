@@ -9,14 +9,25 @@ def handler(event, context):
     print(event)
 
     case_id = event['caseId']
+    doc_id = event['key'].split('/')[1]
     s3 = boto3.resource('s3')
 
-    content_object = s3.Object(BUCKETNAME, f'{event["caseId"]}/rawResults/analyzeDocResponse.json')
-    file_content = content_object.get()['Body'].read().decode('utf-8')
-    json_content = json.loads(file_content)
-    print(json_content)
+    job_id = event["textractResponse"]["JobId"]
+    textract = boto3.client("textract")
 
-    doc = Document(json_content)
+    response = textract.get_document_analysis(
+        JobId=job_id
+    )
+
+    # content_object = s3.Object(BUCKETNAME, f'{event["caseId"]}/rawResults/analyzeDocResponse.json')
+    # file_content = content_object.get()['Body'].read().decode('utf-8')
+    print(response)
+    # json_content = json.loads(response)
+    # print(json_content)
+
+    doc = Document(response)
+
+    print(doc)
 
     results = []
 
@@ -26,7 +37,7 @@ def handler(event, context):
             if result is not None:
                 results.append(result)
 
-    key = f'{case_id}/processedResults/processedResults.json'
+    key = f'{case_id}/{doc_id}/processedResults/processedResults.json'
 
     processedResult = s3.Object(BUCKETNAME, key)
     processedResult.put(

@@ -23,64 +23,6 @@ export class SidekickStack extends cdk.Stack {
       eventBusName: 'SidekickBus'
     });
 
-    const ingestionSfn = new IngestionSfnConstruct(this, 'ingestion-state-machine', sidekickBus);
-
-    const sidekickTable = new dynamodb.Table(this, 'sidekickTable', {
-      partitionKey: {
-        name: 'PK',
-        type: dynamodb.AttributeType.STRING,
-      },
-      sortKey: {
-        name: 'SK',
-        type: dynamodb.AttributeType.STRING,
-      }
-    });
-
-    const sidekickApiLambda = new lambda.Function(this, 'sidekickApiLambda', {
-      code: lambda.Code.fromAsset(('lambda/sidekick_api'), {
-        bundling: {
-          image: lambda.Runtime.PYTHON_3_9.bundlingImage,
-          command: [
-            'bash', '-c',
-            'pip install -r requirements.txt -t /asset-output && rsync -r . /asset-output'
-          ],
-        },
-      }),
-      runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'index.handler',
-      environment: {
-        INGESTION_SFN: ingestionSfn.stateMachine.stateMachineArn
-      }
-    });
-
-    sidekickApiLambda.addToRolePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['dynamodb:DescribeTable','dynamodb:Scan','dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
-      resources: [sidekickTable.tableArn]
-    }))
-
-    sidekickApiLambda.addToRolePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['states:StartExecution'],
-      resources: [ingestionSfn.stateMachine.stateMachineArn]
-    }))
-
-    const authorizerLambda = new lambda.Function(this, 'AuthorizerLambda', {
-      code: lambda.Code.fromAsset(('lambda/authorizer_lambda'), {
-        bundling: {
-          image: lambda.Runtime.PYTHON_3_9.bundlingImage,
-          command: [
-            'bash', '-c',
-            'pip install -r requirements.txt -t /asset-output && rsync -r . /asset-output'
-          ],
-        },
-      }),
-      logGroup: new cdk.aws_logs.LogGroup(this, 'AuthorizerLogGroup'),
-      runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'index.handler',
-    });
-
-    //Create S3 Bucket for our website
     const siteBucket = new s3.Bucket(this, 'FrontendBucket', {
       autoDeleteObjects: true,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
@@ -105,6 +47,66 @@ export class SidekickStack extends cdk.Stack {
           responsePagePath: '/index.html',
         },
       ],
+    });
+
+
+    const caseBucket = new s3.Bucket(this, 'caseBucket', {
+      bucketName: 'sidekick-cases',
+      autoDeleteObjects: true,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      cors: [{ allowedHeaders: ['*'], allowedMethods: [s3.HttpMethods.PUT, s3.HttpMethods.GET], allowedOrigins: [`https://${distribution.domainName}`, 'http://localhost:3000'] }],
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const ingestionSfn = new IngestionSfnConstruct(this, 'ingestion-state-machine', sidekickBus, caseBucket);
+
+    const sidekickApiLambda = new lambda.Function(this, 'sidekickApiLambda', {
+      code: lambda.Code.fromAsset(('lambda/sidekick_api'), {
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_9.bundlingImage,
+          command: [
+            'bash', '-c',
+            'pip install -r requirements.txt -t /asset-output && rsync -r . /asset-output'
+          ],
+        },
+      }),
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'index.handler',
+      environment: {
+        INGESTION_SFN: ingestionSfn.stateMachine.stateMachineArn
+      }
+    });
+
+    const sidekickTable = new dynamodb.Table(this, 'sidekickTable', {
+      partitionKey: {
+        name: 'PK',
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'SK',
+        type: dynamodb.AttributeType.STRING,
+      }
+    });
+
+    sidekickApiLambda.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['dynamodb:DescribeTable','dynamodb:Scan','dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
+      resources: [sidekickTable.tableArn]
+    }))
+
+    const authorizerLambda = new lambda.Function(this, 'AuthorizerLambda', {
+      code: lambda.Code.fromAsset(('lambda/authorizer_lambda'), {
+        bundling: {
+          image: lambda.Runtime.PYTHON_3_9.bundlingImage,
+          command: [
+            'bash', '-c',
+            'pip install -r requirements.txt -t /asset-output && rsync -r . /asset-output'
+          ],
+        },
+      }),
+      logGroup: new cdk.aws_logs.LogGroup(this, 'AuthorizerLogGroup'),
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'index.handler',
     });
 
     new s3Deployment.BucketDeployment(this, 'BucketDeployment', {
@@ -184,35 +186,6 @@ export class SidekickStack extends cdk.Stack {
       }
     });
     ingestion.addMethod('POST');
-
-    const caseBucket = new s3.Bucket(this, 'caseBucket', {
-      bucketName: 'sidekick-cases',
-      autoDeleteObjects: true,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      cors: [{ allowedHeaders: ['*'], allowedMethods: [s3.HttpMethods.PUT, s3.HttpMethods.GET], allowedOrigins: [`https://${distribution.domainName}`, 'http://localhost:3000'] }],
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
-
-    const textractResponseParser = new lambda.Function(this, 'textractResponseParser', {
-      code: lambda.Code.fromAsset(('lambda/textract_response_parser'), {
-        bundling: {
-          image: lambda.Runtime.PYTHON_3_9.bundlingImage,
-          command: [
-            'bash', '-c',
-            'pip install -r requirements.txt -t /asset-output && rsync -r . /asset-output'
-          ],
-        },
-      }),
-      runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'index.handler',
-      timeout: cdk.Duration.seconds(60)
-    });
-
-    textractResponseParser.addToRolePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['s3:GetObject','s3:PutObject'],
-      resources: [caseBucket.bucketArn, `${caseBucket.bucketArn}/*`]
-    }))
 
     const generatePresignedUrlLambda = new lambda.Function(this, 'GeneratePresignedUrlLambda', {
       code: lambda.Code.fromAsset(('lambda/generate_presigned_url'), {
