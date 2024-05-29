@@ -19,11 +19,25 @@ def handler(event, context):
         JobId=job_id
     )
 
-    # content_object = s3.Object(BUCKETNAME, f'{event["caseId"]}/rawResults/analyzeDocResponse.json')
-    # file_content = content_object.get()['Body'].read().decode('utf-8')
+    print(f"Initial Next Token: {response.get('NextToken')}")
+    next_token = response.get('NextToken')
+
+    while next_token and len(next_token) > 1:
+        print('Next token detected, getting more results')
+        next_response = textract.get_document_analysis(JobId=job_id, NextToken=next_token)
+        response['Blocks'].extend(next_response['Blocks'])
+
+        print(f"Next Token: {next_response.get('NextToken')}")
+        next_token = next_response.get('NextToken')
+
+    print('All results received')
     print(response)
-    # json_content = json.loads(response)
-    # print(json_content)
+
+    rawKey = f'{case_id}/{doc_id}/rawResults/analyzeDocResponse.json'
+    rawResult = s3.Object(BUCKETNAME, rawKey)
+    rawResult.put(
+        Body=(bytes(json.dumps(response).encode('UTF-8')))
+    )
 
     doc = Document(response)
 
@@ -37,14 +51,14 @@ def handler(event, context):
             if result is not None:
                 results.append(result)
 
-    key = f'{case_id}/{doc_id}/processedResults/processedResults.json'
+    processedkey = f'{case_id}/{doc_id}/processedResults/processedResults.json'
 
-    processedResult = s3.Object(BUCKETNAME, key)
+    processedResult = s3.Object(BUCKETNAME, processedkey)
     processedResult.put(
         Body=(bytes(json.dumps(results).encode('UTF-8')))
     )
         
-    return key
+    return {"processedResults": processedkey, "rawResults": rawKey}
 
 
 def build_entity(attribute_name: str, value: str, locations: dict, source: str, score) -> Dict[str, str]:

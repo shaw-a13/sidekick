@@ -60,7 +60,8 @@ export class IngestionSfnConstruct extends Construct {
         const getDocumentAnalysisLambdaTask = new tasks.LambdaInvoke(this, 'Get Textract Results',
             {
                 lambdaFunction: textractResponseParser, resultPath: '$.textractResults', resultSelector: {
-                    "processedResults.$": "$.Payload"
+                    "processedResults.$": "$.Payload.processedResults",
+                    "rawResults.$": "$.Payload.rawResults"
                 }
             })
 
@@ -69,7 +70,6 @@ export class IngestionSfnConstruct extends Construct {
                 callTextract
                     .next(new sfn.Wait(this, 'Wait for textract', { time: sfn.WaitTime.duration(cdk.Duration.seconds(30)) }))
                     .next(getDocumentAnalysisLambdaTask)
-                    .next(new sfn.Pass(this, 'Document Analysis Complete'))
             ),
         });
 
