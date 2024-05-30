@@ -12,6 +12,7 @@ import {
   Spinner,
   Table,
   Form,
+  Modal,
 } from "react-bootstrap";
 import { DocumentService } from "../services/document.service";
 import axios from "axios";
@@ -47,6 +48,9 @@ const Case = () => {
   const [docApiData, setDocApiData] = useState<DocumentResultResponse>();
   const [extractionData, setExtractionData] = useState<ExtractionResult[]>();
   const [documentData, setDocumentData] = useState("");
+  const [uploadModal, setUploadModal] = useState(false);
+  const [uploadFile, setUploadFile] = useState<any>();
+  const [showLoader, setShowLoader] = useState(false);
 
   const documentService = new DocumentService();
   const { id } = useParams();
@@ -65,6 +69,32 @@ const Case = () => {
     } catch (e: any) {
       console.log(e.message);
     }
+  };
+
+  const uploadDocument = async (document: any, caseId: string) => {
+    const documentService = new DocumentService();
+
+    // GET request: presigned URL
+    await getAccessToken().then(async (token) => {
+      console.log(token);
+      documentService.getPresignedUrl(token!, caseId).then(async (res) => {
+        const presignedUrl = res?.data.presignedUrl;
+        const key = res?.data.key;
+        console.log(presignedUrl);
+        console.log(key);
+        if (presignedUrl) {
+          await documentService
+            .uploadDocument(presignedUrl, document)
+            .then(async () => {
+              await documentService
+                .triggerIngestion(token!, caseId, key!)
+                .then(async (ingeRes) => {
+                  console.log(`IngesRes: ${ingeRes?.data.executionArn}`);
+                });
+            });
+        }
+      });
+    });
   };
 
   const caseService = new CaseService();
@@ -119,12 +149,55 @@ const Case = () => {
         }
       });
 
-      setLoading(false);
+    setLoading(false);
     });
   }, []);
 
   return (
     <div style={{ paddingTop: "8rem" }}>
+      {uploadModal && (
+        <Modal show={uploadModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Upload Document</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group controlId="formFileLg" className="mb-3">
+              <Form.Label>
+                Please upload the file you wish to analyse
+              </Form.Label>
+              <Form.Control
+                type="file"
+                onChange={(event) => {
+                  const target = event.target as HTMLInputElement;
+                  setUploadFile((target.files as FileList)[0]);
+                  document
+                    .getElementById("submitUploadBtn")!
+                    .classList.remove("d-none");
+                }}
+              />
+            </Form.Group>
+            <div className="text-center mt-3">
+              {showLoader && <Spinner animation="border" />}
+            </div>
+            <div className="text-center mt-3">
+              <Button
+                style={{ backgroundColor: "#CF7650", border: "none" }}
+                id="submitUploadBtn"
+                className="d-none"
+                onClick={() => {
+                  uploadDocument(uploadFile, id!);
+                  setShowLoader(true);
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 1000);
+                }}
+              >
+                Upload
+              </Button>
+            </div>
+          </Modal.Body>
+        </Modal>
+      )}
       <div>
         {loading && (
           <div>
@@ -149,7 +222,7 @@ const Case = () => {
                         <Button
                           style={{ backgroundColor: "#CF7650", border: "none" }}
                           onClick={() => {
-                            setEditCaseDetails(!editCaseDetails);
+                            setUploadModal(true);
                           }}
                         >
                           Upload
