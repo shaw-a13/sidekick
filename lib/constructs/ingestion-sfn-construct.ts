@@ -30,6 +30,17 @@ export class IngestionSfnConstruct extends Construct {
             resultPath: '$.textractResponse'
         });
 
+        const getExtractionStatus = new tasks.CallAwsService(this, 'Get Extraction Status', {
+            service: 'textract',
+            action: 'getDocumentAnalysis',
+            parameters: {
+                JobId: sfn.JsonPath.stringAt('$.textractResponse.JobId'),
+                MaxResults: 1,
+            },
+            iamResources: [bucket.bucketArn, `${bucket.bucketArn}/*`],
+            resultPath: '$.textractStatus'
+        });
+
         const textractResponseParser = new lambda.Function(this, 'textractResponseParser', {
             code: lambda.Code.fromAsset(('lambda/textract_response_parser'), {
                 bundling: {
@@ -65,17 +76,24 @@ export class IngestionSfnConstruct extends Construct {
                 }
             })
 
+        const waitForResults = new sfn.Wait(this, 'Wait for textract', { time: sfn.WaitTime.duration(cdk.Duration.seconds(5)) })
+
         this.stateMachine = new sfn.StateMachine(this, 'StateMachine', {
             definitionBody: sfn.DefinitionBody.fromChainable(
                 callTextract
-                    .next(new sfn.Wait(this, 'Wait for textract', { time: sfn.WaitTime.duration(cdk.Duration.seconds(30)) }))
-                    .next(getDocumentAnalysisLambdaTask)
+                    .next(waitForResults)
+                    .next(getExtractionStatus)
+                    .next(new sfn.Choice(this, 'Extraction complete?')
+                        .when(
+                            sfn.Condition.stringEquals('$.textractStatus.JobStatus', 'SUCCEEDED'), getDocumentAnalysisLambdaTask
+                        )
+                        .otherwise(waitForResults))
             ),
         });
 
         this.stateMachine.addToRolePolicy(new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
-            actions: ['textract:StartDocumentAnalysis'],
+            actions: ['textract:StartDocumentAnalysis', 'textract:GetDocumentAnalysis'],
             resources: ['*']
         }))
 

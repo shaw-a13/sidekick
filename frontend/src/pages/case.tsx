@@ -85,12 +85,16 @@ const Case = () => {
   let results: ExtractionResult;
 
   const updateExtractionData = async (docNo: number) => {
-    await axios
-      .get<ExtractionResult[]>(docApiData!.urls[docNo].processed)
-      .then((res) => {
-        setExtractionData(res.data);
-        console.log(extractionData);
-      });
+    try {
+      await axios
+        .get<ExtractionResult[]>(docApiData!.urls[docNo].processed)
+        .then((res) => {
+          setExtractionData(res.data);
+          console.log(extractionData);
+        });
+    } catch (error) {
+      setExtractionData(undefined);
+    }
   };
 
   useEffect(() => {
@@ -103,12 +107,16 @@ const Case = () => {
         console.log(res);
         setDocApiData(res?.data);
         setDocumentData(res?.data.urls[docNo].original!);
-        await axios
-          .get<ExtractionResult[]>(res?.data.urls[docNo].processed!)
-          .then((res) => {
-            setExtractionData(res.data);
-            console.log(res.data);
-          });
+        try {
+          await axios
+            .get<ExtractionResult[]>(res?.data.urls[docNo].processed!)
+            .then((res) => {
+              setExtractionData(res.data);
+              console.log(res.data);
+            });
+        } catch (error) {
+          setExtractionData(undefined);
+        }
       });
 
       setLoading(false);
@@ -318,17 +326,33 @@ const Case = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {extractionData!.map((result: ExtractionResult) => (
-                            <tr>
-                              <td>{result.key}</td>
-                              <td>{result.value}</td>
-                              <td>{result.locations.pageNumber}</td>
-                              <td>{result.score}</td>
-                              <td>{result.source}</td>
-                            </tr>
-                          ))}
+                          {extractionData &&
+                            extractionData!.map((result: ExtractionResult) => (
+                              <tr>
+                                <td>{result.key}</td>
+                                <td>{result.value}</td>
+                                <td>{result.locations.pageNumber}</td>
+                                <td>{result.score}</td>
+                                <td>{result.source}</td>
+                              </tr>
+                            ))}
                         </tbody>
                       </Table>
+                      {!extractionData && (
+                        <div className="text-center">
+                          <Container className="mt-5">
+                            <Row>
+                              <Col className="text-center">
+                                <h4>
+                                  Awaiting extraction results, please refresh
+                                  the page
+                                </h4>
+                                <Spinner animation="border" />
+                              </Col>
+                            </Row>
+                          </Container>
+                        </div>
+                      )}
                     </Card.Body>
                   </Card>
                 </Col>

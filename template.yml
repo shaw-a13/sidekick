@@ -291,7 +291,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: cdk-hnb659fds-assets-339712865666-eu-west-1
-        S3Key: 4c4c68d758ad481e5348f59b9a6cde070de8e4a5d99510f7a2fda58ab55c3a4e.zip
+        S3Key: 668e61cc696fe7013011f690e0008a3831392a747372be1c39d7622fe494ed54.zip
       Handler: index.handler
       Role:
         Fn::GetAtt:
@@ -304,7 +304,7 @@ Resources:
       - ingestionstatemachinetextractResponseParserServiceRole18A62317
     Metadata:
       aws:cdk:path: SideKickStack/ingestion-state-machine/textractResponseParser/Resource
-      aws:asset:path: asset.4c4c68d758ad481e5348f59b9a6cde070de8e4a5d99510f7a2fda58ab55c3a4e
+      aws:asset:path: asset.668e61cc696fe7013011f690e0008a3831392a747372be1c39d7622fe494ed54
       aws:asset:is-bundled: true
       aws:asset:property: Code
   ingestionstatemachineStateMachineRole3043E50A:
@@ -326,6 +326,7 @@ Resources:
         Statement:
           - Action:
               - s3:GetObject
+              - textract:getDocumentAnalysis
               - textract:startDocumentAnalysis
             Effect: Allow
             Resource:
@@ -350,7 +351,9 @@ Resources:
                         - ingestionstatemachinetextractResponseParser6843823D
                         - Arn
                     - :*
-          - Action: textract:StartDocumentAnalysis
+          - Action:
+              - textract:GetDocumentAnalysis
+              - textract:StartDocumentAnalysis
             Effect: Allow
             Resource: "*"
         Version: "2012-10-17"
@@ -369,13 +372,15 @@ Resources:
             - Ref: AWS::Partition
             - :states:::aws-sdk:textract:startDocumentAnalysis","Parameters":{"DocumentLocation":{"S3Object":{"Bucket":"
             - Ref: caseBucketC8DD2304
-            - '","Name.$":"$.key"}},"FeatureTypes":["FORMS"]}},"Wait for textract":{"Type":"Wait","Seconds":30,"Next":"Get Textract Results"},"Get Textract Results":{"Next":"Document Analysis Complete","Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","ResultPath":"$.textractResults","ResultSelector":{"processedResults.$":"$.Payload"},"Resource":"arn:'
+            - '","Name.$":"$.key"}},"FeatureTypes":["FORMS"]}},"Wait for textract":{"Type":"Wait","Seconds":5,"Next":"Get Extraction Status"},"Get Extraction Status":{"Next":"Extraction complete?","Type":"Task","ResultPath":"$.textractStatus","Resource":"arn:'
+            - Ref: AWS::Partition
+            - ':states:::aws-sdk:textract:getDocumentAnalysis","Parameters":{"JobId.$":"$.textractResponse.JobId","MaxResults":1}},"Extraction complete?":{"Type":"Choice","Choices":[{"Variable":"$.textractStatus.JobStatus","StringEquals":"SUCCEEDED","Next":"Get Textract Results"}],"Default":"Wait for textract"},"Get Textract Results":{"End":true,"Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","ResultPath":"$.textractResults","ResultSelector":{"processedResults.$":"$.Payload.processedResults","rawResults.$":"$.Payload.rawResults"},"Resource":"arn:'
             - Ref: AWS::Partition
             - :states:::lambda:invoke","Parameters":{"FunctionName":"
             - Fn::GetAtt:
                 - ingestionstatemachinetextractResponseParser6843823D
                 - Arn
-            - '","Payload.$":"$"}},"Document Analysis Complete":{"Type":"Pass","End":true}}}'
+            - '","Payload.$":"$"}}}}'
       RoleArn:
         Fn::GetAtt:
           - ingestionstatemachineStateMachineRole3043E50A
@@ -610,7 +615,7 @@ Resources:
       SourceBucketNames:
         - cdk-hnb659fds-assets-339712865666-eu-west-1
       SourceObjectKeys:
-        - 2dc4b24c534b41a6bb9b331a0b84b8cca3982545ea7f14b16dd5956215949994.zip
+        - c1964417b20b27bf7163a6e16ca9c01f7ed6290ceec690a285f6789a05cf22e1.zip
       DestinationBucketName:
         Ref: FrontendBucketEFE2E19C
       Prune: true
@@ -2167,7 +2172,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/3VT227bMAz9lr4rWtvtYa+5rEOBFDWSXR4DRWZc1rJo6JIgM/zvo2QnMYoNMMDDq8hD+lE+fLmX93fq5Ge6rGcG97LbBqVrwaZdB0ewwcvuW5KL6MXyYK94Ew0kQ5K98J9lt4i6hpBsIxpEQQb1+WYe9UFZKM/Z2lAsD45skN0KfXC4jwHJileHFdq51uD9c8kvY8iVlinhKSX8L2JahtsL0B6i1Unzu6B8zWMtlTHzk9+CO6IGsVbNvlTP9kg1t2SyJrunMSvVnOICXIPej9pancH9Apf1LdrKQKBrfC9QNbLb0MhYkjdWBpQo3HXKe2DG50mIElpD54ZnkgNZq6vhw0Sy+60wiILTBe8vwIvSb2jza1O9F+XZqoZK3vMPtR/ayYAHporrrKn67ii2eagR836oshhIdj89uILIJPcVX8DSILc2dY2Wi7qiRqGdBgyWXqgWK27zpM7cGPNv5zG8kcM/4FL4RBu2tAEf5i1mNkd4Iyev/6YxAdWFCQYcT9FpSJcnXoALl8k5oot3rJxx34tl9IGafzk/uApHRyzB5ep5jelVPohb5eGydiadzI7/M21Q8hkyV/mKUvHXGNrIS7ZUgnz3n44PXyV/j3fvHnHmIl95A3IzyL91zH+OxgMAAA==
+      Analytics: v2:deflate64:H4sIAAAAAAAA/3VTyY7bMAz9lrkr6myHXrN0igEymCDpcgwUmXE4kUVDS4LU8L+Xkp3YGLSAAb5HShT5SD/Kh+d7eX+nzn6ii+PE4E42m6D0UbBr28AJbPCy+ZbsLHox39sbXkcDyZFsK/yTbGZRHyEkX486syKD+jK4e96RmfJ8WxuKxd6RDbJZoA8OdzEgWfHusEQ71Rq8fy34ZQw50zxdeEkX/ndinIbLC1Dvo9WJ+W1Q/shtzZUx07PfgDuhBrFU1a5Qr/ZERy7JZCabl/5WyjnGK3AVet+zpbqA+wUu8w3a0kCg2/lWoKpks6ZesWQHVTqUJNw2yntgxafJiAJqQ5eKe5KdWIub41NHsvmtkJU/UGqEJxjgTekD2vzemLeiuFhVUcGT/qF2XUEZcMtUcqYlld8dxTq31WOeEJUWA8nmpwe3IjIpfMNXMDfIxY1DvedKF1QptOMDnacVqsaSyzyrCxfGE7DTGA7k8A+4dHzEujmtwYdpjVnPHg7y5AUYGAtQXpVgwOcpOg1p98QbcOIiBXt0jfaZM25bMY8+UPWv4KfQytEJC3A5ex5kepVXYsjc7dbWpKXZ8p+mDUpeRNYq71FK/h5DHXnMlgqQH/7L6eGr5O/x7sMjTlzkPa9Arjv7F5TD+y3IAwAA
     Metadata:
       aws:cdk:path: SideKickStack/CDKMetadata/Default
 Outputs:
