@@ -18,6 +18,7 @@ import { DocumentService } from "../services/document.service";
 import axios from "axios";
 import { DocumentResultResponse } from "../interfaces/document/documentResultResponse.interface";
 import { CaseEditProps } from "../interfaces/case/caseEditProps.interface";
+
 interface ExtractionResult {
   key: string;
   locations: {
@@ -149,14 +150,14 @@ const Case = () => {
         }
       });
 
-    setLoading(false);
+      setLoading(false);
     });
   }, []);
 
   return (
     <div style={{ paddingTop: "8rem" }}>
       {uploadModal && (
-        <Modal show={uploadModal}>
+        <Modal show={uploadModal} onHide={() => setUploadModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Upload Document</Modal.Title>
           </Modal.Header>
@@ -181,9 +182,8 @@ const Case = () => {
             </div>
             <div className="text-center mt-3">
               <Button
-                style={{ backgroundColor: "#CF7650", border: "none" }}
                 id="submitUploadBtn"
-                className="d-none"
+                className="sidekick-primary-btn d-none"
                 onClick={() => {
                   uploadDocument(uploadFile, id!);
                   setShowLoader(true);
@@ -220,7 +220,7 @@ const Case = () => {
                       <Card.Title>
                         Case Documents{" "}
                         <Button
-                          style={{ backgroundColor: "#CF7650", border: "none" }}
+                          className="sidekick-primary-btn"
                           onClick={() => {
                             setUploadModal(true);
                           }}
@@ -232,11 +232,7 @@ const Case = () => {
                       <div className="mb-2">
                         {docApiData!.urls.map((doc, index) => (
                           <Button
-                            className="rounded-circle m-2"
-                            style={{
-                              backgroundColor: "#CF7650",
-                              border: "none",
-                            }}
+                            className="sidekick-primary-btn rounded-circle m-2"
                             onClick={() => {
                               updateExtractionData(index);
                               setDocumentData(docApiData!.urls[index].original);
@@ -264,7 +260,7 @@ const Case = () => {
                       <Card.Title>
                         Case Information{" "}
                         <Button
-                          style={{ backgroundColor: "#CF7650", border: "none" }}
+                          className="sidekick-primary-btn"
                           onClick={() => {
                             setEditCaseDetails(!editCaseDetails);
                           }}
@@ -364,11 +360,7 @@ const Case = () => {
                             </Form.Group>
                             <div className="text-center">
                               <Button
-                                className="m-2"
-                                style={{
-                                  backgroundColor: "#CF7650",
-                                  border: "none",
-                                }}
+                                className="sidekick-primary-btn m-2"
                                 onClick={() => {
                                   submitCaseEdit(caseEditInfo!);
                                 }}
@@ -437,7 +429,7 @@ const Case = () => {
                       <Card.Title>
                         Case Description{" "}
                         <Button
-                          style={{ backgroundColor: "#CF7650", border: "none" }}
+                          className="sidekick-primary-btn"
                           onClick={() => {
                             setEditCaseDescription(!editCaseDescription);
                           }}
@@ -467,11 +459,7 @@ const Case = () => {
                             </Form.Group>
                             <div className="text-center">
                               <Button
-                                className="m-2"
-                                style={{
-                                  backgroundColor: "#CF7650",
-                                  border: "none",
-                                }}
+                                className="sidekick-primary-btn m-2"
                                 onClick={() => {
                                   submitCaseEdit(caseEditInfo!);
                                 }}

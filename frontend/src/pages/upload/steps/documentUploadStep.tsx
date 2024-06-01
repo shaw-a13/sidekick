@@ -11,6 +11,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const uploadDocument = async (document: any, token: string, caseId: string) => {
   const documentService = new DocumentService();
 
+  document.getElementById("step1")!.style.pointerEvents = "auto";
+
   // GET request: presigned URL
   documentService.getPresignedUrl(token, caseId).then(async (res) => {
     const presignedUrl = res?.data.presignedUrl;
@@ -79,14 +81,7 @@ const DocumentUploadStep = (props: {
         </Form.Group>
       </Card.Text>
       <Button
-        className="m-2"
-        id="reset"
-        onClick={() => window.location.reload()}
-      >
-        <FontAwesomeIcon icon={faUndo} />
-      </Button>
-      <Button
-        className="m-2 d-none"
+        className="m-2 sidekick-primary-btn d-none"
         id="submitCaseBtn"
         onClick={() => {
           if (props.newCase)

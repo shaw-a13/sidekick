@@ -25,7 +25,7 @@ const Upload = () => {
                 <Card.Title>Is this a new or existing case?</Card.Title>
                 <Card.Text>
                   <Button
-                    className="m-2"
+                    className="m-2 sidekick-primary-btn"
                     onClick={() => {
                       setCaseType("new");
                       setCaseSelected(true);
@@ -34,7 +34,7 @@ const Upload = () => {
                     New
                   </Button>
                   <Button
-                    className="m-2"
+                    className="m-2 sidekick-primary-btn"
                     onClick={() => {
                       setCaseType("existing");
                       setCaseSelected(true);
@@ -48,6 +48,18 @@ const Upload = () => {
           </Card.Body>
           {!isExisting && caseSelected && <NewCase />}
           {isExisting && caseSelected && <ExistingCase />}
+          {caseSelected && (
+            <div className="text-center">
+              <Button
+                className="m-2 sidekick-primary-btn"
+                id="reset"
+                onClick={() => setCaseSelected(false)}
+              >
+                Reset
+                <FontAwesomeIcon className="ms-2" icon={faUndo} />
+              </Button>
+            </div>
+          )}
         </Card>
       </Row>
     </Container>

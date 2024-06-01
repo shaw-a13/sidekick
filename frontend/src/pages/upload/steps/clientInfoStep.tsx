@@ -170,14 +170,7 @@ const ClientInfoStep = (props: {
               </Form.Control.Feedback>
             </Form.Group>
           </Row>
-          <Button
-            className="m-2"
-            id="reset"
-            onClick={() => window.location.reload()}
-          >
-            <FontAwesomeIcon icon={faUndo} />
-          </Button>
-          <Button type="submit">
+          <Button type="submit" className="sidekick-primary-btn">
             <FontAwesomeIcon icon={faArrowRight} />
           </Button>
         </Form>

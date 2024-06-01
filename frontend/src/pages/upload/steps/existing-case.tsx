@@ -1,14 +1,7 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
-import { CaseService } from "../../../services/case.service";
-import ClientInfoStep from "./clientInfoStep";
+import { Button, Card, Form, Row } from "react-bootstrap";
 import DocumentUploadStep from "./documentUploadStep";
-import CaseInfoStep from "./caseInfoStep";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Client } from "../../../interfaces/client/client.interface";
-import { ClientService } from "../../../services/client.service";
-import { Case } from "../../../interfaces/case/case.interface";
-import { DocumentService } from "../../../services/document.service";
 
 const ExistingCase = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -72,7 +65,7 @@ const ExistingCase = () => {
     <div>
       <Card.Header>
         <Button
-          className="rounded-circle m-2"
+          className="rounded-circle m-2 sidekick-primary-btn"
           id="step1"
           onClick={() => setStep(0)}
         >
@@ -80,7 +73,7 @@ const ExistingCase = () => {
         </Button>
         {steps.slice(1).map((step, no) => (
           <Button
-            className="rounded-circle m-2"
+            className="rounded-circle m-2 sidekick-primary-btn"
             style={{ pointerEvents: "none" }}
             id={`step${no + 1}`}
             onClick={() => setStep(no + 1)}

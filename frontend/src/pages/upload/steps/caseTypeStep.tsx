@@ -13,7 +13,7 @@ const CaseTypeStep = (props: {
       <Card.Title>Is this a new or existing case?</Card.Title>
       <Card.Text>
         <Button
-          className="m-2"
+          className="m-2 sidekick-primary-btn"
           onClick={() => {
             document.getElementById('step1')!.style.pointerEvents = "auto"
             props.caseSetter("new");
@@ -23,7 +23,7 @@ const CaseTypeStep = (props: {
           New
         </Button>
         <Button
-          className="m-2"
+          className="m-2 sidekick-primary-btn"
           onClick={() => {
             document.getElementById('step1')!.style.pointerEvents = "auto"
             props.caseSetter("existing");

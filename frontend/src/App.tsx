@@ -2,11 +2,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/home";
 import Login from "./pages/login";
 import "./App.css";
+import "./pages/styles/common.css"
 import Navagation from "./pages/navagation";
 import Dashboard from "./pages/dashboard";
 import Case from "./pages/case";
 import Upload from "./pages/upload/upload";
-import { Container } from "react-bootstrap";
 
 function App() {
   return (

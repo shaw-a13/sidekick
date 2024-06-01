@@ -10,19 +10,17 @@ import {
   faBoxOpen,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth0 } from "@auth0/auth0-react";
-import './styles/home.css'
+import "./styles/home.css";
 
 const Home = () => {
   const { user, loginWithRedirect } = useAuth0();
-  if (user) console.log(user!['authGroups'])
+  if (user) console.log(user!["authGroups"]);
 
   return (
     <Container>
       <Row>
         <img src={banner} alt="" style={{ height: "35rem", padding: "0px" }} />
-        <div
-          className="shadow home-blurb"
-        >
+        <div className="shadow home-blurb">
           <div className="m-2">
             <h5>Sidekick</h5>
             <p>Elevate your legal workflow</p>
@@ -32,7 +30,7 @@ const Home = () => {
             </p>
             <div className="text-center">
               <Button
-                style={{ backgroundColor: "#CF7650", border: "none"}}
+                className="sidekick-primary-btn"
                 onClick={() => loginWithRedirect()}
               >
                 Get started
@@ -153,7 +151,7 @@ const Home = () => {
         </Col>
         <Col className="mt-2">
           <Button
-            style={{ backgroundColor: "#CF7650", border: "none"}}
+            className="sidekick-primary-btn"
             onClick={() => loginWithRedirect()}
           >
             Get started

@@ -201,8 +201,12 @@ const Dashboard = () => {
                     onChange={(e) => setRefSearch(e.target.value)}
                   />
                   <Button
-                  style={{ color:'#CF7650', border: '2px solid', borderColor: "#CF7650", backgroundColor: 'white' }}
-                  id="button-addon2"
+                    style={{
+                      color: "#CF7650",
+                      border: "2px solid",
+                      borderColor: "#CF7650",
+                      backgroundColor: "white",
+                    }}
                     onClick={() => filterByRef(refSearch)}
                   >
                     <FontAwesomeIcon icon={faSearch} />
@@ -217,8 +221,12 @@ const Dashboard = () => {
                     onChange={(e) => setClientSearch(e.target.value)}
                   />
                   <Button
-                  style={{ color:'#CF7650', border: '2px solid', borderColor: "#CF7650", backgroundColor: 'white' }}
-                  id="button-addon2"
+                    style={{
+                      color: "#CF7650",
+                      border: "2px solid",
+                      borderColor: "#CF7650",
+                      backgroundColor: "white",
+                    }}
                     onClick={() => filterByClient(clientSearch)}
                   >
                     <FontAwesomeIcon icon={faSearch} />
@@ -228,7 +236,12 @@ const Dashboard = () => {
               <th scope="col">
                 <Dropdown>
                   <Dropdown.Toggle
-                  style={{ color:'#CF7650', border: '2px solid', borderColor: "#CF7650", backgroundColor: 'white' }}
+                    style={{
+                      color: "#CF7650",
+                      border: "2px solid",
+                      borderColor: "#CF7650",
+                      backgroundColor: "white",
+                    }}
                   >
                     Status
                   </Dropdown.Toggle>
@@ -246,7 +259,12 @@ const Dashboard = () => {
               </th>
               <th scope="col">
                 <Button
-                  style={{ color:'#CF7650', border: '2px solid', borderColor: "#CF7650", backgroundColor: 'white' }}
+                  style={{
+                    color: "#CF7650",
+                    border: "2px solid",
+                    borderColor: "#CF7650",
+                    backgroundColor: "white",
+                  }}
                   onClick={() => {
                     setCases(caseRes.data);
                   }}
@@ -275,11 +293,7 @@ const Dashboard = () => {
                 </td>
                 <td>
                   <Link to={`../case/${caseRecord.SK}`}>
-                    <Button
-                      style={{ backgroundColor: "#CF7650", border: "none" }}
-                    >
-                      View
-                    </Button>
+                    <Button className="sidekick-primary-btn">View</Button>
                   </Link>
                 </td>
               </tr>
