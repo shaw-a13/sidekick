@@ -5,6 +5,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "../components/loginButton";
 import LogoutButton from "../components/logoutButton";
 import logo from "../img/logos/png/logo-no-background.png";
+import { Link } from "react-router-dom";
 
 let pages = [
   { name: "Home", href: "/", authenticationRequired: false },
@@ -31,16 +32,16 @@ const Navagation = () => {
           <Nav className="me-auto">
             {isAuthenticated
               ? pages.map((page) => (
-                  <Nav.Link href={page.href} style={{ color: "#CF7650" }}>
+                  <Link to={page.href} style={{ color: "#CF7650", textDecoration:"none", margin: 20 }}>
                     {page.name}
-                  </Nav.Link>
+                  </Link>
                 ))
               : pages
                   .filter((page) => page.authenticationRequired === false)
                   .map((page) => (
-                    <Nav.Link href={page.href} style={{ color: "#CF7650" }}>
-                      {page.name}
-                    </Nav.Link>
+                    <Link to={page.href} style={{ color: "#CF7650", textDecoration:"none", marginTop: 15}}>
+                      <p>{page.name}</p>
+                    </Link>
                   ))}
           </Nav>
         </Navbar.Collapse>

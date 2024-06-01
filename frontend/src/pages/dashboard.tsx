@@ -12,6 +12,7 @@ import { CaseService } from "../services/case.service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { Case } from "../interfaces/case/case.interface";
+import { Link } from "react-router-dom";
 
 const statuses: { [key: string]: string } = {
   ACTIVE: "success",
@@ -30,53 +31,53 @@ const Dashboard = () => {
     data: [
       {
         SK: "REF12336",
-        clientId: '922884',
+        clientId: "922884",
         clientName: "Jayne Salter",
         status: "CLOSED",
         description: "Test desc",
         nature: "Property",
         date: "04/05/2024",
-        assignee: "Jane Sawer"
+        assignee: "Jane Sawer",
       },
       {
         SK: "REF12345",
-        clientId: '00988',
+        clientId: "00988",
         clientName: "John Smith",
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
         date: "04/05/2024",
-        assignee: "Jane Sawer"
+        assignee: "Jane Sawer",
       },
       {
         SK: "REF44332",
-        clientId: '4799',
+        clientId: "4799",
         clientName: "Jack Doe",
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
         date: "04/05/2024",
-        assignee: "Jane Sawer"
+        assignee: "Jane Sawer",
       },
       {
         SK: "REF55744",
-        clientId: '78900',
+        clientId: "78900",
         clientName: "Louise Smith",
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
         date: "04/05/2024",
-        assignee: "Jane Sawer"
+        assignee: "Jane Sawer",
       },
       {
         SK: "REF67899",
-        clientId: '65432',
+        clientId: "65432",
         clientName: "Jane Doe",
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
         date: "04/05/2024",
-        assignee: "Jane Sawer"
+        assignee: "Jane Sawer",
       },
     ],
     status: 200,
@@ -152,15 +153,15 @@ const Dashboard = () => {
     };
 
     const caseService = new CaseService();
-    
+
     let accessToken;
 
     getAccessToken().then(async (res) => {
       accessToken = res;
       if (accessToken) {
-        setLoading(true)
+        setLoading(true);
         setCases(caseRes.data);
-        setLoading(false)
+        setLoading(false);
         // setLoading(true);
         // try {
         //   await caseService.getAllCases(accessToken).then((res) => {
@@ -178,7 +179,7 @@ const Dashboard = () => {
   }, [getAccessTokenSilently, user?.sub]);
 
   return (
-    <Container style={{paddingTop: "8rem"}}>
+    <Container style={{ paddingTop: "8rem" }}>
       <h2>Dashboard</h2>
       <p>{clientSearch}</p>
       <Container className="pt-5">
@@ -199,7 +200,11 @@ const Dashboard = () => {
                     aria-label="Case reference"
                     onChange={(e) => setRefSearch(e.target.value)}
                   />
-                  <Button variant="outline-primary" id="button-addon2" onClick={() => filterByRef(refSearch)}>
+                  <Button
+                    variant="outline-primary"
+                    id="button-addon2"
+                    onClick={() => filterByRef(refSearch)}
+                  >
                     <FontAwesomeIcon icon={faSearch} />
                   </Button>
                 </InputGroup>
@@ -226,13 +231,21 @@ const Dashboard = () => {
 
                   <Dropdown.Menu>
                     {Object.keys(statuses).map((statusItem) => (
-                      <Dropdown.Item onClick={() => filterByStatus(statusItem)}>{statusItem}</Dropdown.Item>
+                      <Dropdown.Item onClick={() => filterByStatus(statusItem)}>
+                        {statusItem}
+                      </Dropdown.Item>
                     ))}
                   </Dropdown.Menu>
                 </Dropdown>
               </th>
               <th scope="col">
-                <Button variant="outline-primary" id="button-addon2" onClick={() => {setCases(caseRes.data)}}>
+                <Button
+                  variant="outline-primary"
+                  id="button-addon2"
+                  onClick={() => {
+                    setCases(caseRes.data);
+                  }}
+                >
                   <FontAwesomeIcon icon={faUndo} />
                 </Button>
               </th>
@@ -251,20 +264,18 @@ const Dashboard = () => {
                 <td>{caseRecord.SK}</td>
                 <td>{caseRecord.clientName}</td>
                 <td>
-                  <Badge
-                    bg={statuses[caseRecord.status]}
-                    text="light"
-                  >
+                  <Badge bg={statuses[caseRecord.status]} text="light">
                     {caseRecord.status}
                   </Badge>
                 </td>
                 <td>
-                  <Button
-                    style={{ backgroundColor: "#e0fbfc", color: "black" }}
-                    href={"case/"+caseRecord.SK}
-                  >
-                    View
-                  </Button>
+                  <Link to={`../case/${caseRecord.SK}`}>
+                    <Button
+                      style={{ backgroundColor: "#e0fbfc", color: "black" }}
+                    >
+                      View
+                    </Button>
+                  </Link>
                 </td>
               </tr>
             ))}
