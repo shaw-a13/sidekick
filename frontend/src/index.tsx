@@ -11,8 +11,8 @@ ReactDOM.render(
     clientId="4kOfyzTQeYmDo0sIsLhv1kNewJmLEWlk"
     authorizationParams={{
       redirect_uri: window.location.origin,
-      audience: `https://dev-loovxx4fwuzohi8k.us.auth0.com/api/v2/`,
-      scope: "read:current_user update:current_user_metadata"
+      audience: `https://sidekick-api.com`,
+      scope: "read:current_user read:current_user_metadata update:current_user_metadata profile openid"
     }}
   >
     <App />

@@ -13,7 +13,8 @@ import { useAuth0 } from "@auth0/auth0-react";
 import './styles/home.css'
 
 const Home = () => {
-  const { loginWithRedirect } = useAuth0();
+  const { user, loginWithRedirect } = useAuth0();
+  if (user) console.log(user!['authGroups'])
 
   return (
     <Container>
