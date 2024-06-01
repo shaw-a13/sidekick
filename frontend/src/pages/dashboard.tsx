@@ -201,8 +201,8 @@ const Dashboard = () => {
                     onChange={(e) => setRefSearch(e.target.value)}
                   />
                   <Button
-                    variant="outline-primary"
-                    id="button-addon2"
+                  style={{ color:'#CF7650', border: '2px solid', borderColor: "#CF7650", backgroundColor: 'white' }}
+                  id="button-addon2"
                     onClick={() => filterByRef(refSearch)}
                   >
                     <FontAwesomeIcon icon={faSearch} />
@@ -217,8 +217,8 @@ const Dashboard = () => {
                     onChange={(e) => setClientSearch(e.target.value)}
                   />
                   <Button
-                    variant="outline-primary"
-                    id="button-addon2"
+                  style={{ color:'#CF7650', border: '2px solid', borderColor: "#CF7650", backgroundColor: 'white' }}
+                  id="button-addon2"
                     onClick={() => filterByClient(clientSearch)}
                   >
                     <FontAwesomeIcon icon={faSearch} />
@@ -227,12 +227,18 @@ const Dashboard = () => {
               </th>
               <th scope="col">
                 <Dropdown>
-                  <Dropdown.Toggle variant="primary">Status</Dropdown.Toggle>
+                  <Dropdown.Toggle
+                  style={{ color:'#CF7650', border: '2px solid', borderColor: "#CF7650", backgroundColor: 'white' }}
+                  >
+                    Status
+                  </Dropdown.Toggle>
 
                   <Dropdown.Menu>
                     {Object.keys(statuses).map((statusItem) => (
                       <Dropdown.Item onClick={() => filterByStatus(statusItem)}>
-                        {statusItem}
+                        <Badge bg={statuses[statusItem]} text="light">
+                          {statusItem}
+                        </Badge>
                       </Dropdown.Item>
                     ))}
                   </Dropdown.Menu>
@@ -240,8 +246,7 @@ const Dashboard = () => {
               </th>
               <th scope="col">
                 <Button
-                  variant="outline-primary"
-                  id="button-addon2"
+                  style={{ color:'#CF7650', border: '2px solid', borderColor: "#CF7650", backgroundColor: 'white' }}
                   onClick={() => {
                     setCases(caseRes.data);
                   }}
@@ -271,7 +276,7 @@ const Dashboard = () => {
                 <td>
                   <Link to={`../case/${caseRecord.SK}`}>
                     <Button
-                      style={{ backgroundColor: "#e0fbfc", color: "black" }}
+                      style={{ backgroundColor: "#CF7650", border: "none" }}
                     >
                       View
                     </Button>
