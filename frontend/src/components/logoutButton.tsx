@@ -6,7 +6,7 @@ const LogoutButton = () => {
   const { logout } = useAuth0();
 
   return (
-    <Button style={{ backgroundColor: "#CF7650", border: "none"}} onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
+    <Button className="sidekick-primary-btn" onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
       Log Out
     </Button>
   );
