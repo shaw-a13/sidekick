@@ -21,7 +21,7 @@ const statuses: { [key: string]: string } = {
 };
 
 const Dashboard = () => {
-  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { user, getAccessTokenSilently } = useAuth0();
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [refSearch, setRefSearch] = useState("");
@@ -57,7 +57,7 @@ const Dashboard = () => {
         description: "Test desc",
         nature: "Property",
         date: "04/05/2024",
-        assignee: "Jane Sawer",
+        assignee: "shaw-a13@ulster.ac.uk",
       },
       {
         SK: "REF55744",
@@ -72,7 +72,7 @@ const Dashboard = () => {
       {
         SK: "REF67899",
         clientId: "65432",
-        clientName: "Jane Doe",
+        clientName: "shaw-a13@ulster.ac.uk",
         status: "ACTIVE",
         description: "Test desc",
         nature: "Property",
@@ -282,7 +282,7 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {cases.map((caseRecord) => (
+            {/* {cases.map((caseRecord) => (
               <tr>
                 <td>{caseRecord.SK}</td>
                 <td>{caseRecord.clientName}</td>
@@ -297,7 +297,67 @@ const Dashboard = () => {
                   </Link>
                 </td>
               </tr>
-            ))}
+            ))} */}
+            {user && user["authGroups"].includes("Admin")
+              ? cases.map((caseRecord) => (
+                  <tr>
+                    <td>{caseRecord.SK}</td>
+                    <td>{caseRecord.clientName}</td>
+                    <td>
+                      <Badge bg={statuses[caseRecord.status]} text="light">
+                        {caseRecord.status}
+                      </Badge>
+                    </td>
+                    <td>
+                      <Link to={`../case/${caseRecord.SK}`}>
+                        <Button className="sidekick-primary-btn">View</Button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              : user && user["authGroups"].includes("Worker")
+                ? cases
+                    .filter((caseRecord) => caseRecord.assignee === user.name)
+                    .map((caseRecord) => (
+                      <tr>
+                        <td>{caseRecord.SK}</td>
+                        <td>{caseRecord.clientName}</td>
+                        <td>
+                          <Badge bg={statuses[caseRecord.status]} text="light">
+                            {caseRecord.status}
+                          </Badge>
+                        </td>
+                        <td>
+                          <Link to={`../case/${caseRecord.SK}`}>
+                            <Button className="sidekick-primary-btn">
+                              View
+                            </Button>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))
+                : cases
+                    .filter(
+                      (caseRecord) => caseRecord.clientName === user!.name
+                    )
+                    .map((caseRecord) => (
+                      <tr>
+                        <td>{caseRecord.SK}</td>
+                        <td>{caseRecord.clientName}</td>
+                        <td>
+                          <Badge bg={statuses[caseRecord.status]} text="light">
+                            {caseRecord.status}
+                          </Badge>
+                        </td>
+                        <td>
+                          <Link to={`../case/${caseRecord.SK}`}>
+                            <Button className="sidekick-primary-btn">
+                              View
+                            </Button>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
           </tbody>
         </table>
 
