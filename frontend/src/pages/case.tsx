@@ -156,7 +156,11 @@ const Case = () => {
 
   return (
     <Container>
-      {isAuthenticated && user && user["authGroups"].includes("Worker") ? (
+      {(isAuthenticated && user && user["authGroups"].includes("Worker")) ||
+      (isAuthenticated &&
+        user &&
+        user["authGroups"].length === 0 &&
+        caseInfo?.clientName === user.name) ? (
         <div style={{ paddingTop: "8rem" }}>
           {uploadModal && (
             <Modal show={uploadModal} onHide={() => setUploadModal(false)}>
@@ -223,6 +227,11 @@ const Case = () => {
                             Case Documents{" "}
                             <Button
                               className="sidekick-primary-btn"
+                              disabled={
+                                caseInfo?.assignee !== user.name &&
+                                caseInfo?.clientName !== user.name &&
+                                !user["authGroups"].includes("Admin")
+                              }
                               onClick={() => {
                                 setUploadModal(true);
                               }}
@@ -265,6 +274,10 @@ const Case = () => {
                             Case Information{" "}
                             <Button
                               className="sidekick-primary-btn"
+                              disabled={
+                                caseInfo?.assignee !== user.name &&
+                                !user["authGroups"].includes("Admin")
+                              }
                               onClick={() => {
                                 setEditCaseDetails(!editCaseDetails);
                               }}
@@ -436,6 +449,10 @@ const Case = () => {
                             Case Description{" "}
                             <Button
                               className="sidekick-primary-btn"
+                              disabled={
+                                caseInfo?.assignee !== user.name &&
+                                !user["authGroups"].includes("Admin")
+                              }
                               onClick={() => {
                                 setEditCaseDescription(!editCaseDescription);
                               }}
