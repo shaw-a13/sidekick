@@ -18,6 +18,8 @@ import { DocumentService } from "../services/document.service";
 import axios from "axios";
 import { DocumentResultResponse } from "../interfaces/document/documentResultResponse.interface";
 import { CaseEditProps } from "../interfaces/case/caseEditProps.interface";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 
 interface ExtractionResult {
   key: string;
@@ -113,8 +115,6 @@ const Case = () => {
     return await caseService.getSingleCase(token, id!);
   };
 
-  let results: ExtractionResult;
-
   const updateExtractionData = async (docNo: number) => {
     try {
       await axios
@@ -155,330 +155,367 @@ const Case = () => {
   }, []);
 
   return (
-    <div style={{ paddingTop: "8rem" }}>
-      {uploadModal && (
-        <Modal show={uploadModal} onHide={() => setUploadModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Upload Document</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form.Group controlId="formFileLg" className="mb-3">
-              <Form.Label>
-                Please upload the file you wish to analyse
-              </Form.Label>
-              <Form.Control
-                type="file"
-                onChange={(event) => {
-                  const target = event.target as HTMLInputElement;
-                  setUploadFile((target.files as FileList)[0]);
-                  document
-                    .getElementById("submitUploadBtn")!
-                    .classList.remove("d-none");
-                }}
-              />
-            </Form.Group>
-            <div className="text-center mt-3">
-              {showLoader && <Spinner animation="border" />}
-            </div>
-            <div className="text-center mt-3">
-              <Button
-                id="submitUploadBtn"
-                className="sidekick-primary-btn d-none"
-                onClick={() => {
-                  uploadDocument(uploadFile, id!);
-                  setShowLoader(true);
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 1000);
-                }}
-              >
-                Upload
-              </Button>
-            </div>
-          </Modal.Body>
-        </Modal>
-      )}
-      <div>
-        {loading && (
+    <Container>
+      {isAuthenticated && user && user["authGroups"].includes("Worker") ? (
+        <div style={{ paddingTop: "8rem" }}>
+          {uploadModal && (
+            <Modal show={uploadModal} onHide={() => setUploadModal(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Upload Document</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Form.Group controlId="formFileLg" className="mb-3">
+                  <Form.Label>
+                    Please upload the file you wish to analyse
+                  </Form.Label>
+                  <Form.Control
+                    type="file"
+                    onChange={(event) => {
+                      const target = event.target as HTMLInputElement;
+                      setUploadFile((target.files as FileList)[0]);
+                      document
+                        .getElementById("submitUploadBtn")!
+                        .classList.remove("d-none");
+                    }}
+                  />
+                </Form.Group>
+                <div className="text-center mt-3">
+                  {showLoader && <Spinner animation="border" />}
+                </div>
+                <div className="text-center mt-3">
+                  <Button
+                    id="submitUploadBtn"
+                    className="sidekick-primary-btn d-none"
+                    onClick={() => {
+                      uploadDocument(uploadFile, id!);
+                      setShowLoader(true);
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 1000);
+                    }}
+                  >
+                    Upload
+                  </Button>
+                </div>
+              </Modal.Body>
+            </Modal>
+          )}
           <div>
-            <Container className="mt-5">
-              <Row>
-                <Col className="text-center">
-                  <Spinner animation="border" />
-                </Col>
-              </Row>
-            </Container>
-          </div>
-        )}
-        {!loading && (
-          <div>
-            <Container>
-              <Row className="mb-3">
-                <Col>
-                  <Card>
-                    <Card.Body>
-                      <Card.Title>
-                        Case Documents{" "}
-                        <Button
-                          className="sidekick-primary-btn"
-                          onClick={() => {
-                            setUploadModal(true);
-                          }}
-                        >
-                          Upload
-                        </Button>
-                      </Card.Title>
-                      <hr />
-                      <div className="mb-2">
-                        {docApiData!.urls.map((doc, index) => (
-                          <Button
-                            className="sidekick-primary-btn rounded-circle m-2"
-                            onClick={() => {
-                              updateExtractionData(index);
-                              setDocumentData(docApiData!.urls[index].original);
-                              setDocNo(index);
-                            }}
-                          >
-                            {index + 1}
-                          </Button>
-                        ))}
-                      </div>
-                      <Card.Subtitle className="mb-2 text-muted">
-                        <iframe
-                          title="pdf-viewer"
-                          src={documentData}
-                          width="700"
-                          height="600"
-                        ></iframe>
-                      </Card.Subtitle>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col sm={4}>
-                  <Card>
-                    <Card.Body>
-                      <Card.Title>
-                        Case Information{" "}
-                        <Button
-                          className="sidekick-primary-btn"
-                          onClick={() => {
-                            setEditCaseDetails(!editCaseDetails);
-                          }}
-                        >
-                          Edit
-                        </Button>
-                      </Card.Title>
-                      <hr />
-                      {!editCaseDetails && (
-                        <div>
-                          <Card.Subtitle className="mb-2 text-muted">
-                            Client Name: {caseInfo!.clientName}
-                          </Card.Subtitle>
+            {loading && (
+              <div>
+                <Container className="mt-5">
+                  <Row>
+                    <Col className="text-center">
+                      <Spinner animation="border" />
+                    </Col>
+                  </Row>
+                </Container>
+              </div>
+            )}
+            {!loading && (
+              <div>
+                <Container>
+                  <Row className="mb-3">
+                    <Col>
+                      <Card>
+                        <Card.Body>
+                          <Card.Title>
+                            Case Documents{" "}
+                            <Button
+                              className="sidekick-primary-btn"
+                              onClick={() => {
+                                setUploadModal(true);
+                              }}
+                            >
+                              Upload
+                            </Button>
+                          </Card.Title>
                           <hr />
-                          <Card.Subtitle className="mb-2 text-muted">
-                            Nature: {caseInfo!.nature}
-                          </Card.Subtitle>
-                          <hr />
-                          <Card.Subtitle className="mb-2 text-muted">
-                            Date: {caseInfo!.date}
-                          </Card.Subtitle>
-                          <hr />
-                          <Card.Subtitle className="mb-2 text-muted">
-                            Status: {caseInfo!.status}
-                          </Card.Subtitle>
-                          <hr />
-                          <Card.Subtitle className="mb-2 text-muted">
-                            Assignee: {caseInfo!.assignee}
-                          </Card.Subtitle>
-                          <hr />
-                          <Card.Subtitle className="mb-2 text-muted">
-                            Client ID: {caseInfo!.clientId}
-                          </Card.Subtitle>
-                        </div>
-                      )}
-                      {editCaseDetails && (
-                        <div>
-                          <Form>
-                            <Form.Group controlId="formClientName">
-                              <Form.Label>Client Name</Form.Label>
-                              <Form.Control
-                                type="text"
-                                name="clientName"
-                                placeholder="Enter client name"
-                                defaultValue={caseInfo!.clientName}
-                                onChange={handleCaseEditChange}
-                              />
-                            </Form.Group>
-                            <Form.Group controlId="formNature">
-                              <Form.Label>Nature</Form.Label>
-                              <Form.Control
-                                type="text"
-                                name="nature"
-                                placeholder="Enter nature"
-                                defaultValue={caseInfo!.nature}
-                                onChange={handleCaseEditChange}
-                              />
-                            </Form.Group>
-                            <Form.Group controlId="formDate">
-                              <Form.Label>Date</Form.Label>
-                              <Form.Control
-                                type="date"
-                                name="date"
-                                defaultValue={caseInfo!.date}
-                                onChange={handleCaseEditChange}
-                              />
-                            </Form.Group>
-                            <Form.Group controlId="formStatus">
-                              <Form.Label>Status</Form.Label>
-                              <Form.Control
-                                type="text"
-                                name="status"
-                                placeholder="Enter status"
-                                defaultValue={caseInfo!.status}
-                                onChange={handleCaseEditChange}
-                              />
-                            </Form.Group>
-                            <Form.Group controlId="formAssignee">
-                              <Form.Label>Assignee</Form.Label>
-                              <Form.Control
-                                type="text"
-                                name="assignee"
-                                placeholder="Enter assignee"
-                                defaultValue={caseInfo!.assignee}
-                                onChange={handleCaseEditChange}
-                              />
-                            </Form.Group>
-                            <Form.Group controlId="formClientId">
-                              <Form.Label>Client ID</Form.Label>
-                              <Form.Control
-                                type="text"
-                                name="clientId"
-                                placeholder="Enter client ID"
-                                defaultValue={caseInfo!.clientId}
-                                onChange={handleCaseEditChange}
-                              />
-                            </Form.Group>
-                            <div className="text-center">
+                          <div className="mb-2">
+                            {docApiData!.urls.map((doc, index) => (
                               <Button
-                                className="sidekick-primary-btn m-2"
+                                className="sidekick-primary-btn rounded-circle m-2"
                                 onClick={() => {
-                                  submitCaseEdit(caseEditInfo!);
+                                  updateExtractionData(index);
+                                  setDocumentData(
+                                    docApiData!.urls[index].original
+                                  );
+                                  setDocNo(index);
                                 }}
                               >
-                                Submit
+                                {index + 1}
                               </Button>
-                            </div>
-                          </Form>
-                        </div>
-                      )}
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Card>
-                    <Card.Body>
-                      <Card.Title>Document Extractions</Card.Title>
-                      <Table striped bordered hover>
-                        <thead>
-                          <tr>
-                            <th>Key</th>
-                            <th>Value</th>
-                            <th>Page Number</th>
-                            <th>Score</th>
-                            <th>Source</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {extractionData &&
-                            extractionData!.map((result: ExtractionResult) => (
-                              <tr>
-                                <td>{result.key}</td>
-                                <td>{result.value}</td>
-                                <td>{result.locations.pageNumber}</td>
-                                <td>{result.score}</td>
-                                <td>{result.source}</td>
-                              </tr>
                             ))}
-                        </tbody>
-                      </Table>
-                      {!extractionData && (
-                        <div className="text-center">
-                          <Container className="mt-5">
-                            <Row>
-                              <Col className="text-center">
-                                <h4>
-                                  Awaiting extraction results, please refresh
-                                  the page
-                                </h4>
-                                <Spinner animation="border" />
-                              </Col>
-                            </Row>
-                          </Container>
-                        </div>
-                      )}
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
-              <Row>
-                <Col className="mt-3 mb-5">
-                  <Card>
-                    <Card.Body>
-                      <Card.Title>
-                        Case Description{" "}
-                        <Button
-                          className="sidekick-primary-btn"
-                          onClick={() => {
-                            setEditCaseDescription(!editCaseDescription);
-                          }}
-                        >
-                          Edit
-                        </Button>
-                      </Card.Title>
-                      <hr />
-                      {!editCaseDescription && (
-                        <Card.Subtitle className="mb-2 text-muted">
-                          {caseInfo!.description}
-                        </Card.Subtitle>
-                      )}
-                      {editCaseDescription && (
-                        <div>
-                          <Form>
-                            <Form.Group controlId="formClientName">
-                              <Form.Control
-                                as="textarea"
-                                required
-                                type="text"
-                                placeholder=""
-                                name="description"
-                                defaultValue={caseInfo!.description}
-                                onChange={handleCaseEditChange}
-                              />
-                            </Form.Group>
-                            <div className="text-center">
-                              <Button
-                                className="sidekick-primary-btn m-2"
-                                onClick={() => {
-                                  submitCaseEdit(caseEditInfo!);
-                                }}
-                              >
-                                Submit
-                              </Button>
+                          </div>
+                          <Card.Subtitle className="mb-2 text-muted">
+                            <iframe
+                              title="pdf-viewer"
+                              src={documentData}
+                              width="700"
+                              height="600"
+                            ></iframe>
+                          </Card.Subtitle>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                    <Col sm={4}>
+                      <Card>
+                        <Card.Body>
+                          <Card.Title>
+                            Case Information{" "}
+                            <Button
+                              className="sidekick-primary-btn"
+                              onClick={() => {
+                                setEditCaseDetails(!editCaseDetails);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </Card.Title>
+                          <hr />
+                          {!editCaseDetails && (
+                            <div>
+                              <Card.Subtitle className="mb-2 text-muted">
+                                Client Name: {caseInfo!.clientName}
+                              </Card.Subtitle>
+                              <hr />
+                              <Card.Subtitle className="mb-2 text-muted">
+                                Nature: {caseInfo!.nature}
+                              </Card.Subtitle>
+                              <hr />
+                              <Card.Subtitle className="mb-2 text-muted">
+                                Date: {caseInfo!.date}
+                              </Card.Subtitle>
+                              <hr />
+                              <Card.Subtitle className="mb-2 text-muted">
+                                Status: {caseInfo!.status}
+                              </Card.Subtitle>
+                              <hr />
+                              <Card.Subtitle className="mb-2 text-muted">
+                                Assignee: {caseInfo!.assignee}
+                              </Card.Subtitle>
+                              <hr />
+                              <Card.Subtitle className="mb-2 text-muted">
+                                Client ID: {caseInfo!.clientId}
+                              </Card.Subtitle>
                             </div>
-                          </Form>
-                        </div>
-                      )}
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
-            </Container>
+                          )}
+                          {editCaseDetails && (
+                            <div>
+                              <Form>
+                                <Form.Group controlId="formClientName">
+                                  <Form.Label>Client Name</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="clientName"
+                                    placeholder="Enter client name"
+                                    defaultValue={caseInfo!.clientName}
+                                    onChange={handleCaseEditChange}
+                                  />
+                                </Form.Group>
+                                <Form.Group controlId="formNature">
+                                  <Form.Label>Nature</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="nature"
+                                    placeholder="Enter nature"
+                                    defaultValue={caseInfo!.nature}
+                                    onChange={handleCaseEditChange}
+                                  />
+                                </Form.Group>
+                                <Form.Group controlId="formDate">
+                                  <Form.Label>Date</Form.Label>
+                                  <Form.Control
+                                    type="date"
+                                    name="date"
+                                    defaultValue={caseInfo!.date}
+                                    onChange={handleCaseEditChange}
+                                  />
+                                </Form.Group>
+                                <Form.Group controlId="formStatus">
+                                  <Form.Label>Status</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="status"
+                                    placeholder="Enter status"
+                                    defaultValue={caseInfo!.status}
+                                    onChange={handleCaseEditChange}
+                                  />
+                                </Form.Group>
+                                <Form.Group controlId="formAssignee">
+                                  <Form.Label>Assignee</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="assignee"
+                                    placeholder="Enter assignee"
+                                    defaultValue={caseInfo!.assignee}
+                                    onChange={handleCaseEditChange}
+                                  />
+                                </Form.Group>
+                                <Form.Group controlId="formClientId">
+                                  <Form.Label>Client ID</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="clientId"
+                                    placeholder="Enter client ID"
+                                    defaultValue={caseInfo!.clientId}
+                                    onChange={handleCaseEditChange}
+                                  />
+                                </Form.Group>
+                                <div className="text-center">
+                                  <Button
+                                    className="sidekick-primary-btn m-2"
+                                    onClick={() => {
+                                      submitCaseEdit(caseEditInfo!);
+                                    }}
+                                  >
+                                    Submit
+                                  </Button>
+                                </div>
+                              </Form>
+                            </div>
+                          )}
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <Card>
+                        <Card.Body>
+                          <Card.Title>Document Extractions</Card.Title>
+                          <Table striped bordered hover>
+                            <thead>
+                              <tr>
+                                <th>Key</th>
+                                <th>Value</th>
+                                <th>Page Number</th>
+                                <th>Score</th>
+                                <th>Source</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {extractionData &&
+                                extractionData!.map(
+                                  (result: ExtractionResult) => (
+                                    <tr>
+                                      <td>{result.key}</td>
+                                      <td>{result.value}</td>
+                                      <td>{result.locations.pageNumber}</td>
+                                      <td>{result.score}</td>
+                                      <td>{result.source}</td>
+                                    </tr>
+                                  )
+                                )}
+                            </tbody>
+                          </Table>
+                          {!extractionData && (
+                            <div className="text-center">
+                              <Container className="mt-5">
+                                <Row>
+                                  <Col className="text-center">
+                                    <h4>
+                                      Awaiting extraction results, please
+                                      refresh the page
+                                    </h4>
+                                    <Spinner animation="border" />
+                                  </Col>
+                                </Row>
+                              </Container>
+                            </div>
+                          )}
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="mt-3 mb-5">
+                      <Card>
+                        <Card.Body>
+                          <Card.Title>
+                            Case Description{" "}
+                            <Button
+                              className="sidekick-primary-btn"
+                              onClick={() => {
+                                setEditCaseDescription(!editCaseDescription);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </Card.Title>
+                          <hr />
+                          {!editCaseDescription && (
+                            <Card.Subtitle className="mb-2 text-muted">
+                              {caseInfo!.description}
+                            </Card.Subtitle>
+                          )}
+                          {editCaseDescription && (
+                            <div>
+                              <Form>
+                                <Form.Group controlId="formClientName">
+                                  <Form.Control
+                                    as="textarea"
+                                    required
+                                    type="text"
+                                    placeholder=""
+                                    name="description"
+                                    defaultValue={caseInfo!.description}
+                                    onChange={handleCaseEditChange}
+                                  />
+                                </Form.Group>
+                                <div className="text-center">
+                                  <Button
+                                    className="sidekick-primary-btn m-2"
+                                    onClick={() => {
+                                      submitCaseEdit(caseEditInfo!);
+                                    }}
+                                  >
+                                    Submit
+                                  </Button>
+                                </div>
+                              </Form>
+                            </div>
+                          )}
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  </Row>
+                </Container>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      ) : isAuthenticated &&
+        user &&
+        user["authGroups"].length === 0 &&
+        !loading &&
+        caseInfo &&
+        caseInfo.clientName !== user.name ? (
+        <div style={{ paddingTop: "8rem" }}>
+          <div className="text-center">
+            <FontAwesomeIcon
+              className="m-3"
+              icon={faTriangleExclamation}
+              color="red"
+              size="3x"
+            />
+            <h4>You must be a worker to view cases not relating to yourself</h4>
+          </div>
+        </div>
+      ) : (
+        <div style={{ paddingTop: "8rem" }}>
+          <div className="text-center">
+            <FontAwesomeIcon
+              className="m-3"
+              icon={faTriangleExclamation}
+              color="red"
+              size="3x"
+            />
+            <h4>You must be authenticated to view cases</h4>
+          </div>
+        </div>
+      )}
+    </Container>
   );
 };
 

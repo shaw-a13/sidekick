@@ -282,22 +282,6 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {/* {cases.map((caseRecord) => (
-              <tr>
-                <td>{caseRecord.SK}</td>
-                <td>{caseRecord.clientName}</td>
-                <td>
-                  <Badge bg={statuses[caseRecord.status]} text="light">
-                    {caseRecord.status}
-                  </Badge>
-                </td>
-                <td>
-                  <Link to={`../case/${caseRecord.SK}`}>
-                    <Button className="sidekick-primary-btn">View</Button>
-                  </Link>
-                </td>
-              </tr>
-            ))} */}
             {user && user["authGroups"].includes("Admin")
               ? cases.map((caseRecord) => (
                   <tr>
