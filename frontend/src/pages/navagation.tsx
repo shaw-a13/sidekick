@@ -33,8 +33,8 @@ let pages = [
     name: "Profile",
     href: "/profile",
     authenticationRequired: true,
-    workerRequired: true,
-    adminRequired: true,
+    workerRequired: false,
+    adminRequired: false,
   },
 ];
 
