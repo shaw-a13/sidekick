@@ -8,13 +8,13 @@ TABLENAME = "SideKickStack-sidekickTableFDBE0BEC-1HYP1C6X8JDIT"
 def handler(event, context):
     print(event)
     client = boto3.client("dynamodb")
-    ingestion_sfn = env['INGESTION_SFN']
+    ingestion_sfn = env["INGESTION_SFN"]
     if event["resource"] == "/cases":
         if event["httpMethod"] == "GET":
             print("Getting all cases...")
             response = get_all_dynamo_items(client, "CASE")
             print(response)
-            data = response["Items"]
+            data = response
         elif event["httpMethod"] == "POST":
             print("Adding new case...")
             data = json.loads(event["body"])
@@ -62,7 +62,7 @@ def handler(event, context):
             print("Getting all clients...")
             response = get_all_dynamo_items(client, "CLIENT")
             print(response)
-            data = response["Items"]
+            data = response
         if event["httpMethod"] == "POST":
             print("Adding new client...")
             data = json.loads(event["body"])
@@ -106,7 +106,7 @@ def handler(event, context):
             print(response)
             data = response
     elif event["resource"] == "/ingestion":
-        print('triggering ingestion...')
+        print("triggering ingestion...")
         data = json.loads(event["body"])
         sfn_client = boto3.client("stepfunctions")
         response = sfn_client.start_execution(
@@ -121,11 +121,11 @@ def handler(event, context):
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
             },
-            "body": json.dumps({"executionArn": response['executionArn']}),
+            "body": json.dumps({"executionArn": response["executionArn"]}),
         }
 
     return {
-        "statusCode": response["ResponseMetadata"]["HTTPStatusCode"],
+        "statusCode": 200,
         "headers": {
             "Access-Control-Allow-Headers": "Content-Type",
             "Access-Control-Allow-Origin": "*",
@@ -136,11 +136,22 @@ def handler(event, context):
 
 
 def get_all_dynamo_items(client, partition_key):
-    return client.query(
+    res = client.query(
         ExpressionAttributeValues={":pk": {"S": partition_key}},
         KeyConditionExpression="PK = :pk",
         TableName=TABLENAME,
     )
+    result_list = []
+    [
+        result_list.append(
+            {
+                key: list(item.values())[i]["S"]
+                for i, key in enumerate(list(item.keys()))
+            }
+        )
+        for item in res["Items"]
+    ]
+    return result_list
 
 
 def get_single_dynamo_item(client, partition_key: str, sort_key: str):

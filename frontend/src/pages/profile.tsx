@@ -10,8 +10,8 @@ const Profile = () => {
   if (isAuthenticated) {
     return (
       <Container style={{ paddingTop: "8rem" }}>
-        <Row className="justify-content-md-center text-center">
-          <Col xs lg="6">
+        <Row className="justify-content-md-center text-center" md={2}>
+          <Col>
             <Card>
               <Card.Body>
                 <Card.Title>Profile Information </Card.Title>

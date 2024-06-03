@@ -282,7 +282,7 @@ const Dashboard = () => {
             {user && user["authGroups"].includes("Admin")
               ? cases.map((caseRecord) => (
                   <tr>
-                    <td>{caseRecord.SK.S}</td>
+                    <td>{caseRecord.SK}</td>
                     <td>{caseRecord.clientName}</td>
                     <td>
                       <Badge bg={statuses[caseRecord.status]} text="light">
