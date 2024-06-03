@@ -7,6 +7,7 @@ import Navagation from "./pages/navagation";
 import Dashboard from "./pages/dashboard";
 import Case from "./pages/case";
 import Upload from "./pages/upload/upload";
+import Profile from "./pages/profile";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path="upload" element={<Upload />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="login" element={<Login />} />
         <Route path="case/:id" element={<Case />} />
       </Routes>
