@@ -160,20 +160,17 @@ const Dashboard = () => {
       accessToken = res;
       if (accessToken) {
         setLoading(true);
-        setCases(caseRes.data);
+        try {
+          await caseService.getAllCases(accessToken).then((res) => {
+            if (res) {
+              console.log(res)
+              setCases(res.data)
+            }
+          });
+        } catch (e) {
+          console.log(e);
+        }
         setLoading(false);
-        // setLoading(true);
-        // try {
-        //   await caseService.getAllCases(accessToken).then((res) => {
-        //     if (res) {
-        //       console.log(res)
-        //       setCases(res.data)
-        //     }
-        //   });
-        // } catch (e) {
-        //   console.log(e);
-        // }
-        // setLoading(false);
       }
     });
   }, [getAccessTokenSilently, user?.sub]);
@@ -285,7 +282,7 @@ const Dashboard = () => {
             {user && user["authGroups"].includes("Admin")
               ? cases.map((caseRecord) => (
                   <tr>
-                    <td>{caseRecord.SK}</td>
+                    <td>{caseRecord.SK.S}</td>
                     <td>{caseRecord.clientName}</td>
                     <td>
                       <Badge bg={statuses[caseRecord.status]} text="light">
