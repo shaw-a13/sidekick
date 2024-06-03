@@ -125,6 +125,11 @@ const Navagation = () => {
           </Nav>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
+          {isAuthenticated && (
+            <p style={{ color: "#CF7650", margin: 20 }}>
+              Hello, {user!.name}
+            </p>
+          )}
           {isAuthenticated ? <LogoutButton /> : <LoginButton />}
         </Navbar.Collapse>
       </Container>
