@@ -1,10 +1,11 @@
 import { Col, Card, Row } from "react-bootstrap";
 import { TestimonialComponentProps, TestimonialProps } from "../interfaces/testimonialProps.interface";
+import "../../styles/home.css";
 
 export const Testimonial: React.FC<TestimonialComponentProps> = ({ imgSrc, title, text }) => (
   <Col>
-    <Card className="h-100 shadow testimonial-card">
-      <Card.Img variant="bottom" src={imgSrc} className="testimonial-img" />
+    <Card className="h-100 shadow" style={{backgroundColor: '#162836', color: 'white'}}>
+      <Card.Img variant="bottom" src={imgSrc} style={{margin: '1rem', width: '8rem'}} />
       <Card.Body>
         <Card.Title>{title}</Card.Title>
         <Card.Text>{text}</Card.Text>

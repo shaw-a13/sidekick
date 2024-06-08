@@ -11,7 +11,6 @@ import banner from "../../img/pexels-pixabay-48148.jpg";
 import testimonialImg1 from "../../img/testimonial-img-1.png";
 import testimonialImg2 from "../../img/testimonial-img-2.png";
 import testimonialImg3 from "../../img/testimonial-img-3.png";
-import "../styles/home.css";
 import { FeatureProps } from "./interfaces/featureProps.interface";
 import { TestimonialProps } from "./interfaces/testimonialProps.interface";
 
