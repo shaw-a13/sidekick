@@ -1,35 +1,23 @@
-import {
-  Button,
-  Card,
-  Container,
-} from "react-bootstrap";
+import { Button, Card, Container } from "react-bootstrap";
+import { CaseTypeStepProps } from "../interfaces/caseTypeStepProps.interface";
 
-const CaseTypeStep = (props: {
-  caseSetter: React.Dispatch<React.SetStateAction<string>>;
-  stepSetter: React.Dispatch<React.SetStateAction<number>>;
-}) => {
+const CaseTypeStep = ({ caseSetter, stepSetter }: CaseTypeStepProps) => {
+  const onButtonClick = (caseType: string, stepNumber: number = 0) => {
+    document.getElementById("step1")!.style.pointerEvents = "auto";
+    caseSetter(caseType);
+    if (stepNumber) {
+      stepSetter(stepNumber);
+    }
+  };
+
   return (
     <Container>
       <Card.Title>Is this a new or existing case?</Card.Title>
       <Card.Text>
-        <Button
-          className="m-2 sidekick-primary-btn"
-          onClick={() => {
-            document.getElementById('step1')!.style.pointerEvents = "auto"
-            props.caseSetter("new");
-            props.stepSetter(1);
-          }}
-        >
+        <Button className="m-2 sidekick-primary-btn" onClick={() => onButtonClick("new", 1)}>
           New
         </Button>
-        <Button
-          className="m-2 sidekick-primary-btn"
-          onClick={() => {
-            document.getElementById('step1')!.style.pointerEvents = "auto"
-            props.caseSetter("existing");
-            // props.stepSetter(1);
-          }}
-        >
+        <Button className="m-2 sidekick-primary-btn" onClick={() => onButtonClick("existing")}>
           Existing
         </Button>
       </Card.Text>
@@ -37,5 +25,4 @@ const CaseTypeStep = (props: {
   );
 };
 
-export default CaseTypeStep
-
+export default CaseTypeStep;

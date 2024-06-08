@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Card } from "react-bootstrap";
-import { CaseService } from "../../../../services/case.service";
+import { Card } from "react-bootstrap";
 import ClientInfoStep from "../clientInfoStep";
 import DocumentUploadStep from "../documentUploadStep";
 import CaseInfoStep from "./caseInfoStep";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Client } from "../../../../interfaces/client/client.interface";
-import { ClientService } from "../../../../services/client.service";
 import { Case } from "../../../../interfaces/case/case.interface";
 import { StepButton } from "./components/stepButton.component";
 
