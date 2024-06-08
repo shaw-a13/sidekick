@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "react-bootstrap";
 import ExistingCase from "../steps/existing-case";
-import NewCase from "../steps/new-case";
+import NewCase from "../steps/newCase/newCase";
 import { ResetButton } from "./resetButtonComponent";
 import { CaseSelection } from "./caseSelection.component";
 import { UploadCardProps } from "../interfaces/uploadCardProps.interface";
