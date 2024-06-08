@@ -2,9 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/home/home";
 import Login from "./pages/login";
 import "./App.css";
-import "./pages/styles/common.css"
+import "./pages/styles/common.css";
 import Navagation from "./pages/navagation";
-import Dashboard from "./pages/dashboard";
+import Dashboard from "./pages/dashboard/dashboard";
 import Case from "./pages/case";
 import Upload from "./pages/upload/upload";
 import Profile from "./pages/profile";
