@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Card } from "react-bootstrap";
-import ClientInfoStep from "../clientInfoStep";
+import ClientInfoStep from "./clientInfoStep";
 import DocumentUploadStep from "../documentUploadStep";
 import CaseInfoStep from "./caseInfoStep";
 import { useAuth0 } from "@auth0/auth0-react";

@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
-import { Client } from "../../../interfaces/client/client.interface";
+import { Client } from "../../../../interfaces/client/client.interface";
 import { v4 as uuid } from "uuid";
 
 const ClientInfoStep = (props: { stepSetter: (step: number) => void; clientInfo: Client; clientInfoSetter: React.Dispatch<React.SetStateAction<Client>> }) => {
