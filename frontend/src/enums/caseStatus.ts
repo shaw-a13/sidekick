@@ -1,5 +1,6 @@
 export enum CaseStatus {
-    OPEN = "OPEN",
-    PENDING = "PENDING",
-    CLOSED = "CLOSED",
+  OPEN = "OPEN",
+  ACTIVE = "ACTIVE",
+  PENDING = "PENDING",
+  CLOSED = "CLOSED",
 }
