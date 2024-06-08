@@ -1,9 +1,9 @@
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Col, Row } from "react-bootstrap";
-import { FeatureInterface } from "../interfaces/feature.interface";
+import { FeatureProps } from "../interfaces/featureProps.interface";
 
-export const Feature = ({ icon, title, text }: { icon: IconDefinition; title: string; text: string }) => (
+export const Feature: React.FC<FeatureProps> = ({ icon, title, text }) => (
   <Col>
     <FontAwesomeIcon icon={icon} size="8x" color="#CF7650" />
     <div style={{ color: "white" }}>
@@ -13,7 +13,7 @@ export const Feature = ({ icon, title, text }: { icon: IconDefinition; title: st
   </Col>
 );
 
-export const FeatureSection = ({ features }: { features: FeatureInterface[] }) => (
+export const FeatureSection = ({ features }: { features: FeatureProps[] }) => (
   <Row>
     <div style={{ backgroundColor: "#162836" }}>
       <Row className="text-center m-4">

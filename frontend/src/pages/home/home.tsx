@@ -2,8 +2,6 @@ import { Container } from "react-bootstrap";
 import { faGaugeHigh, faMicrochip, faBoxOpen } from "@fortawesome/free-solid-svg-icons";
 import { useAuth0 } from "@auth0/auth0-react";
 
-import { FeatureInterface } from "./interfaces/feature.interface";
-import { TestimonialInterface } from "./interfaces/testimonial.interface";
 import { BannerSection } from "./components/banner.component";
 import { CallToAction } from "./components/callToAction.component";
 import { FeatureSection } from "./components/feature.component";
@@ -14,12 +12,14 @@ import testimonialImg1 from "../../img/testimonial-img-1.png";
 import testimonialImg2 from "../../img/testimonial-img-2.png";
 import testimonialImg3 from "../../img/testimonial-img-3.png";
 import "../styles/home.css";
+import { FeatureProps } from "./interfaces/featureProps.interface";
+import { TestimonialProps } from "./interfaces/testimonialProps.interface";
 
 const Home = () => {
   const { user, loginWithRedirect } = useAuth0();
   if (user) console.log(user!["authGroups"]);
 
-  const features: FeatureInterface[] = [
+  const features: FeatureProps[] = [
     {
       icon: faGaugeHigh,
       title: "Speedy document processing",
@@ -37,7 +37,7 @@ const Home = () => {
     },
   ];
 
-  const testimonials: TestimonialInterface[] = [
+  const testimonials: TestimonialProps[] = [
     {
       img: testimonialImg1,
       title: "John (Solicitor, 32)",

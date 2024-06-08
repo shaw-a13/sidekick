@@ -1,6 +1,7 @@
 import { Row, Button } from "react-bootstrap";
+import { BannerSectionProps } from "../interfaces/bannerSectionProps.interface";
 
-export const BannerSection = ({ banner, loginWithRedirect }: { banner: string; loginWithRedirect: any }) => (
+export const BannerSection: React.FC<BannerSectionProps> = ({ banner, loginWithRedirect }) => (
   <Row>
     <img src={banner} alt="" style={{ height: "35rem", padding: "0px" }} />
     <div className="shadow home-blurb">
