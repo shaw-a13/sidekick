@@ -43,7 +43,7 @@ const NewCase = () => {
 
   const [clientInfo, setClientInfo] = useState(initialClientFormState);
   const [caseInfo, setCaseInfo] = useState(initialCaseFormState);
-  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
   const steps = useMemo(
     () => [
       {

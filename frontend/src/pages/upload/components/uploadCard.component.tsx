@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card } from "react-bootstrap";
-import ExistingCase from "../steps/existing-case";
+import ExistingCase from "../steps/existingCase/existingCase";
 import NewCase from "../steps/newCase/newCase";
 import { ResetButton } from "./resetButtonComponent";
 import { CaseSelection } from "./caseSelection.component";

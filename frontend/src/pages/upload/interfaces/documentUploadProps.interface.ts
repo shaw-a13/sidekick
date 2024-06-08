@@ -6,7 +6,7 @@ export interface DocumentUploadStepProps {
   caseInfo?: Case;
   caseId?: string;
   accessToken: string;
-  uploadFile: Document | null;
+  uploadFile: File | null;
   newCase: boolean;
   uploadFileSetter: React.Dispatch<React.SetStateAction<File | null>>;
 }

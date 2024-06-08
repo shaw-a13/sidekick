@@ -8,7 +8,7 @@ import { Case } from "../../../interfaces/case/case.interface";
 import { useState } from "react";
 import { DocumentUploadStepProps } from "../interfaces/documentUploadProps.interface";
 
-const uploadDocument = async (document: Document, token: string, caseId: string) => {
+const uploadDocument = async (file: File, token: string, caseId: string) => {
   const documentService = new DocumentService();
 
   document.getElementById("step1")!.style.pointerEvents = "auto";
@@ -19,7 +19,7 @@ const uploadDocument = async (document: Document, token: string, caseId: string)
     const key = res?.data.key;
 
     if (presignedUrl && key) {
-      await documentService.uploadDocument(presignedUrl, document);
+      await documentService.uploadDocument(presignedUrl, file);
       const ingeRes = await documentService.triggerIngestion(token, caseId, key);
       console.log(`IngesRes: ${ingeRes?.data?.executionArn}`);
     }
