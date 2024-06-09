@@ -1,0 +1,11 @@
+.paginationItem span {
+  background-color: #cf7650 !important;
+  color: white !important;
+  border: 1px solid #cf7650 !important;
+}
+
+.paginationItem a {
+  background-color: white !important;
+  color: black !important;
+  border: 1px solid #cf7650 !important;
+}

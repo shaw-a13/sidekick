@@ -1,7 +1,8 @@
-import React from "react";
-import { Col, Container, Row, Spinner, Table } from "react-bootstrap";
+import React, { useState } from "react";
+import { Col, Container, Pagination, Row, Spinner, Table } from "react-bootstrap";
 import { ExtractionResultProps } from "../interfaces/extractionResultProps.interface";
 import { ExtractionTableProps } from "../interfaces/extractionTableProps.interface";
+import "./ExtractionTable.css";
 
 export const EmptyResults: React.FC = () => (
   <div className="text-center">
@@ -16,28 +17,52 @@ export const EmptyResults: React.FC = () => (
   </div>
 );
 
-export const ExtractionTable: React.FC<ExtractionTableProps> = ({ extractionData }) => (
-  <Table striped bordered hover>
-    <thead>
-      <tr>
-        <th>Key</th>
-        <th>Value</th>
-        <th>Page Number</th>
-        <th>Score</th>
-        <th>Source</th>
-      </tr>
-    </thead>
-    <tbody>
-      {extractionData &&
-        extractionData.map((result: ExtractionResultProps) => (
-          <tr>
-            <td>{result.key}</td>
-            <td>{result.value}</td>
-            <td>{result.locations.pageNumber}</td>
-            <td>{result.score}</td>
-            <td>{result.source}</td>
-          </tr>
+export const ExtractionTable: React.FC<ExtractionTableProps> = ({ extractionData }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // Change this to the number of items you want per page
+
+  const totalPages = Math.ceil(extractionData.length / itemsPerPage);
+
+  const handleChangePage = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const paginatedData = extractionData.filter((_, index) => {
+    const page = Math.floor(index / itemsPerPage) + 1;
+    return page === currentPage;
+  });
+
+  return (
+    <>
+      <Pagination>
+        {[...Array(totalPages)].map((_, index) => (
+          <Pagination.Item className="paginationItem" key={index} active={index + 1 === currentPage} onClick={() => handleChangePage(index + 1)}>
+            {index + 1}
+          </Pagination.Item>
         ))}
-    </tbody>
-  </Table>
-);
+      </Pagination>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Value</th>
+            <th>Page Number</th>
+            <th>Score</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedData.map((result: ExtractionResultProps) => (
+            <tr>
+              <td>{result.key}</td>
+              <td>{result.value}</td>
+              <td>{result.locations.pageNumber}</td>
+              <td>{result.score}</td>
+              <td>{result.source}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </>
+  );
+};
