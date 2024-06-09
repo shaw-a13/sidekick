@@ -45,7 +45,7 @@ const linkStyle = {
   marginRight: 20,
 };
 
-const Navagation = () => {
+const Navigation = () => {
   const { user, isAuthenticated } = useAuth0();
 
   const userHasRole = (role: string) => user && user["authGroups"].includes(role);
@@ -90,4 +90,4 @@ const Navagation = () => {
   );
 };
 
-export default Navagation;
+export default Navigation;
