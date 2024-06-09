@@ -7,6 +7,7 @@ import { CaseRow, statuses } from "./components/caseRow.component";
 import { ResetButton } from "./components/resetButton.component";
 import { SearchInput } from "./components/searchInput.component";
 import { StatusDropdown } from "./components/statusDropdown.component";
+import { CaseStatus } from "../../enums/caseStatus";
 
 const Dashboard = () => {
   const { user, getAccessTokenSilently } = useAuth0();
@@ -25,7 +26,7 @@ const Dashboard = () => {
 
   // Map functions
   const adminCases = cases.map((caseRecord) => <CaseRow caseRecord={caseRecord} />);
-  const workerCases = cases.filter((caseRecord) => caseRecord.status === "OPEN" || caseRecord.assignee === user!.name).map((caseRecord) => <CaseRow caseRecord={caseRecord} />);
+  const workerCases = cases.filter((caseRecord) => caseRecord.status === CaseStatus.OPEN || caseRecord.assignee === user!.name).map((caseRecord) => <CaseRow caseRecord={caseRecord} />);
   const clientCases = cases.filter((caseRecord) => caseRecord.clientName === user!.name).map((caseRecord) => <CaseRow caseRecord={caseRecord} />);
 
   const filterByStatus = (status: string) => {
