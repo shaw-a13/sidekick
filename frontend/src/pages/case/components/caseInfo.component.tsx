@@ -48,7 +48,7 @@ export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, setEditCaseD
               <Button
                 className="sidekick-primary-btn m-2"
                 onClick={() => {
-                  assignCase({ assignee: user.name, status: CaseStatus.OPEN }, caseService, accessToken, id!);
+                  assignCase({ assignee: user.name, status: CaseStatus.ACTIVE }, caseService, accessToken, id!);
                 }}
               >
                 Assign to me
