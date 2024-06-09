@@ -7,7 +7,7 @@ import LogoutButton from "../components/logoutButton";
 import logo from "../img/logos/png/logo-no-background.png";
 import { Link } from "react-router-dom";
 
-let pages = [
+const pages = [
   {
     name: "Home",
     href: "/",
@@ -38,98 +38,51 @@ let pages = [
   },
 ];
 
+const linkStyle = {
+  color: "#CF7650",
+  textDecoration: "none",
+  marginTop: 20,
+  marginRight: 20,
+};
+
 const Navagation = () => {
   const { user, isAuthenticated } = useAuth0();
+
+  const userHasRole = (role: string) => user && user["authGroups"].includes(role);
+
+  const renderLinks = (filterFunc: (page: any) => boolean) => {
+    return pages.filter(filterFunc).map(({ name, href }) => (
+      <Link to={href} style={linkStyle}>
+        <p>{name}</p>
+      </Link>
+    ));
+  };
+
+  const getLinks = () => {
+    if (isAuthenticated) {
+      if (userHasRole("Admin") || userHasRole("Worker")) {
+        return renderLinks(() => true);
+      } else if (userHasRole("Worker")) {
+        return renderLinks((page) => !page.adminRequired);
+      } else if (user && user["authGroups"].length === 0) {
+        return renderLinks((page) => !page.adminRequired && !page.workerRequired);
+      }
+    }
+    return renderLinks((page) => !page.authenticationRequired);
+  };
+
   return (
-    <Navbar
-      variant="dark"
-      expand="lg"
-      fixed="top"
-      className="shadow-lg"
-      style={{ backgroundColor: "#162836" }}
-    >
+    <Navbar variant="dark" expand="lg" fixed="top" className="shadow-lg" style={{ backgroundColor: "#162836" }}>
       <Container>
         <Navbar.Brand href="/">
-          <img
-            alt=""
-            width={"150"}
-            src={logo}
-            className="d-inline-block align-top m-2"
-          />{" "}
+          <img alt="" width={"150"} src={logo} className="d-inline-block align-top m-2" />{" "}
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" color="#CF7650">
-          <Nav className="me-auto">
-            {isAuthenticated &&
-            user &&
-            user["authGroups"].includes("Admin", "Worker")
-              ? pages.map((page) => (
-                  <Link
-                    to={page.href}
-                    style={{
-                      color: "#CF7650",
-                      textDecoration: "none",
-                      margin: 20,
-                    }}
-                  >
-                    {page.name}
-                  </Link>
-                ))
-              : isAuthenticated && user && user["authGroups"].includes("Worker")
-                ? pages
-                    .filter((page) => page.adminRequired === false)
-                    .map((page) => (
-                      <Link
-                        to={page.href}
-                        style={{
-                          color: "#CF7650",
-                          textDecoration: "none",
-                          marginTop: 20,
-                          marginRight: 20,
-                        }}
-                      >
-                        <p>{page.name}</p>
-                      </Link>
-                    ))
-                : isAuthenticated && user && user["authGroups"].length === 0
-                  ? pages
-                      .filter((page) => page.adminRequired === false)
-                      .filter((page) => page.workerRequired === false)
-                      .map((page) => (
-                        <Link
-                          to={page.href}
-                          style={{
-                            color: "#CF7650",
-                            textDecoration: "none",
-                            marginTop: 20,
-                            marginRight: 20,
-                          }}
-                        >
-                          <p>{page.name}</p>
-                        </Link>
-                      ))
-                  : pages
-                      .filter((page) => page.authenticationRequired === false)
-                      .map((page) => (
-                        <Link
-                          to={page.href}
-                          style={{
-                            color: "#CF7650",
-                            textDecoration: "none",
-                            marginTop: 15,
-                          }}
-                        >
-                          <p>{page.name}</p>
-                        </Link>
-                      ))}
-          </Nav>
+          <Nav className="me-auto">{getLinks()}</Nav>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
-          {isAuthenticated && (
-            <p style={{ color: "#CF7650", margin: 20 }}>
-              Hello, {user!.name}
-            </p>
-          )}
+          {isAuthenticated && <p style={{ color: "#CF7650", margin: 20 }}>Hello, {user!.name}</p>}
           {isAuthenticated ? <LogoutButton /> : <LoginButton />}
         </Navbar.Collapse>
       </Container>
