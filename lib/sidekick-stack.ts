@@ -90,7 +90,7 @@ export class SidekickStack extends cdk.Stack {
 
     sidekickApiLambda.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
-      actions: ['dynamodb:DescribeTable','dynamodb:Scan','dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
+      actions: ['dynamodb:DescribeTable', 'dynamodb:Scan', 'dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
       resources: [sidekickTable.tableArn]
     }))
 
@@ -193,6 +193,39 @@ export class SidekickStack extends cdk.Stack {
     });
     ingestion.addMethod('POST');
 
+    const comments = sidekickApi.root.addResource('comments', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apiGateway.Cors.ALL_ORIGINS
+      }
+    });
+
+    const caseComments = comments.addResource('{caseId}');
+    caseComments.addMethod('GET');
+    caseComments.addMethod('POST');
+
+
+    const singleComment = caseComments.addResource('{commentId}');
+    singleComment.addMethod('GET');
+    singleComment.addMethod('PUT');
+    singleComment.addMethod('DELETE');
+
+
+    const history = sidekickApi.root.addResource('history', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apiGateway.Cors.ALL_ORIGINS
+      }
+    });
+
+    const caseHistory = history.addResource('{caseId}');
+    caseHistory.addMethod('GET');
+    caseHistory.addMethod('POST');
+
+
+    const singleHistory = caseHistory.addResource('{historyId}');
+    singleHistory.addMethod('GET');
+    singleHistory.addMethod('PUT');
+    singleHistory.addMethod('DELETE');
+
     const generatePresignedUrlLambda = new lambda.Function(this, 'GeneratePresignedUrlLambda', {
       code: lambda.Code.fromAsset(('lambda/generate_presigned_url'), {
         bundling: {
@@ -263,7 +296,7 @@ export class SidekickStack extends cdk.Stack {
     const documentDownload = download.addResource('{caseId}')
     documentDownload.addMethod('GET', new apiGateway.LambdaIntegration(downloadLambda));
 
-    
+
     new cdk.CfnOutput(this, 'CloudFrontURL', {
       value: distribution.domainName,
       description: 'The distribution URL',

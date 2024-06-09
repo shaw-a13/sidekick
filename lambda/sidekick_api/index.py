@@ -123,6 +123,118 @@ def handler(event, context):
             },
             "body": json.dumps({"executionArn": response["executionArn"]}),
         }
+    elif event["resource"] == "/comments/{caseId}":
+        if event["httpMethod"] == "GET":
+            print("Getting all comments...")
+            case_id = event["pathParameters"]["caseId"]
+            response = get_single_dynamo_item_begins_with(client, "COMMENT", case_id)
+            print(response)
+            return {
+                "statusCode": 200,
+                "headers": {
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+                },
+                "body": json.dumps(response),
+            }
+        if event["httpMethod"] == "POST":
+            print("Adding new comment...")
+            data = json.loads(event["body"])
+            response = put_dynamo_item(client, "COMMENT", data)
+            print(response)
+            return {
+                "statusCode": response["ResponseMetadata"]["HTTPStatusCode"],
+                "headers": {
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+                },
+                "body": json.dumps({"Id": data["SK"]}),
+            }
+    elif event["resource"] == "/comments/{caseId}/{commentId}":
+        if event["httpMethod"] == "GET":
+            print("Getting a single comment...")
+            commentId = event["pathParameters"]["commentId"]
+            response = get_single_dynamo_item(client, "COMMENT", commentId)
+            return {
+                "statusCode": 200,
+                "headers": {
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+                },
+                "body": json.dumps(response),
+            }
+        elif event["httpMethod"] == "PUT":
+            print("Updating a single comment...")
+            data = json.loads(event["body"])
+            commentId = event["pathParameters"]["commentId"]
+            response = update_dynamo_item(client, "COMMENT", commentId, data["props"])
+            print(response)
+            data = response["Attributes"]
+        elif event["httpMethod"] == "DELETE":
+            print("Deleting a single comment...")
+            commentId = event["pathParameters"]["commentId"]
+            response = delete_dynamo_item(client, "COMMENT", commentId)
+            print(response)
+            data = response
+    elif event["resource"] == "/history/{caseId}":
+        if event["httpMethod"] == "GET":
+            print("Getting all history...")
+            case_id = event["pathParameters"]["caseId"]
+            response = get_single_dynamo_item_begins_with(client, "CASE-HISTORY", case_id)
+            print(response)
+            return {
+                "statusCode": 200,
+                "headers": {
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+                },
+                "body": json.dumps(response),
+            }
+        if event["httpMethod"] == "POST":
+            print("Adding new history update...")
+            data = json.loads(event["body"])
+            response = put_dynamo_item(client, "CASE-HISTORY", data)
+            print(response)
+            return {
+                "statusCode": response["ResponseMetadata"]["HTTPStatusCode"],
+                "headers": {
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+                },
+                "body": json.dumps({"Id": data["SK"]}),
+            }
+    elif event["resource"] == "/history/{caseId}/{historyId}":
+        if event["httpMethod"] == "GET":
+            print("Getting a single history update...")
+            historyId = event["pathParameters"]["historyId"]
+            response = get_single_dynamo_item(client, "CASE-HISTORY", historyId)
+            return {
+                "statusCode": 200,
+                "headers": {
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+                },
+                "body": json.dumps(response),
+            }
+        elif event["httpMethod"] == "PUT":
+            print("Updating a single history update...")
+            data = json.loads(event["body"])
+            historyId = event["pathParameters"]["historyId"]
+            response = update_dynamo_item(client, "CASE-HISTORY", historyId, data["props"])
+            print(response)
+            data = response["Attributes"]
+        elif event["httpMethod"] == "DELETE":
+            print("Deleting a single history update...")
+            historyId = event["pathParameters"]["historyId"]
+            response = delete_dynamo_item(client, "CASE-HISTORY", historyId)
+            print(response)
+            data = response
 
     return {
         "statusCode": 200,
@@ -153,6 +265,25 @@ def get_all_dynamo_items(client, partition_key):
     ]
     return result_list
 
+
+def get_single_dynamo_item_begins_with(client, partition_key: str, sort_key: str):
+    res = client.query(
+        ExpressionAttributeValues={":pk": {"S": partition_key}, ":sk": {"S": sort_key}},
+        KeyConditionExpression="PK = :pk AND begins_with( SK, :sk)",
+        TableName=TABLENAME,
+    )
+    result_list = []
+    [
+        result_list.append(
+            {
+                key: list(item.values())[i]["S"]
+                for i, key in enumerate(list(item.keys()))
+            }
+        )
+        for item in res["Items"]
+    ]
+
+    return result_list
 
 def get_single_dynamo_item(client, partition_key: str, sort_key: str):
     res = client.query(
