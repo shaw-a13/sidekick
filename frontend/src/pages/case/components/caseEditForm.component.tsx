@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Badge } from "react-bootstrap";
 import { CaseEditFormProps } from "../interfaces/caseEditFormProps.interface";
 import { CaseEditProps } from "../../../interfaces/case/caseEditProps.interface";
 import { CaseService } from "../../../services/case.service";
+import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
 
 const submitCaseEdit = async (edit_obj: CaseEditProps, caseService: CaseService, token: string, id: string) => {
   await caseService.editCase(token, edit_obj, id!).then(() => window.location.reload());
@@ -45,7 +46,15 @@ export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseServic
       </Form.Group>
       <Form.Group controlId="formStatus">
         <Form.Label>Status</Form.Label>
-        <Form.Control type="text" name="status" placeholder="Enter status" defaultValue={caseInfo.status} onChange={changeHandler} />
+        <Form.Select name="status" defaultValue={caseInfo.status} onChange={changeHandler}>
+          {Object.keys(CaseStatus).map((statusItem) => (
+            <option>
+              <Badge bg={CaseStatusStyles[statusItem as CaseStatus].style} text="light">
+                {statusItem}
+              </Badge>
+            </option>
+          ))}
+        </Form.Select>
       </Form.Group>
       <Form.Group controlId="formAssignee">
         <Form.Label>Assignee</Form.Label>

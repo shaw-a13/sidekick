@@ -1,9 +1,9 @@
-import { Card, Button } from "react-bootstrap";
+import { Card, Button, Badge } from "react-bootstrap";
 import { CaseEditForm } from "./caseEditForm.component";
 import { CaseInfoProps } from "../interfaces/caseInfoProps.interface";
 import { CaseEditProps } from "../../../interfaces/case/caseEditProps.interface";
 import { CaseService } from "../../../services/case.service";
-import { CaseStatus } from "../../../enums/caseStatus";
+import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
 
 const assignCase = async (edit_obj: CaseEditProps, caseService: CaseService, token: string, id: string) => {
   await caseService.editCase(token, edit_obj, id!).then(() => window.location.reload());
@@ -33,7 +33,12 @@ export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, setEditCaseD
           <hr />
           <Card.Subtitle className="mb-2 text-muted">Date: {caseInfo!.date}</Card.Subtitle>
           <hr />
-          <Card.Subtitle className="mb-2 text-muted">Status: {caseInfo!.status}</Card.Subtitle>
+          <Card.Subtitle className="mb-2 text-muted">
+            Status:{" "}
+            <Badge bg={CaseStatusStyles[caseInfo!.status as CaseStatus].style} text="light">
+              {caseInfo!.status}
+            </Badge>
+          </Card.Subtitle>
           <hr />
           <Card.Subtitle className="mb-2 text-muted">Assignee: {caseInfo!.assignee}</Card.Subtitle>
           <hr />

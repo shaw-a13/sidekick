@@ -3,7 +3,7 @@ import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import { Container, Row, Col, Spinner } from "react-bootstrap";
 import { CaseService } from "../../services/case.service";
 import { Case } from "../../interfaces/case/case.interface";
-import { CaseRow, statuses } from "./components/caseRow.component";
+import { CaseRow } from "./components/caseRow.component";
 import { ResetButton } from "./components/resetButton.component";
 import { SearchInput } from "./components/searchInput.component";
 import { StatusDropdown } from "./components/statusDropdown.component";
@@ -111,7 +111,7 @@ const Dashboard = () => {
                 />
               </th>
               <th scope="col">
-                <StatusDropdown statuses={statuses} onClick={filterByStatus} buttonStyle={buttonStyle} />
+                <StatusDropdown onClick={filterByStatus} buttonStyle={buttonStyle} />
               </th>
               <th scope="col">
                 <ResetButton onClick={() => getCases(accessToken)} buttonStyle={buttonStyle} />
