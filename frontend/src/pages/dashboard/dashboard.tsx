@@ -25,7 +25,7 @@ const Dashboard = () => {
 
   // Map functions
   const adminCases = cases.map((caseRecord) => <CaseRow caseRecord={caseRecord} />);
-  const workerCases = cases.filter((caseRecord) => caseRecord.assignee === user!.name).map((caseRecord) => <CaseRow caseRecord={caseRecord} />);
+  const workerCases = cases.filter((caseRecord) => caseRecord.status === "OPEN" || caseRecord.assignee === user!.name).map((caseRecord) => <CaseRow caseRecord={caseRecord} />);
   const clientCases = cases.filter((caseRecord) => caseRecord.clientName === user!.name).map((caseRecord) => <CaseRow caseRecord={caseRecord} />);
 
   const filterByStatus = (status: string) => {
