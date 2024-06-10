@@ -16,10 +16,23 @@ import { DocumentViewer } from "./components/documentViewer.component";
 import { LoadingSpinner } from "./components/loadingSpinner.component";
 import { CaseInfo as CaseInfoComponent } from "./components/caseInfo.component";
 import { UnauthorizedMessage } from "./components/unauthorisedMessage.component";
+import { CommentService } from "../../services/comment.service";
+import { Comment } from "../../interfaces/comment/comment.interface";
+import { Comments } from "./components/comments.component";
+import { HistoryService } from "../../services/history.service";
+import { History as HistoryProps } from "../../interfaces/history/history.interface";
+import { History } from "./components/history.component";
+import { Client } from "../../interfaces/client/client.interface";
+import { ClientService } from "../../services/client.service";
+import { ClientInfo } from "./components/clientInfo.component";
 
 const Case = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [caseInfo, setCaseInfo] = useState<CaseInfo>();
+  const [clientInfo, setClientInfo] = useState<Client>();
+  const [comments, setComments] = useState<Comment[]>();
+  const [history, setHistory] = useState<HistoryProps[]>();
+
   const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
 
   const [accessToken, setAccessToken] = useState("");
@@ -36,12 +49,27 @@ const Case = () => {
   const [editCaseDescription, setEditCaseDescription] = useState(false);
 
   const caseService = new CaseService();
+  const clientService = new ClientService();
+  const commentervice = new CommentService();
+  const historyService = new HistoryService();
 
   const handleCaseEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target);
     const { name, value } = event.target;
 
     setCaseEditInfo({ ...caseEditInfo!, [name]: value });
+  };
+
+  const getComments = async (token: string) => {
+    return await commentervice.getAllComments(token, id!);
+  };
+
+  const getHistory = async (token: string) => {
+    return await historyService.getAllHistory(token, id!);
+  };
+
+  const getClientInfo = async (token: string, clientId: string) => {
+    return await clientService.getSingleClient(token, clientId);
   };
 
   const getCase = async (token: string) => {
@@ -62,8 +90,12 @@ const Case = () => {
   useEffect(() => {
     getAccessTokenSilently().then(async (token: string) => {
       setAccessToken(token!);
-      await getCase(token!).then((res) => {
+      await getCase(token!).then(async (res) => {
         setCaseInfo(res?.data);
+        if (res)
+          await getClientInfo(token!, res?.data.clientId).then((res) => {
+            setClientInfo(res?.data);
+          });
       });
       await documentService.getDocuments(token!, id!).then(async (res) => {
         setDocApiData(res?.data);
@@ -76,6 +108,12 @@ const Case = () => {
         } catch (error) {
           setExtractionData(undefined);
         }
+      });
+      await getComments(token!).then((res) => {
+        setComments(res?.data);
+      });
+      await getHistory(token!).then((res) => {
+        setHistory(res?.data);
       });
 
       setLoading(false);
@@ -93,7 +131,7 @@ const Case = () => {
               <div>
                 <Container>
                   <Row className="mb-3">
-                    <Col>
+                    <Col sm={7}>
                       <DocumentViewer
                         caseInfo={caseInfo!}
                         user={user}
@@ -105,7 +143,7 @@ const Case = () => {
                         documentData={documentData}
                       />
                     </Col>
-                    <Col sm={4}>
+                    <Col sm={5}>
                       <CaseInfoComponent
                         caseInfo={caseInfo!}
                         user={user}
@@ -117,6 +155,8 @@ const Case = () => {
                         caseEditInfo={caseEditInfo!}
                         handleCaseEditChange={handleCaseEditChange}
                       />
+                      <Col className="mt-3">{clientInfo && <ClientInfo clientInfo={clientInfo} />}</Col>
+                      <Col className="mt-3"> {history && <History history={history} />}</Col>
                     </Col>
                   </Row>
                   <Row>
@@ -130,8 +170,8 @@ const Case = () => {
                       </Card>
                     </Col>
                   </Row>
-                  <Row>
-                    <Col className="mt-3 mb-5">
+                  <Row className="mt-3">
+                    <Col sm={6}>
                       <Card>
                         <Card.Body>
                           <Card.Title>
@@ -156,7 +196,9 @@ const Case = () => {
                         </Card.Body>
                       </Card>
                     </Col>
+                    <Col sm={6}>{comments && <Comments comments={comments} />}</Col>
                   </Row>
+                  <Row className="mt-3 mb-3"></Row>
                 </Container>
               </div>
             )}

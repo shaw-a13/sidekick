@@ -32,7 +32,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ caseInfo, user, 
         ))}
       </div>
       <Card.Subtitle className="mb-2 text-muted">
-        <iframe title="pdf-viewer" src={documentData} width="700" height="600"></iframe>
+        <iframe title="pdf-viewer" src={documentData} width="700" height="900"></iframe>
       </Card.Subtitle>
     </Card.Body>
   </Card>
