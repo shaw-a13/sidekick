@@ -9,7 +9,7 @@ const assignCase = async (edit_obj: CaseEditProps, caseService: CaseService, tok
   await caseService.editCase(token, edit_obj, id!).then(() => window.location.reload());
 };
 
-export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, setEditCaseDetails, editCaseDetails, caseService, accessToken, id, caseEditInfo, handleCaseEditChange }) => (
+export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, setEditCaseDetails, editCaseDetails, caseService, clientService, accessToken, id, caseEditInfo, handleCaseEditChange }) => (
   <Card>
     <Card.Body>
       <Card.Title>
@@ -59,7 +59,15 @@ export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, setEditCaseD
       )}
       {editCaseDetails && (
         <div>
-          <CaseEditForm caseInfo={caseInfo!} caseService={caseService} accessToken={accessToken} id={id!} caseEditInfo={caseEditInfo!} changeHandler={handleCaseEditChange} />
+          <CaseEditForm
+            caseInfo={caseInfo!}
+            caseService={caseService}
+            clientService={clientService}
+            accessToken={accessToken}
+            id={id!}
+            caseEditInfo={caseEditInfo!}
+            changeHandler={handleCaseEditChange}
+          />
         </div>
       )}
     </Card.Body>

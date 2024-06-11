@@ -150,6 +150,7 @@ const Case = () => {
                         setEditCaseDetails={setEditCaseDetails}
                         editCaseDetails={editCaseDetails}
                         caseService={caseService}
+                        clientService={clientService}
                         accessToken={accessToken}
                         id={id!}
                         caseEditInfo={caseEditInfo!}
@@ -190,7 +191,15 @@ const Case = () => {
                           {!editCaseDescription && <Card.Subtitle className="mb-2 text-muted">{caseInfo!.description}</Card.Subtitle>}
                           {editCaseDescription && (
                             <div>
-                              <CaseDescEditForm caseInfo={caseInfo!} caseService={caseService} accessToken={accessToken} id={id!} caseEditInfo={caseEditInfo!} changeHandler={handleCaseEditChange} />
+                              <CaseDescEditForm
+                                caseInfo={caseInfo!}
+                                caseService={caseService}
+                                clientService={clientService}
+                                accessToken={accessToken}
+                                id={id!}
+                                caseEditInfo={caseEditInfo!}
+                                changeHandler={handleCaseEditChange}
+                              />
                             </div>
                           )}
                         </Card.Body>
