@@ -4,9 +4,15 @@ import { CaseEditFormProps } from "../interfaces/caseEditFormProps.interface";
 import { CaseEditProps } from "../../../interfaces/case/caseEditProps.interface";
 import { CaseService } from "../../../services/case.service";
 import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
+import { ClientService } from "../../../services/client.service";
 
-const submitCaseEdit = async (edit_obj: CaseEditProps, caseService: CaseService, token: string, id: string) => {
-  await caseService.editCase(token, edit_obj, id!).then(() => window.location.reload());
+const submitCaseEdit = async (edit_obj: CaseEditProps, caseService: CaseService, clientService: ClientService, token: string, id: string) => {
+  await caseService.editCase(token, edit_obj, id!).then(async () => {
+    if (edit_obj.clientName) {
+      const name = edit_obj.clientName.split(" ");
+      await clientService.editClient(token, { firstName: name[0], lastName: name[1] }, id).then(() => window.location.reload());
+    }
+  });
 };
 
 export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, accessToken, id, caseEditInfo, changeHandler }) => {
@@ -29,7 +35,7 @@ export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseSe
   );
 };
 
-export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, accessToken, id, caseEditInfo, changeHandler }) => {
+export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, clientService, accessToken, id, caseEditInfo, changeHandler }) => {
   return (
     <Form>
       <Form.Group controlId="formClientName">
@@ -68,7 +74,7 @@ export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseServic
         <Button
           className="sidekick-primary-btn m-2"
           onClick={() => {
-            submitCaseEdit(caseEditInfo, caseService, accessToken, id);
+            submitCaseEdit(caseEditInfo, caseService, clientService, accessToken, id);
           }}
         >
           Submit
