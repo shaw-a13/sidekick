@@ -25,6 +25,7 @@ import { History } from "./components/history.component";
 import { Client } from "../../interfaces/client/client.interface";
 import { ClientService } from "../../services/client.service";
 import { ClientInfo } from "./components/clientInfo.component";
+import { ClientEditProps } from "../../interfaces/client/clientEditProps.interface";
 
 const Case = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -34,6 +35,7 @@ const Case = () => {
   const [history, setHistory] = useState<HistoryProps[]>();
 
   const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
+  const [clientEditInfo, setClientEditInfo] = useState<ClientEditProps>();
 
   const [accessToken, setAccessToken] = useState("");
   const [loading, setLoading] = useState(true);
@@ -47,11 +49,19 @@ const Case = () => {
   const { id } = useParams();
   const [editCaseDetails, setEditCaseDetails] = useState(false);
   const [editCaseDescription, setEditCaseDescription] = useState(false);
+  const [editClientInfo, setEditClientInfo] = useState(false);
 
   const caseService = new CaseService();
   const clientService = new ClientService();
   const commentervice = new CommentService();
   const historyService = new HistoryService();
+
+  const handleClientEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target);
+    const { name, value } = event.target;
+
+    setClientEditInfo({ ...clientEditInfo!, [name]: value });
+  };
 
   const handleCaseEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target);
@@ -156,7 +166,22 @@ const Case = () => {
                         caseEditInfo={caseEditInfo!}
                         handleCaseEditChange={handleCaseEditChange}
                       />
-                      <Col className="mt-3">{clientInfo && <ClientInfo clientInfo={clientInfo} />}</Col>
+                      <Col className="mt-3">
+                        {clientInfo && (
+                          <ClientInfo
+                            clientInfo={clientInfo}
+                            editClientInfo={editClientInfo}
+                            setEditClientInfo={setEditClientInfo}
+                            caseService={caseService}
+                            clientService={clientService}
+                            accessToken={accessToken}
+                            caseId={id!}
+                            clientEditInfo={clientEditInfo!}
+                            changeHandler={handleClientEditChange}
+                          />
+                        )}
+                      </Col>
+
                       <Col className="mt-3"> {history && <History history={history} />}</Col>
                     </Col>
                   </Row>

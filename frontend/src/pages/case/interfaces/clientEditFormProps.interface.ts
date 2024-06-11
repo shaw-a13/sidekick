@@ -1,16 +1,17 @@
+import { Case as CaseInfo } from "../../../interfaces/case/case.interface";
 import { Client } from "../../../interfaces/client/client.interface";
 import { ClientEditProps } from "../../../interfaces/client/clientEditProps.interface";
 import { CaseService } from "../../../services/case.service";
 import { ClientService } from "../../../services/client.service";
 
-export interface ClientInfoProps {
+export interface ClientEditFormProps {
   clientInfo: Client;
-  editClientInfo: boolean;
-  setEditClientInfo: React.Dispatch<React.SetStateAction<boolean>>;
   caseService: CaseService;
   clientService: ClientService;
   accessToken: string;
+  clientId: string;
   caseId: string;
   clientEditInfo: ClientEditProps;
   changeHandler: (event: any) => void;
 }
+
