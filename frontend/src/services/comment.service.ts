@@ -20,7 +20,7 @@ export class CommentService extends BaseService {
 
   public async deleteComment(token: string, caseId: string, commentId: string) {
     try {
-      return await axios.delete(`${this.baseUrl}/Comments/${caseId}/${commentId}`, {
+      return await axios.delete(`${this.baseUrl}/comments/${caseId}/${commentId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -31,9 +31,9 @@ export class CommentService extends BaseService {
     }
   }
 
-  public async addComment(token: string, commentInfo: Comment) {
+  public async addComment(token: string, commentInfo: Comment, caseId: string) {
     try {
-      return await axios.post(`${this.baseUrl}/comments`, commentInfo, {
+      return await axios.post(`${this.baseUrl}/comments/${caseId}`, commentInfo, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -53,7 +53,7 @@ const Case = () => {
 
   const caseService = new CaseService();
   const clientService = new ClientService();
-  const commentervice = new CommentService();
+  const commentService = new CommentService();
   const historyService = new HistoryService();
 
   const handleClientEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +71,7 @@ const Case = () => {
   };
 
   const getComments = async (token: string) => {
-    return await commentervice.getAllComments(token, id!);
+    return await commentService.getAllComments(token, id!);
   };
 
   const getHistory = async (token: string) => {
@@ -230,7 +230,7 @@ const Case = () => {
                         </Card.Body>
                       </Card>
                     </Col>
-                    <Col sm={6}>{comments && <Comments comments={comments} />}</Col>
+                    <Col sm={6}>{comments && <Comments comments={comments} caseId={id!} userId={user.name!} commentService={commentService} accessToken={accessToken} />}</Col>
                   </Row>
                   <Row className="mt-3 mb-3"></Row>
                 </Container>
