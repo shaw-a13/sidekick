@@ -152,25 +152,13 @@ def handler(event, context):
                 },
                 "body": json.dumps({"Id": data["SK"]}),
             }
-    elif event["resource"] == "/comments/{caseId}/{commentId}":
-        if event["httpMethod"] == "GET":
-            print("Getting a single comment...")
-            commentId = event["pathParameters"]["commentId"]
-            response = get_single_dynamo_item(client, "COMMENT", commentId)
-            return {
-                "statusCode": 200,
-                "headers": {
-                    "Access-Control-Allow-Headers": "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
-                },
-                "body": json.dumps(response),
-            }
+    elif event["resource"] == "/comments/{caseId}/{caseId}":
         elif event["httpMethod"] == "PUT":
             print("Updating a single comment...")
             data = json.loads(event["body"])
-            commentId = event["pathParameters"]["commentId"]
-            response = update_dynamo_item(client, "COMMENT", commentId, data["props"])
+            case_id = event["pathParameters"]["caseId"]
+            timestamp = event["pathParameters"]["timestamp"]
+            response = update_dynamo_item(client, "COMMENT", f'{case_id}#{timestamp}', data["props"])
             print(response)
             data = response["Attributes"]
         elif event["httpMethod"] == "DELETE":
@@ -208,33 +196,15 @@ def handler(event, context):
                 },
                 "body": json.dumps({"Id": data["SK"]}),
             }
-    elif event["resource"] == "/history/{caseId}/{historyId}":
-        if event["httpMethod"] == "GET":
-            print("Getting a single history update...")
-            historyId = event["pathParameters"]["historyId"]
-            response = get_single_dynamo_item(client, "CASE-HISTORY", historyId)
-            return {
-                "statusCode": 200,
-                "headers": {
-                    "Access-Control-Allow-Headers": "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
-                },
-                "body": json.dumps(response),
-            }
+    elif event["resource"] == "/history/{caseId}/{timestamp}":
         elif event["httpMethod"] == "PUT":
             print("Updating a single history update...")
             data = json.loads(event["body"])
-            historyId = event["pathParameters"]["historyId"]
-            response = update_dynamo_item(client, "CASE-HISTORY", historyId, data["props"])
+            case_id = event["pathParameters"]["caseId"]
+            timestamp = event["pathParameters"]["timestamp"] 
+            response = update_dynamo_item(client, "CASE-HISTORY", f'{case_id}#{timestamp}', data["props"])
             print(response)
             data = response["Attributes"]
-        elif event["httpMethod"] == "DELETE":
-            print("Deleting a single history update...")
-            historyId = event["pathParameters"]["historyId"]
-            response = delete_dynamo_item(client, "CASE-HISTORY", historyId)
-            print(response)
-            data = response
 
     return {
         "statusCode": 200,

@@ -204,8 +204,7 @@ export class SidekickStack extends cdk.Stack {
     caseComments.addMethod('POST');
 
 
-    const singleComment = caseComments.addResource('{commentId}');
-    singleComment.addMethod('GET');
+    const singleComment = caseComments.addResource('{timestamp}');
     singleComment.addMethod('PUT');
     singleComment.addMethod('DELETE');
 
@@ -221,8 +220,7 @@ export class SidekickStack extends cdk.Stack {
     caseHistory.addMethod('POST');
 
 
-    const singleHistory = caseHistory.addResource('{historyId}');
-    singleHistory.addMethod('GET');
+    const singleHistory = caseHistory.addResource('{timestamp}');
     singleHistory.addMethod('PUT');
     singleHistory.addMethod('DELETE');
 
