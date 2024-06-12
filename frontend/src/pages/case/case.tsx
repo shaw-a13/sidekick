@@ -10,7 +10,7 @@ import { DocumentResultResponse } from "../../interfaces/document/documentResult
 import { CaseEditProps } from "../../interfaces/case/caseEditProps.interface";
 import { UploadModal } from "./components/uploadModal.component";
 import { ExtractionResultProps } from "./interfaces/extractionResultProps.interface";
-import { CaseDescEditForm, CaseEditForm } from "./components/caseEditForm.component";
+import { CaseDescEditForm } from "./components/caseEditForm.component";
 import { EmptyResults, ExtractionTable } from "./components/extrationTable.component";
 import { DocumentViewer } from "./components/documentViewer.component";
 import { LoadingSpinner } from "./components/loadingSpinner.component";

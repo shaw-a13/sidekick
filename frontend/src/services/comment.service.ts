@@ -44,15 +44,16 @@ export class CommentService extends BaseService {
     }
   }
 
-  public async editComment(token: string, commentEdits: CommentEditProps, caseId: string, commentId: string) {
+  public async editComment(token: string, commentEdits: CommentEditProps, caseId: string, timestamp: string) {
     let data: DynamoEditProps = {
       props: [],
     };
     for (const [key, value] of Object.entries(commentEdits)) {
       data.props.push({ key, value });
     }
+    console.log(data);
     try {
-      return await axios.put(`${this.baseUrl}/Comments/${caseId}/${commentId}`, data, {
+      return await axios.put(`${this.baseUrl}/comments/${caseId}/${timestamp}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
