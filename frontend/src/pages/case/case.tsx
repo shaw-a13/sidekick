@@ -10,7 +10,7 @@ import { DocumentResultResponse } from "../../interfaces/document/documentResult
 import { CaseEditProps } from "../../interfaces/case/caseEditProps.interface";
 import { UploadModal } from "./components/uploadModal.component";
 import { ExtractionResultProps } from "./interfaces/extractionResultProps.interface";
-import { CaseDescEditForm, CaseEditForm } from "./components/caseEditForm.component";
+import { CaseDescEditForm } from "./components/caseEditForm.component";
 import { EmptyResults, ExtractionTable } from "./components/extrationTable.component";
 import { DocumentViewer } from "./components/documentViewer.component";
 import { LoadingSpinner } from "./components/loadingSpinner.component";
@@ -53,7 +53,7 @@ const Case = () => {
 
   const caseService = new CaseService();
   const clientService = new ClientService();
-  const commentervice = new CommentService();
+  const commentService = new CommentService();
   const historyService = new HistoryService();
 
   const handleClientEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +71,7 @@ const Case = () => {
   };
 
   const getComments = async (token: string) => {
-    return await commentervice.getAllComments(token, id!);
+    return await commentService.getAllComments(token, id!);
   };
 
   const getHistory = async (token: string) => {
@@ -230,7 +230,7 @@ const Case = () => {
                         </Card.Body>
                       </Card>
                     </Col>
-                    <Col sm={6}>{comments && <Comments comments={comments} />}</Col>
+                    <Col sm={6}>{comments && <Comments comments={comments} caseId={id!} userId={user.name!} commentService={commentService} accessToken={accessToken} />}</Col>
                   </Row>
                   <Row className="mt-3 mb-3"></Row>
                 </Container>
