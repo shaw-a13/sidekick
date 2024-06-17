@@ -7,13 +7,15 @@ import { DocumentService } from "../../../services/document.service";
 import { Case } from "../../../interfaces/case/case.interface";
 import { useState } from "react";
 import { DocumentUploadStepProps } from "../interfaces/documentUploadProps.interface";
+import { HistoryService } from "../../../services/history.service";
+import { CaseHistory } from "../../../enums/caseHistory";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const uploadDocument = async (file: File, token: string, caseId: string) => {
   const documentService = new DocumentService();
 
-  document.getElementById("step1")!.style.pointerEvents = "auto";
-
   try {
+    console.log("Uploading document");
     const res = await documentService.getPresignedUrl(token, caseId);
     const presignedUrl = res?.data.presignedUrl;
     const key = res?.data.key;
@@ -42,7 +44,18 @@ const addCase = async (clientInfo: Client, caseInfo: Case, accessToken: string) 
   }
 };
 
+const setInitialHistory = async (accessToken: string, caseId: string, user: any) => {
+  const historyService = new HistoryService();
+  let date = new Date().toISOString();
+
+  await historyService.addHistory(accessToken, caseId, { SK: `${caseId}#${date}`, action: CaseHistory.OPENED, name: user!.name!, timestamp: date });
+
+  date = new Date().toISOString();
+  await historyService.addHistory(accessToken, caseId, { SK: `${caseId}#${date}`, action: CaseHistory.DOCUMENT_UPLOADED, name: user!.name!, timestamp: new Date().toISOString() });
+};
+
 const DocumentUploadStep = (props: DocumentUploadStepProps) => {
+  const { user } = useAuth0();
   const navigate = useNavigate();
 
   const [showSubmitButton, setShowSubmitButton] = useState(false);
@@ -54,19 +67,33 @@ const DocumentUploadStep = (props: DocumentUploadStepProps) => {
   };
 
   const handleSubmit = async () => {
+    console.log("Submitting case");
     if (!props.uploadFile) {
       console.error("No file to upload");
       return;
     }
 
     if (props.newCase && props.clientInfo && props.caseInfo) {
-      await addCase(props.clientInfo, props.caseInfo, props.accessToken);
-    }
-
-    const caseId = props.caseInfo?.SK ?? props.caseId;
-    if (caseId) {
-      await uploadDocument(props.uploadFile, props.accessToken, caseId);
-      navigate(`../case/${caseId}`);
+      await addCase(props.clientInfo, props.caseInfo, props.accessToken)
+        .then(async () => {
+          await uploadDocument(props.uploadFile!, props.accessToken, props.caseInfo?.SK!);
+        })
+        .then(async () => setInitialHistory(props.accessToken, props.caseInfo?.SK!, user))
+        .then(
+          async () =>
+            await setTimeout(() => {
+              navigate(`/case/${props.caseInfo?.SK!}`);
+            }, 1000)
+        );
+    } else {
+      await uploadDocument(props.uploadFile, props.accessToken, props.caseId!)
+        .then(async () => setInitialHistory(props.accessToken, props.caseId!, user))
+        .then(
+          async () =>
+            await setTimeout(() => {
+              navigate(`/case/${props.caseId!}`);
+            }, 1000)
+        );
     }
   };
 

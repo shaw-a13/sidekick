@@ -4,17 +4,14 @@ import { CaseService } from "../../services/case.service";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { Case as CaseInfo } from "../../interfaces/case/case.interface";
-import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { Card, Col, Container, Row } from "react-bootstrap";
 import { DocumentService } from "../../services/document.service";
 import { DocumentResultResponse } from "../../interfaces/document/documentResultResponse.interface";
-import { CaseEditProps } from "../../interfaces/case/caseEditProps.interface";
 import { UploadModal } from "./components/uploadModal.component";
 import { ExtractionResultProps } from "./interfaces/extractionResultProps.interface";
-import { CaseDescEditForm } from "./components/caseEditForm.component";
 import { EmptyResults, ExtractionTable } from "./components/extrationTable.component";
 import { DocumentViewer } from "./components/documentViewer.component";
 import { LoadingSpinner } from "./components/loadingSpinner.component";
-import { CaseInfo as CaseInfoComponent } from "./components/caseInfo.component";
 import { UnauthorizedMessage } from "./components/unauthorisedMessage.component";
 import { CommentService } from "../../services/comment.service";
 import { Comment } from "../../interfaces/comment/comment.interface";
@@ -24,8 +21,6 @@ import { History as HistoryProps } from "../../interfaces/history/history.interf
 import { History } from "./components/history.component";
 import { Client } from "../../interfaces/client/client.interface";
 import { ClientService } from "../../services/client.service";
-import { ClientInfo } from "./components/clientInfo.component";
-import { ClientEditProps } from "../../interfaces/client/clientEditProps.interface";
 import { CaseDescription } from "./components/caseDescription.component";
 import { CaseInfoPaginator } from "./components/caseInfoPaginator";
 
