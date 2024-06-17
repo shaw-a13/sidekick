@@ -111,7 +111,7 @@ const Case = () => {
     <Container>
       {(isAuthenticated && user && user["authGroups"].includes("Worker")) || (isAuthenticated && user && user["authGroups"].length === 0 && caseInfo?.clientName === user.name) ? (
         <div style={{ paddingTop: "8rem" }}>
-          <UploadModal id={id!} accessToken={accessToken} show={uploadModal} setShow={setUploadModal} />
+          <UploadModal historyService={historyService} id={id!} accessToken={accessToken} show={uploadModal} setShow={setUploadModal} user={user} />
           <div>
             {loading && <LoadingSpinner />}
             {!loading && (

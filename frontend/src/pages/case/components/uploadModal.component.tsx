@@ -1,11 +1,12 @@
 import { useState, useRef } from "react";
 import { Modal, Spinner, Button, Form } from "react-bootstrap";
 import { DocumentService } from "../../../services/document.service";
+import { HistoryService } from "../../../services/history.service";
+import { CaseHistory } from "../../../enums/caseHistory";
 
-const uploadDocument = async (document: any, caseId: string, accessToken: string) => {
+const uploadDocument = async (document: any, caseId: string, accessToken: string, historyService: HistoryService, user: any) => {
   const documentService = new DocumentService();
 
-  // GET request: presigned URL
   documentService.getPresignedUrl(accessToken, caseId).then(async (res) => {
     const presignedUrl = res?.data.presignedUrl;
     const key = res?.data.key;
@@ -13,15 +14,39 @@ const uploadDocument = async (document: any, caseId: string, accessToken: string
     console.log(key);
     if (presignedUrl) {
       await documentService.uploadDocument(presignedUrl, document).then(async () => {
-        await documentService.triggerIngestion(accessToken, caseId, key!).then(async (ingeRes) => {
-          console.log(`IngesRes: ${ingeRes?.data.executionArn}`);
-        });
+        await documentService
+          .triggerIngestion(accessToken, caseId, key!)
+          .then(async (ingeRes) => {
+            console.log(`IngesRes: ${ingeRes?.data.executionArn}`);
+          })
+          .then(async () =>
+            historyService.addHistory(accessToken, caseId, {
+              SK: `${caseId}#${new Date().toISOString()}`,
+              action: CaseHistory.DOCUMENT_UPLOADED,
+              name: user!.name!,
+              timestamp: new Date().toISOString(),
+            })
+          );
       });
     }
   });
 };
 
-export const UploadModal = ({ id, accessToken, show, setShow }: { id: string; accessToken: string; show: boolean; setShow: (prev: boolean) => void }) => {
+export const UploadModal = ({
+  historyService,
+  id,
+  accessToken,
+  show,
+  setShow,
+  user,
+}: {
+  historyService: HistoryService;
+  id: string;
+  accessToken: string;
+  show: boolean;
+  setShow: (prev: boolean) => void;
+  user: any;
+}) => {
   const [uploadFile, setUploadFile] = useState<any>();
   const [showLoader, setShowLoader] = useState(false);
   const uploadButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -32,12 +57,13 @@ export const UploadModal = ({ id, accessToken, show, setShow }: { id: string; ac
     uploadButtonRef!.current!.classList.remove("d-none");
   };
 
-  const handleDocumentUpload = () => {
-    uploadDocument(uploadFile, id, accessToken);
-    setShowLoader(true);
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+  const handleDocumentUpload = (historyService: HistoryService, user: any) => {
+    uploadDocument(uploadFile, id, accessToken, historyService, user).then(() => {
+      setShowLoader(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    });
   };
 
   return (
@@ -52,7 +78,7 @@ export const UploadModal = ({ id, accessToken, show, setShow }: { id: string; ac
         </Form.Group>
         <div className="text-center mt-3">{showLoader && <Spinner animation="border" />}</div>
         <div className="text-center mt-3">
-          <Button ref={uploadButtonRef} id="submitUploadBtn" className="sidekick-primary-btn d-none" onClick={handleDocumentUpload}>
+          <Button ref={uploadButtonRef} id="submitUploadBtn" className="sidekick-primary-btn d-none" onClick={() => handleDocumentUpload(historyService, user)}>
             Upload
           </Button>
         </div>
