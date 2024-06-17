@@ -63,7 +63,7 @@ def handler(event, context):
             response = get_all_dynamo_items(client, "CLIENT")
             print(response)
             data = response
-        if event["httpMethod"] == "POST":
+        elif event["httpMethod"] == "POST":
             print("Adding new client...")
             data = json.loads(event["body"])
             response = put_dynamo_item(client, "CLIENT", data)
@@ -138,7 +138,7 @@ def handler(event, context):
                 },
                 "body": json.dumps(response),
             }
-        if event["httpMethod"] == "POST":
+        elif event["httpMethod"] == "POST":
             print("Adding new comment...")
             data = json.loads(event["body"])
             response = put_dynamo_item(client, "COMMENT", data)
@@ -152,8 +152,8 @@ def handler(event, context):
                 },
                 "body": json.dumps({"Id": data["SK"]}),
             }
-    elif event["resource"] == "/comments/{caseId}/{caseId}":
-        elif event["httpMethod"] == "PUT":
+    elif event["resource"] == "/comments/{caseId}/{timestamp}":
+        if event["httpMethod"] == "PUT":
             print("Updating a single comment...")
             data = json.loads(event["body"])
             case_id = event["pathParameters"]["caseId"]
@@ -163,8 +163,7 @@ def handler(event, context):
             data = response["Attributes"]
         elif event["httpMethod"] == "DELETE":
             print("Deleting a single comment...")
-            commentId = event["pathParameters"]["commentId"]
-            response = delete_dynamo_item(client, "COMMENT", commentId)
+            response = delete_dynamo_item(client, "COMMENT", f"{case_id}#{timestamp}")
             print(response)
             data = response
     elif event["resource"] == "/history/{caseId}":
@@ -182,7 +181,7 @@ def handler(event, context):
                 },
                 "body": json.dumps(response),
             }
-        if event["httpMethod"] == "POST":
+        elif event["httpMethod"] == "POST":
             print("Adding new history update...")
             data = json.loads(event["body"])
             response = put_dynamo_item(client, "CASE-HISTORY", data)
@@ -197,15 +196,14 @@ def handler(event, context):
                 "body": json.dumps({"Id": data["SK"]}),
             }
     elif event["resource"] == "/history/{caseId}/{timestamp}":
-        elif event["httpMethod"] == "PUT":
-            print("Updating a single history update...")
+        if event["httpMethod"] == "DELETE":
+            print("Deleting a single history update...")
             data = json.loads(event["body"])
             case_id = event["pathParameters"]["caseId"]
             timestamp = event["pathParameters"]["timestamp"] 
-            response = update_dynamo_item(client, "CASE-HISTORY", f'{case_id}#{timestamp}', data["props"])
+            response = delete_dynamo_item(client, "CASE-HISTORY", f"{case_id}#{timestamp}")
             print(response)
-            data = response["Attributes"]
-
+            data = response
     return {
         "statusCode": 200,
         "headers": {
