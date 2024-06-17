@@ -153,11 +153,11 @@ def handler(event, context):
                 "body": json.dumps({"Id": data["SK"]}),
             }
     elif event["resource"] == "/comments/{caseId}/{timestamp}":
+        case_id = event["pathParameters"]["caseId"]
+        timestamp = event["pathParameters"]["timestamp"]
         if event["httpMethod"] == "PUT":
             print("Updating a single comment...")
             data = json.loads(event["body"])
-            case_id = event["pathParameters"]["caseId"]
-            timestamp = event["pathParameters"]["timestamp"]
             response = update_dynamo_item(client, "COMMENT", f'{case_id}#{timestamp}', data["props"])
             print(response)
             data = response["Attributes"]
