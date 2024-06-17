@@ -5,11 +5,23 @@ import { ClientService } from "../../../services/client.service";
 import { ClientEditFormProps } from "../interfaces/clientEditFormProps.interface";
 import { ClientEditProps } from "../../../interfaces/client/clientEditProps.interface";
 import { Client } from "../../../interfaces/client/client.interface";
+import { HistoryService } from "../../../services/history.service";
+import { CaseHistory } from "../../../enums/caseHistory";
 
-const submitClientEdit = async (edit_obj: ClientEditProps, clientInfo: Client, caseService: CaseService, clientService: ClientService, token: string, clientId: string, caseId: string) => {
+const submitClientEdit = async (
+  edit_obj: ClientEditProps,
+  clientInfo: Client,
+  caseService: CaseService,
+  clientService: ClientService,
+  historyService: HistoryService,
+  token: string,
+  userId: string,
+  caseId: string
+) => {
+  const date = new Date().toISOString();
   console.log(edit_obj);
   await clientService
-    .editClient(token, edit_obj, clientId)
+    .editClient(token, edit_obj, clientInfo.SK)
     .then(async () => {
       if (edit_obj.firstName && edit_obj.lastName) {
         const name = edit_obj.firstName + " " + edit_obj.lastName;
@@ -22,10 +34,12 @@ const submitClientEdit = async (edit_obj: ClientEditProps, clientInfo: Client, c
         await caseService.editCase(token, { clientName: name }, caseId);
       }
     })
-    .then(() => window.location.reload());
+    .then(
+      async () => await historyService.addHistory(token, caseId, { SK: `${caseId}#${date}`, action: CaseHistory.CLIENT_EDITED, name: userId, timestamp: date }).then(() => window.location.reload())
+    );
 };
 
-export const ClientEditForm: React.FC<ClientEditFormProps> = ({ clientInfo, caseService, clientService, accessToken, caseId }) => {
+export const ClientEditForm: React.FC<ClientEditFormProps> = ({ clientInfo, caseService, clientService, historyService, accessToken, caseId, user }) => {
   const [clientEditInfo, setClientEditInfo] = useState<ClientEditProps>();
 
   const handleClientEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +92,7 @@ export const ClientEditForm: React.FC<ClientEditFormProps> = ({ clientInfo, case
         <Button
           className="sidekick-primary-btn m-2"
           onClick={() => {
-            submitClientEdit(clientEditInfo!, clientInfo, caseService, clientService, accessToken, clientInfo.SK, caseId);
+            submitClientEdit(clientEditInfo!, clientInfo, caseService, clientService, historyService, accessToken, user.name, caseId);
           }}
         >
           Submit

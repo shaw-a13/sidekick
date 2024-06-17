@@ -3,7 +3,7 @@ import { ClientInfoProps } from "../interfaces/clientInfoProps.interface";
 import { ClientEditForm } from "./clientEditForm.component";
 import { Card, Button, Row, Col } from "react-bootstrap";
 
-export const ClientInfo: React.FC<ClientInfoProps> = ({ clientInfo, caseService, clientService, accessToken, caseId }) => {
+export const ClientInfo: React.FC<ClientInfoProps> = ({ clientInfo, caseService, clientService, historyService, accessToken, caseId, assignee, user }) => {
   const [editClientInfo, setEditClientInfo] = useState(false);
   return (
     <Card>
@@ -12,6 +12,7 @@ export const ClientInfo: React.FC<ClientInfoProps> = ({ clientInfo, caseService,
           Client Information{" "}
           <Button
             className="sidekick-primary-btn"
+            disabled={assignee !== user.name && !user["authGroups"].includes("Admin")}
             onClick={() => {
               setEditClientInfo(!editClientInfo);
             }}
@@ -45,7 +46,9 @@ export const ClientInfo: React.FC<ClientInfoProps> = ({ clientInfo, caseService,
             </Row>
           </div>
         )}
-        {editClientInfo && <ClientEditForm clientInfo={clientInfo} caseService={caseService} clientService={clientService} accessToken={accessToken} clientId={clientInfo.SK} caseId={caseId} />}
+        {editClientInfo && (
+          <ClientEditForm clientInfo={clientInfo} caseService={caseService} clientService={clientService} historyService={historyService} accessToken={accessToken} user={user} caseId={caseId} />
+        )}
       </Card.Body>
     </Card>
   );

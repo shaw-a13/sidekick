@@ -135,8 +135,16 @@ const Case = () => {
                         documentData={documentData}
                       />
                     </Col>
-                    <Col >
-                      <CaseInfoPaginator caseInfo={caseInfo!} user={user} caseService={caseService} clientService={clientService} accessToken={accessToken} clientInfo={clientInfo!} />
+                    <Col>
+                      <CaseInfoPaginator
+                        caseInfo={caseInfo!}
+                        user={user}
+                        caseService={caseService}
+                        clientService={clientService}
+                        historyService={historyService}
+                        accessToken={accessToken}
+                        clientInfo={clientInfo!}
+                      />
                       {history && <History history={history} />}
                     </Col>
                   </Row>
@@ -155,9 +163,7 @@ const Case = () => {
                     <Col sm={6}>
                       <CaseDescription caseInfo={caseInfo!} user={user!} caseService={caseService} clientService={clientService} accessToken={accessToken} />
                     </Col>
-                    <Col sm={6}>
-                      {comments && <Comments comments={comments} caseId={id!} user={user!} commentService={commentService} historyService={historyService} accessToken={accessToken} />}
-                    </Col>
+                    <Col sm={6}>{comments && <Comments comments={comments} caseId={id!} user={user!} commentService={commentService} historyService={historyService} accessToken={accessToken} />}</Col>
                   </Row>
                   <Row className="mt-3 mb-3"></Row>
                 </Container>
