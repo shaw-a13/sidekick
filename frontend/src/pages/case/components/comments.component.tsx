@@ -4,16 +4,38 @@ import { Card, Col, Row, Button, Form, useAccordionButton } from "react-bootstra
 import { Comment } from "../../../interfaces/comment/comment.interface";
 import { CommentService } from "../../../services/comment.service";
 import { CommentEditProps } from "../../../interfaces/comment/commentEditProps.interface";
+import { HistoryService } from "../../../services/history.service";
+import { CaseHistory } from "../../../enums/caseHistory";
 
-const submitComment = async (commentService: CommentService, token: string, commentInfo: Comment, caseId: string) => {
-  await commentService.addComment(token, commentInfo, caseId).then(() => window.location.reload());
+const submitComment = async (commentService: CommentService, historyService: HistoryService, token: string, commentInfo: Comment, caseId: string, userId: string) => {
+  const date = new Date().toISOString();
+  await commentService
+    .addComment(token, commentInfo, caseId)
+    .then(
+      async () => await historyService.addHistory(token, caseId, { SK: `${caseId}#${date}`, action: CaseHistory.COMMENT_ADDED, name: userId, timestamp: date }).then(() => window.location.reload())
+    );
 };
 
-const submitCommentEdit = async (commentService: CommentService, token: string, commentEdits: CommentEditProps, caseId: string, timestamp: string) => {
-  await commentService.editComment(token, commentEdits, caseId, timestamp);
+const submitCommentEdit = async (commentService: CommentService, historyService: HistoryService, token: string, commentEdits: CommentEditProps, caseId: string, timestamp: string, userId: string) => {
+  const date = new Date().toISOString();
+  await commentService
+    .editComment(token, commentEdits, caseId, timestamp)
+    .then(
+      async () => await historyService.addHistory(token, caseId, { SK: `${caseId}#${date}`, action: CaseHistory.COMMENT_EDITED, name: userId, timestamp: date }).then(() => window.location.reload())
+    );
 };
 
-export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, commentService, accessToken }) => {
+const submitCommentDelete = async (commentService: CommentService, historyService: HistoryService, token: string, caseId: string, timestamp: string, userId: string) => {
+  const date = new Date().toISOString();
+
+  await commentService
+    .deleteComment(token, caseId, timestamp)
+    .then(
+      async () => await historyService.addHistory(token, caseId, { SK: `${caseId}#${date}`, action: CaseHistory.COMMENT_DELETED, name: userId, timestamp: date }).then(() => window.location.reload())
+    );
+};
+
+export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, commentService, historyService, accessToken }) => {
   const [addComment, setAddComment] = useState(false);
   const [newComment, setNewComment] = useState<Comment>({} as Comment);
 
@@ -56,7 +78,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, co
                 <Button
                   className="sidekick-primary-btn m-2"
                   onClick={() => {
-                    submitComment(commentService, accessToken, newComment, caseId);
+                    submitComment(commentService, historyService, accessToken, newComment, caseId, userId);
                   }}
                 >
                   Submit
@@ -84,7 +106,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, co
               <Button
                 className="sidekick-primary-btn m-2"
                 onClick={() => {
-                  submitCommentEdit(commentService, accessToken, commentEdits, caseId, editedCommentId);
+                  submitCommentEdit(commentService, historyService, accessToken, commentEdits, caseId, editedCommentTimestamp, userId);
                 }}
               >
                 Submit
@@ -115,6 +137,18 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, co
                       }}
                     >
                       Edit
+                    </Button>
+                  </Card.Subtitle>
+                </Col>
+                <Col sm={2}>
+                  <Card.Subtitle className="mb-2">
+                    <Button
+                      className="btn-danger"
+                      onClick={() => {
+                        submitCommentDelete(commentService, historyService, accessToken, caseId, comment.timestamp, userId);
+                      }}
+                    >
+                      Delete
                     </Button>
                   </Card.Subtitle>
                 </Col>

@@ -230,7 +230,9 @@ const Case = () => {
                         </Card.Body>
                       </Card>
                     </Col>
-                    <Col sm={6}>{comments && <Comments comments={comments} caseId={id!} userId={user.name!} commentService={commentService} accessToken={accessToken} />}</Col>
+                    <Col sm={6}>
+                      {comments && <Comments comments={comments} caseId={id!} userId={user.name!} commentService={commentService} historyService={historyService} accessToken={accessToken} />}
+                    </Col>
                   </Row>
                   <Row className="mt-3 mb-3"></Row>
                 </Container>

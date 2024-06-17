@@ -19,7 +19,7 @@ export const EmptyResults: React.FC = () => (
 
 export const ExtractionTable: React.FC<ExtractionTableProps> = ({ extractionData }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Change this to the number of items you want per page
+  const itemsPerPage = 10;
 
   const totalPages = Math.ceil(extractionData.length / itemsPerPage);
 

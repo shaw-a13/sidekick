@@ -18,9 +18,9 @@ export class CommentService extends BaseService {
     }
   }
 
-  public async deleteComment(token: string, caseId: string, commentId: string) {
+  public async deleteComment(token: string, caseId: string, timestamp: string) {
     try {
-      return await axios.delete(`${this.baseUrl}/comments/${caseId}/${commentId}`, {
+      return await axios.delete(`${this.baseUrl}/comments/${caseId}/${timestamp}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
