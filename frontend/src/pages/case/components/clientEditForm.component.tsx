@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { CaseService } from "../../../services/case.service";
 import { ClientService } from "../../../services/client.service";
@@ -25,51 +25,60 @@ const submitClientEdit = async (edit_obj: ClientEditProps, clientInfo: Client, c
     .then(() => window.location.reload());
 };
 
-export const ClientEditForm: React.FC<ClientEditFormProps> = ({ clientInfo, caseService, clientService, accessToken, clientId, caseId, clientEditInfo, changeHandler }) => {
+export const ClientEditForm: React.FC<ClientEditFormProps> = ({ clientInfo, caseService, clientService, accessToken, caseId }) => {
+  const [clientEditInfo, setClientEditInfo] = useState<ClientEditProps>();
+
+  const handleClientEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target);
+    const { name, value } = event.target;
+
+    setClientEditInfo({ ...clientEditInfo!, [name]: value });
+  };
+
   return (
     <Form>
       <Form.Group controlId="formFirstName">
         <Form.Label>First Name</Form.Label>
-        <Form.Control type="text" name="firstName" placeholder="Enter first name" defaultValue={clientInfo.firstName} onChange={changeHandler} />
+        <Form.Control type="text" name="firstName" placeholder="Enter first name" defaultValue={clientInfo.firstName} onChange={handleClientEditChange} />
       </Form.Group>
       <Form.Group controlId="formLastName">
         <Form.Label>Last Name</Form.Label>
-        <Form.Control type="text" name="lastName" placeholder="Enter last name" defaultValue={clientInfo.lastName} onChange={changeHandler} />
+        <Form.Control type="text" name="lastName" placeholder="Enter last name" defaultValue={clientInfo.lastName} onChange={handleClientEditChange} />
       </Form.Group>
       <Form.Group controlId="formEmail">
         <Form.Label>Address Line 1</Form.Label>
-        <Form.Control type="text" name="addressLine1" placeholder="Enter address line 1" defaultValue={clientInfo.addressLine1} onChange={changeHandler} />
+        <Form.Control type="text" name="addressLine1" placeholder="Enter address line 1" defaultValue={clientInfo.addressLine1} onChange={handleClientEditChange} />
       </Form.Group>
       <Form.Group controlId="formEmail">
         <Form.Label>Address Line 2</Form.Label>
-        <Form.Control type="text" name="addressLine2" placeholder="Enter address line 2" defaultValue={clientInfo.addressLine2} onChange={changeHandler} />
+        <Form.Control type="text" name="addressLine2" placeholder="Enter address line 2" defaultValue={clientInfo.addressLine2} onChange={handleClientEditChange} />
       </Form.Group>
       <Form.Group controlId="formEmail">
         <Form.Label>City</Form.Label>
-        <Form.Control type="text" name="city" placeholder="Enter city" defaultValue={clientInfo.city} onChange={changeHandler} />
+        <Form.Control type="text" name="city" placeholder="Enter city" defaultValue={clientInfo.city} onChange={handleClientEditChange} />
       </Form.Group>
       <Form.Group controlId="formEmail">
         <Form.Label>County</Form.Label>
-        <Form.Control type="text" name="county" placeholder="Enter county" defaultValue={clientInfo.county} onChange={changeHandler} />
+        <Form.Control type="text" name="county" placeholder="Enter county" defaultValue={clientInfo.county} onChange={handleClientEditChange} />
       </Form.Group>
       <Form.Group controlId="formEmail">
         <Form.Label>Postcode</Form.Label>
-        <Form.Control type="text" name="postcode" placeholder="Enter postcode" defaultValue={clientInfo.postcode} onChange={changeHandler} />
+        <Form.Control type="text" name="postcode" placeholder="Enter postcode" defaultValue={clientInfo.postcode} onChange={handleClientEditChange} />
       </Form.Group>
       <Form.Group controlId="formEmail">
         <Form.Label>Email</Form.Label>
-        <Form.Control type="email" name="email" placeholder="Enter email" defaultValue={clientInfo.email} onChange={changeHandler} />
+        <Form.Control type="email" name="email" placeholder="Enter email" defaultValue={clientInfo.email} onChange={handleClientEditChange} />
       </Form.Group>
       <Form.Group controlId="formEmail">
         <Form.Label>Phone Number</Form.Label>
-        <Form.Control type="tel" name="phoneNumber" placeholder="Enter phone number" defaultValue={clientInfo.phoneNumber} onChange={changeHandler} />
+        <Form.Control type="tel" name="phoneNumber" placeholder="Enter phone number" defaultValue={clientInfo.phoneNumber} onChange={handleClientEditChange} />
       </Form.Group>
 
       <div className="text-center">
         <Button
           className="sidekick-primary-btn m-2"
           onClick={() => {
-            submitClientEdit(clientEditInfo, clientInfo, caseService, clientService, accessToken, clientInfo.SK, caseId);
+            submitClientEdit(clientEditInfo!, clientInfo, caseService, clientService, accessToken, clientInfo.SK, caseId);
           }}
         >
           Submit

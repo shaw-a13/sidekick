@@ -26,6 +26,7 @@ import { Client } from "../../interfaces/client/client.interface";
 import { ClientService } from "../../services/client.service";
 import { ClientInfo } from "./components/clientInfo.component";
 import { ClientEditProps } from "../../interfaces/client/clientEditProps.interface";
+import { CaseDescription } from "./components/caseDescription.component";
 
 const Case = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -33,9 +34,6 @@ const Case = () => {
   const [clientInfo, setClientInfo] = useState<Client>();
   const [comments, setComments] = useState<Comment[]>();
   const [history, setHistory] = useState<HistoryProps[]>();
-
-  const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
-  const [clientEditInfo, setClientEditInfo] = useState<ClientEditProps>();
 
   const [accessToken, setAccessToken] = useState("");
   const [loading, setLoading] = useState(true);
@@ -47,28 +45,11 @@ const Case = () => {
 
   const documentService = new DocumentService();
   const { id } = useParams();
-  const [editCaseDetails, setEditCaseDetails] = useState(false);
-  const [editCaseDescription, setEditCaseDescription] = useState(false);
-  const [editClientInfo, setEditClientInfo] = useState(false);
 
   const caseService = new CaseService();
   const clientService = new ClientService();
   const commentService = new CommentService();
   const historyService = new HistoryService();
-
-  const handleClientEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target);
-    const { name, value } = event.target;
-
-    setClientEditInfo({ ...clientEditInfo!, [name]: value });
-  };
-
-  const handleCaseEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target);
-    const { name, value } = event.target;
-
-    setCaseEditInfo({ ...caseEditInfo!, [name]: value });
-  };
 
   const getComments = async (token: string) => {
     return await commentService.getAllComments(token, id!);
@@ -154,34 +135,6 @@ const Case = () => {
                       />
                     </Col>
                     <Col sm={5}>
-                      <CaseInfoComponent
-                        caseInfo={caseInfo!}
-                        user={user}
-                        setEditCaseDetails={setEditCaseDetails}
-                        editCaseDetails={editCaseDetails}
-                        caseService={caseService}
-                        clientService={clientService}
-                        accessToken={accessToken}
-                        id={id!}
-                        caseEditInfo={caseEditInfo!}
-                        handleCaseEditChange={handleCaseEditChange}
-                      />
-                      <Col className="mt-3">
-                        {clientInfo && (
-                          <ClientInfo
-                            clientInfo={clientInfo}
-                            editClientInfo={editClientInfo}
-                            setEditClientInfo={setEditClientInfo}
-                            caseService={caseService}
-                            clientService={clientService}
-                            accessToken={accessToken}
-                            caseId={id!}
-                            clientEditInfo={clientEditInfo!}
-                            changeHandler={handleClientEditChange}
-                          />
-                        )}
-                      </Col>
-
                       <Col className="mt-3"> {history && <History history={history} />}</Col>
                     </Col>
                   </Row>
@@ -198,37 +151,7 @@ const Case = () => {
                   </Row>
                   <Row className="mt-3">
                     <Col sm={6}>
-                      <Card>
-                        <Card.Body>
-                          <Card.Title>
-                            Case Description{" "}
-                            <Button
-                              className="sidekick-primary-btn"
-                              disabled={caseInfo?.assignee !== user.name && !user["authGroups"].includes("Admin")}
-                              onClick={() => {
-                                setEditCaseDescription(!editCaseDescription);
-                              }}
-                            >
-                              Edit
-                            </Button>
-                          </Card.Title>
-                          <hr />
-                          {!editCaseDescription && <Card.Subtitle className="mb-2 text-muted">{caseInfo!.description}</Card.Subtitle>}
-                          {editCaseDescription && (
-                            <div>
-                              <CaseDescEditForm
-                                caseInfo={caseInfo!}
-                                caseService={caseService}
-                                clientService={clientService}
-                                accessToken={accessToken}
-                                id={id!}
-                                caseEditInfo={caseEditInfo!}
-                                changeHandler={handleCaseEditChange}
-                              />
-                            </div>
-                          )}
-                        </Card.Body>
-                      </Card>
+                      <CaseDescription caseInfo={caseInfo!} user={user!} caseService={caseService} clientService={clientService} accessToken={accessToken} />
                     </Col>
                     <Col sm={6}>
                       {comments && <Comments comments={comments} caseId={id!} userId={user.name!} commentService={commentService} historyService={historyService} accessToken={accessToken} />}

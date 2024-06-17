@@ -14,18 +14,36 @@ const submitCaseEdit = async (edit_obj: CaseEditProps, caseService: CaseService,
     }
   });
 };
+const handleCaseEditChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, setCaseEditInfo: any, caseEditInfo: any) => {
+  console.log(event.target);
+  const { name, value } = event.target;
 
-export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, clientService, accessToken, id, caseEditInfo, changeHandler }) => {
+  setCaseEditInfo({ ...caseEditInfo!, [name]: value });
+};
+
+export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, clientService, accessToken, id }) => {
+  const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
+
   return (
     <Form>
       <Form.Group controlId="formClientName">
-        <Form.Control as="textarea" required type="text" placeholder="" name="description" defaultValue={caseInfo!.description} onChange={changeHandler} />
+        <Form.Control
+          as="textarea"
+          required
+          type="text"
+          placeholder=""
+          name="description"
+          defaultValue={caseInfo!.description}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            handleCaseEditChange(event, setCaseEditInfo, caseEditInfo);
+          }}
+        />
       </Form.Group>
       <div className="text-center">
         <Button
           className="sidekick-primary-btn m-2"
           onClick={() => {
-            submitCaseEdit(caseEditInfo, caseService, clientService, accessToken, caseInfo.clientId, id);
+            submitCaseEdit(caseEditInfo!, caseService, clientService, accessToken, caseInfo.clientId, id);
           }}
         >
           Submit
@@ -35,24 +53,55 @@ export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseSe
   );
 };
 
-export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, clientService, accessToken, id, caseEditInfo, changeHandler }) => {
+export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, clientService, accessToken, id }) => {
+  const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
+
   return (
     <Form>
       <Form.Group controlId="formClientName">
         <Form.Label>Client Name</Form.Label>
-        <Form.Control type="text" name="clientName" placeholder="Enter client name" defaultValue={caseInfo.clientName} onChange={changeHandler} />
+        <Form.Control
+          type="text"
+          name="clientName"
+          placeholder="Enter client name"
+          defaultValue={caseInfo.clientName}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            handleCaseEditChange(event, setCaseEditInfo, caseEditInfo);
+          }}
+        />
       </Form.Group>
       <Form.Group controlId="formNature">
         <Form.Label>Nature</Form.Label>
-        <Form.Control type="text" name="nature" placeholder="Enter nature" defaultValue={caseInfo.nature} onChange={changeHandler} />
+        <Form.Control
+          type="text"
+          name="nature"
+          placeholder="Enter nature"
+          defaultValue={caseInfo.nature}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            handleCaseEditChange(event, setCaseEditInfo, caseEditInfo);
+          }}
+        />
       </Form.Group>
       <Form.Group controlId="formDate">
         <Form.Label>Date</Form.Label>
-        <Form.Control type="date" name="date" defaultValue={caseInfo.date} onChange={changeHandler} />
+        <Form.Control
+          type="date"
+          name="date"
+          defaultValue={caseInfo.date}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            handleCaseEditChange(event, setCaseEditInfo, caseEditInfo);
+          }}
+        />
       </Form.Group>
       <Form.Group controlId="formStatus">
         <Form.Label>Status</Form.Label>
-        <Form.Select name="status" defaultValue={caseInfo.status} onChange={changeHandler}>
+        <Form.Select
+          name="status"
+          defaultValue={caseInfo.status}
+          onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+            handleCaseEditChange(event, setCaseEditInfo, caseEditInfo);
+          }}
+        >
           {Object.keys(CaseStatus).map((statusItem) => (
             <option>
               <Badge bg={CaseStatusStyles[statusItem as CaseStatus].style} text="light">
@@ -64,17 +113,33 @@ export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseServic
       </Form.Group>
       <Form.Group controlId="formAssignee">
         <Form.Label>Assignee</Form.Label>
-        <Form.Control type="text" name="assignee" placeholder="Enter assignee" defaultValue={caseInfo.assignee} onChange={changeHandler} />
+        <Form.Control
+          type="text"
+          name="assignee"
+          placeholder="Enter assignee"
+          defaultValue={caseInfo.assignee}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            handleCaseEditChange(event, setCaseEditInfo, caseEditInfo);
+          }}
+        />
       </Form.Group>
       <Form.Group controlId="formClientId">
         <Form.Label>Client ID</Form.Label>
-        <Form.Control type="text" name="clientId" placeholder="Enter client ID" defaultValue={caseInfo.clientId} onChange={changeHandler} />
+        <Form.Control
+          type="text"
+          name="clientId"
+          placeholder="Enter client ID"
+          defaultValue={caseInfo.clientId}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            handleCaseEditChange(event, setCaseEditInfo, caseEditInfo);
+          }}
+        />
       </Form.Group>
       <div className="text-center">
         <Button
           className="sidekick-primary-btn m-2"
           onClick={() => {
-            submitCaseEdit(caseEditInfo, caseService, clientService, accessToken, caseInfo.clientId, id);
+            submitCaseEdit(caseEditInfo!, caseService, clientService, accessToken, caseInfo.clientId, id);
           }}
         >
           Submit
