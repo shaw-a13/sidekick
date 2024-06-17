@@ -35,7 +35,7 @@ const submitCommentDelete = async (commentService: CommentService, historyServic
     );
 };
 
-export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, commentService, historyService, accessToken }) => {
+export const Comments: React.FC<CommentsProps> = ({ comments, caseId, user, commentService, historyService, accessToken }) => {
   const [addComment, setAddComment] = useState(false);
   const [newComment, setNewComment] = useState<Comment>({} as Comment);
 
@@ -70,7 +70,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, co
                   onChange={(event) => {
                     const { name, value } = event.target;
                     const date = new Date().toISOString();
-                    setNewComment({ SK: `${caseId}#${date}`, name: userId, text: value, timestamp: date });
+                    setNewComment({ SK: `${caseId}#${date}`, name: user.name, text: value, timestamp: date });
                   }}
                 />
               </Form.Group>
@@ -78,7 +78,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, co
                 <Button
                   className="sidekick-primary-btn m-2"
                   onClick={() => {
-                    submitComment(commentService, historyService, accessToken, newComment, caseId, userId);
+                    submitComment(commentService, historyService, accessToken, newComment, caseId, user.name);
                   }}
                 >
                   Submit
@@ -106,7 +106,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, co
               <Button
                 className="sidekick-primary-btn m-2"
                 onClick={() => {
-                  submitCommentEdit(commentService, historyService, accessToken, commentEdits, caseId, editedCommentTimestamp, userId);
+                  submitCommentEdit(commentService, historyService, accessToken, commentEdits, caseId, editedCommentTimestamp, user.name);
                 }}
               >
                 Submit
@@ -114,48 +114,57 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, userId, co
             </div>
           </Form>
         )}
-        {comments.map((comment) => {
-          return (
-            <div>
-              <hr />
+        {comments
+          .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))
+          .map((comment) => {
+            console.log(Date.parse(comment.timestamp));
+            const date = new Date(Date.parse(comment.timestamp));
+            return (
+              <div>
+                <hr />
 
-              <Row>
-                <Col>
-                  <Card.Subtitle className="mb-2">{comment.name}</Card.Subtitle>
+                <Row>
+                  <Col>
+                    <Card.Subtitle className="mb-2">{comment.name}</Card.Subtitle>
+                  </Col>
+                  <Col>
+                    <Card.Subtitle className="mb-2">
+                      {date.toDateString()} | {date.toLocaleTimeString()}
+                    </Card.Subtitle>
+                  </Col>
+                  <Col sm={2}>
+                    <Card.Subtitle className="mb-2">
+                      <Button
+                        className="sidekick-primary-btn"
+                        onClick={() => {
+                          setEditComment(!editComment);
+                          setEditedCommentTimestamp(comment.timestamp);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    </Card.Subtitle>
+                  </Col>
+                  <Col sm={2}>
+                    <Card.Subtitle className="mb-2">
+                      <Button
+                        className="btn-danger"
+                        disabled={comment.name !== user.name && !user["authGroups"].includes("Admin")}
+                        onClick={() => {
+                          submitCommentDelete(commentService, historyService, accessToken, caseId, comment.timestamp, user.name);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </Card.Subtitle>
+                  </Col>
+                </Row>
+                <Row>
                   <Card.Subtitle className="mb-2 text-muted">{comment.text}</Card.Subtitle>
-                </Col>
-                <Col>
-                  <Card.Subtitle className="mb-2">{comment.timestamp}</Card.Subtitle>
-                </Col>
-                <Col sm={2}>
-                  <Card.Subtitle className="mb-2">
-                    <Button
-                      className="sidekick-primary-btn"
-                      onClick={() => {
-                        setEditComment(!editComment);
-                        setEditedCommentTimestamp(comment.timestamp);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                  </Card.Subtitle>
-                </Col>
-                <Col sm={2}>
-                  <Card.Subtitle className="mb-2">
-                    <Button
-                      className="btn-danger"
-                      onClick={() => {
-                        submitCommentDelete(commentService, historyService, accessToken, caseId, comment.timestamp, userId);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </Card.Subtitle>
-                </Col>
-              </Row>
-            </div>
-          );
-        })}
+                </Row>
+              </div>
+            );
+          })}
       </Card.Body>
     </Card>
   );

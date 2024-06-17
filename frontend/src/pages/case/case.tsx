@@ -156,7 +156,7 @@ const Case = () => {
                       <CaseDescription caseInfo={caseInfo!} user={user!} caseService={caseService} clientService={clientService} accessToken={accessToken} />
                     </Col>
                     <Col sm={6}>
-                      {comments && <Comments comments={comments} caseId={id!} userId={user.name!} commentService={commentService} historyService={historyService} accessToken={accessToken} />}
+                      {comments && <Comments comments={comments} caseId={id!} user={user!} commentService={commentService} historyService={historyService} accessToken={accessToken} />}
                     </Col>
                   </Row>
                   <Row className="mt-3 mb-3"></Row>

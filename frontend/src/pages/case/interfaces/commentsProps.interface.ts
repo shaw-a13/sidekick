@@ -5,7 +5,7 @@ import { HistoryService } from "../../../services/history.service";
 export interface CommentsProps {
   comments: Comment[];
   caseId: string;
-  userId: string;
+  user: any;
   commentService: CommentService;
   historyService: HistoryService;
   accessToken: string;

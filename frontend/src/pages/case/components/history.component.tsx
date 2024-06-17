@@ -31,6 +31,7 @@ export const History: React.FC<HistoryProps> = ({ history }) => {
           ))}
         </Pagination>
         {paginatedData.map((history) => {
+          const date = new Date(Date.parse(history.timestamp));
           return (
             <div>
               <hr />
@@ -40,7 +41,9 @@ export const History: React.FC<HistoryProps> = ({ history }) => {
                   <Card.Subtitle className="mb-2 text-muted">{history.name}</Card.Subtitle>
                 </Col>
                 <Col>
-                  <Card.Subtitle className="mb-2">{history.timestamp}</Card.Subtitle>
+                  <Card.Subtitle className="mb-2">
+                    {date.toDateString()} | {date.toLocaleTimeString()}
+                  </Card.Subtitle>
                 </Col>
               </Row>
             </div>
