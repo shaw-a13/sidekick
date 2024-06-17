@@ -11,11 +11,24 @@ export const CaseInfoPaginator: React.FC<CaseInfoPaginatorProps> = ({ caseInfo, 
   const pages = [
     {
       name: "Case Information",
-      component: <CaseInfoComponent caseInfo={caseInfo} user={user} caseService={caseService} clientService={clientService} accessToken={accessToken} id={caseInfo.SK} />,
+      component: (
+        <CaseInfoComponent caseInfo={caseInfo} user={user} caseService={caseService} clientService={clientService} historyService={historyService} accessToken={accessToken} id={caseInfo.SK} />
+      ),
     },
     {
       name: "Client Information",
-      component: <ClientInfo clientInfo={clientInfo} caseService={caseService} clientService={clientService} historyService={historyService} accessToken={accessToken} caseId={caseInfo.SK} assignee={caseInfo.assignee} user={user} />,
+      component: (
+        <ClientInfo
+          clientInfo={clientInfo}
+          caseService={caseService}
+          clientService={clientService}
+          historyService={historyService}
+          accessToken={accessToken}
+          caseId={caseInfo.SK}
+          assignee={caseInfo.assignee}
+          user={user}
+        />
+      ),
     },
   ];
 

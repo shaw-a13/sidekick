@@ -161,7 +161,7 @@ const Case = () => {
                   </Row>
                   <Row className="mt-3">
                     <Col sm={6}>
-                      <CaseDescription caseInfo={caseInfo!} user={user!} caseService={caseService} clientService={clientService} accessToken={accessToken} />
+                      <CaseDescription caseInfo={caseInfo!} user={user!} caseService={caseService} clientService={clientService} historyService={historyService} accessToken={accessToken} />
                     </Col>
                     <Col sm={6}>{comments && <Comments comments={comments} caseId={id!} user={user!} commentService={commentService} historyService={historyService} accessToken={accessToken} />}</Col>
                   </Row>

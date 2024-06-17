@@ -5,8 +5,23 @@ import { CaseEditProps } from "../../../interfaces/case/caseEditProps.interface"
 import { CaseService } from "../../../services/case.service";
 import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
 import { ClientService } from "../../../services/client.service";
+import { HistoryService } from "../../../services/history.service";
+import { CaseHistory } from "../../../enums/caseHistory";
 
-const submitCaseEdit = async (edit_obj: CaseEditProps, caseService: CaseService, clientService: ClientService, token: string, clientId: string, caseId: string) => {
+const submitCaseEdit = async (
+  action: CaseHistory,
+  edit_obj: CaseEditProps,
+  caseService: CaseService,
+  clientService: ClientService,
+  historyService: HistoryService,
+  token: string,
+  clientId: string,
+  caseId: string,
+  userId: string
+) => {
+  const date = new Date().toISOString();
+  console.log(action);
+
   await caseService
     .editCase(token, edit_obj, caseId)
     .then(async () => {
@@ -15,7 +30,7 @@ const submitCaseEdit = async (edit_obj: CaseEditProps, caseService: CaseService,
         await clientService.editClient(token, { firstName: name[0], lastName: name[1] }, clientId);
       }
     })
-    .then(() => window.location.reload());
+    .then(async () => await historyService.addHistory(token, caseId, { SK: `${caseId}#${date}`, action: action, name: userId, timestamp: date }).then(() => window.location.reload()));
 };
 const handleCaseEditChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, setCaseEditInfo: any, caseEditInfo: any) => {
   console.log(event.target);
@@ -24,7 +39,7 @@ const handleCaseEditChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSe
   setCaseEditInfo({ ...caseEditInfo!, [name]: value });
 };
 
-export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, clientService, accessToken, id }) => {
+export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, clientService, historyService, accessToken, id, user }) => {
   const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
 
   return (
@@ -46,7 +61,7 @@ export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseSe
         <Button
           className="sidekick-primary-btn m-2"
           onClick={() => {
-            submitCaseEdit(caseEditInfo!, caseService, clientService, accessToken, caseInfo.clientId, id);
+            submitCaseEdit(CaseHistory.DESCRIPTION_EDITED, caseEditInfo!, caseService, clientService, historyService, accessToken, caseInfo.clientId, id, user.name);
           }}
         >
           Submit
@@ -56,7 +71,7 @@ export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseSe
   );
 };
 
-export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, clientService, accessToken, id }) => {
+export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseService, clientService, historyService, accessToken, id, user }) => {
   const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
 
   return (
@@ -142,7 +157,7 @@ export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseServic
         <Button
           className="sidekick-primary-btn m-2"
           onClick={() => {
-            submitCaseEdit(caseEditInfo!, caseService, clientService, accessToken, caseInfo.clientId, id);
+            submitCaseEdit(CaseHistory.DETAILS_EDITED, caseEditInfo!, caseService, clientService, historyService, accessToken, caseInfo.clientId, id, user.name);
           }}
         >
           Submit

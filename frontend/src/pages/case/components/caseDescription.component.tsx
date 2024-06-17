@@ -3,7 +3,7 @@ import { Button, Card } from "react-bootstrap";
 import { CaseDescEditForm } from "./caseEditForm.component";
 import { CaseDescriptionProps } from "../interfaces/caseDescriptionProps.interface";
 
-export const CaseDescription: React.FC<CaseDescriptionProps> = ({ caseInfo, user, caseService, clientService, accessToken }) => {
+export const CaseDescription: React.FC<CaseDescriptionProps> = ({ caseInfo, user, caseService, clientService, historyService, accessToken }) => {
   const [editCaseDescription, setEditCaseDescription] = useState(false);
 
   return (
@@ -25,7 +25,7 @@ export const CaseDescription: React.FC<CaseDescriptionProps> = ({ caseInfo, user
         {!editCaseDescription && <Card.Subtitle className="mb-2 text-muted">{caseInfo!.description}</Card.Subtitle>}
         {editCaseDescription && (
           <div>
-            <CaseDescEditForm caseInfo={caseInfo!} caseService={caseService} clientService={clientService} accessToken={accessToken} id={caseInfo.SK} />
+            <CaseDescEditForm caseInfo={caseInfo!} caseService={caseService} clientService={clientService} historyService={historyService} accessToken={accessToken} id={caseInfo.SK} user={user} />
           </div>
         )}
       </Card.Body>
