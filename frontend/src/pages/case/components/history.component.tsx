@@ -20,7 +20,7 @@ export const History: React.FC<HistoryProps> = ({ history }) => {
     });
 
   return (
-    <Card>
+    <Card className="mt-3">
       <Card.Body>
         <Card.Title>History</Card.Title>
         <Pagination>

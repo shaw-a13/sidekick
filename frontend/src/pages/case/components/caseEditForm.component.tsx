@@ -7,12 +7,15 @@ import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
 import { ClientService } from "../../../services/client.service";
 
 const submitCaseEdit = async (edit_obj: CaseEditProps, caseService: CaseService, clientService: ClientService, token: string, clientId: string, caseId: string) => {
-  await caseService.editCase(token, edit_obj, caseId).then(async () => {
-    if (edit_obj.clientName) {
-      const name = edit_obj.clientName.split(" ");
-      await clientService.editClient(token, { firstName: name[0], lastName: name[1] }, clientId).then(() => window.location.reload());
-    }
-  });
+  await caseService
+    .editCase(token, edit_obj, caseId)
+    .then(async () => {
+      if (edit_obj.clientName) {
+        const name = edit_obj.clientName.split(" ");
+        await clientService.editClient(token, { firstName: name[0], lastName: name[1] }, clientId);
+      }
+    })
+    .then(() => window.location.reload());
 };
 const handleCaseEditChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, setCaseEditInfo: any, caseEditInfo: any) => {
   console.log(event.target);

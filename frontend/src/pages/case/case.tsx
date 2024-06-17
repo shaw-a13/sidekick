@@ -27,6 +27,7 @@ import { ClientService } from "../../services/client.service";
 import { ClientInfo } from "./components/clientInfo.component";
 import { ClientEditProps } from "../../interfaces/client/clientEditProps.interface";
 import { CaseDescription } from "./components/caseDescription.component";
+import { CaseInfoPaginator } from "./components/caseInfoPaginator";
 
 const Case = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -134,8 +135,9 @@ const Case = () => {
                         documentData={documentData}
                       />
                     </Col>
-                    <Col sm={5}>
-                      <Col className="mt-3"> {history && <History history={history} />}</Col>
+                    <Col >
+                      <CaseInfoPaginator caseInfo={caseInfo!} user={user} caseService={caseService} clientService={clientService} accessToken={accessToken} clientInfo={clientInfo!} />
+                      {history && <History history={history} />}
                     </Col>
                   </Row>
                   <Row>
