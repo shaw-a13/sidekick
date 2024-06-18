@@ -1,4 +1,4 @@
-import { Button, Card, Container, Form } from "react-bootstrap";
+import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Client } from "../../../interfaces/client/client.interface";
 import { CaseService } from "../../../services/case.service";
@@ -58,6 +58,8 @@ const DocumentUploadStep = (props: DocumentUploadStepProps) => {
   const { user } = useAuth0();
   const navigate = useNavigate();
 
+  const [showLoader, setShowLoader] = useState(false);
+
   const [showSubmitButton, setShowSubmitButton] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,25 +76,24 @@ const DocumentUploadStep = (props: DocumentUploadStepProps) => {
     }
 
     if (props.newCase && props.clientInfo && props.caseInfo) {
+      setShowLoader(true);
       await addCase(props.clientInfo, props.caseInfo, props.accessToken)
         .then(async () => {
           await uploadDocument(props.uploadFile!, props.accessToken, props.caseInfo?.SK!);
         })
         .then(async () => setInitialHistory(props.accessToken, props.caseInfo?.SK!, user))
-        .then(
-          async () =>
-            await setTimeout(() => {
-              navigate(`/case/${props.caseInfo?.SK!}`);
-            }, 1000)
+        .then(async () =>
+          setTimeout(() => {
+            navigate(`/case/${props.caseInfo?.SK!}`);
+          }, 2000)
         );
     } else {
       await uploadDocument(props.uploadFile, props.accessToken, props.caseId!)
         .then(async () => setInitialHistory(props.accessToken, props.caseId!, user))
-        .then(
-          async () =>
-            await setTimeout(() => {
-              navigate(`/case/${props.caseId!}`);
-            }, 1000)
+        .then(async () =>
+          setTimeout(() => {
+            navigate(`/case/${props.caseId!}`);
+          }, 2000)
         );
     }
   };
@@ -111,6 +112,7 @@ const DocumentUploadStep = (props: DocumentUploadStepProps) => {
           Submit Case
         </Button>
       )}
+      <div className="text-center mt-3">{showLoader && <Spinner animation="border" />}</div>
     </Container>
   );
 };
