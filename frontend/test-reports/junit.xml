@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="1" failures="0" errors="0" time="4.845">
-  <testsuite name="undefined" errors="0" failures="0" skipped="0" timestamp="2024-06-18T13:49:07" time="3.985" tests="1">
-    <testcase classname=" loads and displays greeting" name=" loads and displays greeting" time="0.205">
+<testsuites name="jest tests" tests="7" failures="0" errors="0" time="5.278">
+  <testsuite name="Home Component Tests" errors="0" failures="0" skipped="0" timestamp="2024-06-18T21:46:11" time="4.623" tests="7">
+    <testcase classname="Home Component Tests Home component renders without crashing" name="Home Component Tests Home component renders without crashing" time="0.174">
+    </testcase>
+    <testcase classname="Home Component Tests When it renders the banner section it renders the banner image" name="Home Component Tests When it renders the banner section it renders the banner image" time="0.08">
+    </testcase>
+    <testcase classname="Home Component Tests When it renders the banner section it renders the blurb text" name="Home Component Tests When it renders the banner section it renders the blurb text" time="0.015">
+    </testcase>
+    <testcase classname="Home Component Tests renders the feature sections" name="Home Component Tests renders the feature sections" time="0.029">
+    </testcase>
+    <testcase classname="Home Component Tests renders the testimonial sections" name="Home Component Tests renders the testimonial sections" time="0.015">
+    </testcase>
+    <testcase classname="Home Component Tests renders the call to action section" name="Home Component Tests renders the call to action section" time="0.047">
+    </testcase>
+    <testcase classname="Home Component Tests calls loginWithRedirect when the Get Started buttons are clicked" name="Home Component Tests calls loginWithRedirect when the Get Started buttons are clicked" time="0.068">
     </testcase>
   </testsuite>
 </testsuites>
