@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 
 const pages = [
   {
+    id: 1,
     name: "Home",
     href: "/",
     authenticationRequired: false,
@@ -16,6 +17,7 @@ const pages = [
     adminRequired: false,
   },
   {
+    id: 2,
     name: "Upload",
     href: "/upload",
     authenticationRequired: true,
@@ -23,6 +25,7 @@ const pages = [
     adminRequired: false,
   },
   {
+    id: 3,
     name: "Dashboard",
     href: "/dashboard",
     authenticationRequired: true,
@@ -30,6 +33,7 @@ const pages = [
     adminRequired: false,
   },
   {
+    id: 4,
     name: "Profile",
     href: "/profile",
     authenticationRequired: true,
@@ -52,7 +56,7 @@ const Navigation = () => {
 
   const renderLinks = (filterFunc: (page: any) => boolean) => {
     return pages.filter(filterFunc).map(({ name, href }) => (
-      <Link to={href} style={linkStyle}>
+      <Link key={name} to={href} style={linkStyle}>
         <p>{name}</p>
       </Link>
     ));
@@ -60,7 +64,7 @@ const Navigation = () => {
 
   const getLinks = () => {
     if (isAuthenticated) {
-      if (userHasRole("Admin") || userHasRole("Worker")) {
+      if (userHasRole("Admin")) {
         return renderLinks(() => true);
       } else if (userHasRole("Worker")) {
         return renderLinks((page) => !page.adminRequired);
@@ -72,14 +76,16 @@ const Navigation = () => {
   };
 
   return (
-    <Navbar variant="dark" expand="lg" fixed="top" className="shadow-lg" style={{ backgroundColor: "#162836" }}>
+    <Navbar data-testid="navbar" variant="dark" expand="lg" fixed="top" className="shadow-lg" style={{ backgroundColor: "#162836" }}>
       <Container>
         <Navbar.Brand href="/">
-          <img alt="" width={"150"} src={logo} className="d-inline-block align-top m-2" />{" "}
+          <img data-testid="logo" alt="" width={"150"} src={logo} className="d-inline-block align-top m-2" />{" "}
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" color="#CF7650">
-          <Nav className="me-auto">{getLinks()}</Nav>
+          <Nav data-testid="navLinks" className="me-auto">
+            {getLinks()}
+          </Nav>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
           {isAuthenticated && <p style={{ color: "#CF7650", margin: 20 }}>Hello, {user!.name}</p>}
