@@ -79,7 +79,7 @@ const Dashboard = () => {
   }, [getAccessTokenSilently]);
 
   return (
-    <Container style={{ paddingTop: "8rem" }}>
+    <Container style={{ paddingTop: "8rem" }} data-testid="dashboardSection">
       <h2>Dashboard</h2>
       <Container className="pt-5">
         <table className="table table-striped">
@@ -143,4 +143,4 @@ const Dashboard = () => {
   );
 };
 
-export default withAuthenticationRequired(Dashboard);
+export default Dashboard;
