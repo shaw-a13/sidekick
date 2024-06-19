@@ -25,46 +25,111 @@ describe("Home Component Tests", () => {
   });
 
   describe("When it renders the banner section", () => {
-    test("it renders the banner image", () => {
+    test("renders the image correctly", async () => {
       render(<Home />);
-      const bannerElement = screen.getByRole("presentation", { name: "banner image" });
-      expect(bannerElement).toBeInTheDocument();
+      const bannerSection = screen.getByTestId("bannerSection");
+      const image = await within(bannerSection).findByTestId("bannerImage");
+
+      expect(image).toBeInTheDocument();
     });
 
-    test("it renders the blurb text", () => {
+    test("renders the blurb section with the correct text", async () => {
       render(<Home />);
-      const blurbSection = screen.getByTestId("blurb");
+      const bannerSection = screen.getByTestId("bannerSection");
 
-      const blurbTexts = within(blurbSection).getAllByText(/Sidekick|Elevate your legal workflow|Seamlessly integrate automation with your legal processes with your document extraction ally/i);
+      expect(bannerSection).toHaveTextContent("Sidekick");
+      expect(bannerSection).toHaveTextContent("Elevate your legal workflow");
+      expect(bannerSection).toHaveTextContent("Seamlessly integrate automation with your legal processes with your document extraction ally");
+    });
 
-      expect(blurbTexts).toHaveLength(3);
+    test("renders the get started button", async () => {
+      render(<Home />);
+      const bannerSection = screen.getByTestId("bannerSection");
+      const getStartedButton = await within(bannerSection).findByRole("button", { name: /get started/i });
+      expect(getStartedButton).toBeInTheDocument();
     });
   });
 
-  test("renders the feature sections", async () => {
-    render(<Home />);
-    const featureTitles = await screen.findAllByText(/Speedy document processing|Intelligent extractions|Reliable storage/i);
-    expect(featureTitles).toHaveLength(3);
+  describe("When it renders the feature section", () => {
+    test("renders the correct amount of features", async () => {
+      render(<Home />);
+      const featureSection = screen.getByTestId("featureSection");
+      const features = await within(featureSection).findAllByTestId("feature");
+      expect(features).toHaveLength(3);
+    });
+
+    test("renders the feature sections with the correct text", async () => {
+      render(<Home />);
+      const featureSection = screen.getByTestId("featureSection");
+      const features = await within(featureSection).findAllByTestId("feature");
+
+      expect(features[0]).toHaveTextContent("Speedy document processing");
+      expect(features[1]).toHaveTextContent("Intelligent extractions");
+      expect(features[2]).toHaveTextContent("Reliable storage");
+
+      expect(features[0]).toHaveTextContent("The automated extraction of content from legal documents removes the need to manually search through documents to find information");
+      expect(features[1]).toHaveTextContent("Using state of the art artificial intelligence and managed services, information can be easily extracted");
+      expect(features[2]).toHaveTextContent("Every document uploaded is stored reliably on the cloud, it is also secured to a high standard following the latest security guidelines");
+    });
   });
 
-  test("renders the testimonial sections", async () => {
-    render(<Home />);
-    const testimonialTexts = await screen.findAllByText(/Switching to using Sidekick|Sidekick has made my job so much easier|Sidekick has opened up so many possibilities/i);
-    expect(testimonialTexts).toHaveLength(3);
+  describe("When it renders the testimonial section", () => {
+    test("renders the correct amount of testimonials", async () => {
+      render(<Home />);
+      const testimonialSection = screen.getByTestId("testimonialSection");
+      const testimonials = await within(testimonialSection).findAllByTestId("testimonial");
+      expect(testimonials).toHaveLength(3);
+    });
+
+    test("renders the testimonial sections with the correct text", async () => {
+      render(<Home />);
+      const testimonialSection = screen.getByTestId("testimonialSection");
+      const testimonials = await within(testimonialSection).findAllByTestId("testimonial");
+
+      expect(testimonials[0]).toHaveTextContent("John (Solicitor, 32)");
+      expect(testimonials[1]).toHaveTextContent("Jane (Secretary, 30)");
+      expect(testimonials[2]).toHaveTextContent("Sarah (Solicitor, 50)");
+
+      expect(testimonials[0]).toHaveTextContent("Switching to using Sidekick has improved case processing times by 50% at JS and Associates, we havent looked back since switching to Sidekick!");
+      expect(testimonials[1]).toHaveTextContent(
+        "Sidekick has made my job so much easier. Gone are the days of needing to trawl through long documents to find information. I can now focus on more important activities!"
+      );
+      expect(testimonials[2]).toHaveTextContent(
+        "Sidekick has opened up so many possibilities for my law firm! Since switching to using it, we have received very positive feedback from clients about how much better our process is"
+      );
+    });
+
+    test("renders the testimonial sections with correct number of images", async () => {
+      render(<Home />);
+      const testimonialSection = screen.getByTestId("testimonialSection");
+      const testimonialImages = await within(testimonialSection).findAllByRole("img");
+      expect(testimonialImages).toHaveLength(3);
+    });
   });
 
-  test("renders the call to action section", async () => {
-    render(<Home />);
-    const callToActionElements = await screen.findAllByRole("button", { name: /get started/i });
-    expect(callToActionElements).toHaveLength(2);
+  describe("When it renders the call to action section", () => {
+    test("renders the section heading", async () => {
+      render(<Home />);
+      const callToActionSection = screen.getByTestId("callToActionSection");
+      const heading = await within(callToActionSection).findByText(/Make the switch today/i);
+      expect(heading).toBeInTheDocument();
+    });
+    test("renders the get started button", async () => {
+      render(<Home />);
+      const callToActionSection = screen.getByTestId("callToActionSection");
+      const getStartedButton = await within(callToActionSection).findByRole("button", { name: /get started/i });
+      expect(getStartedButton).toBeInTheDocument();
+    });
   });
 
-  test("calls loginWithRedirect when the Get Started buttons are clicked", async () => {
-    render(<Home />);
-    const getStartedButtons = await screen.findAllByRole("button", { name: /get started/i });
-    userEvent.click(getStartedButtons[0]);
-    userEvent.click(getStartedButtons[1]);
+  describe("When the Get Started buttons are clicked", () => {
+    test("it calls loginWithRedirect", async () => {
+      render(<Home />);
+      const getStartedButtons = await screen.findAllByRole("button", { name: /get started/i });
+      userEvent.click(getStartedButtons[0]);
+      userEvent.click(getStartedButtons[1]);
 
-    expect(mockLoginWithRedirect).toBeCalledTimes(2);
+      expect(mockLoginWithRedirect).toBeCalledTimes(2);
+    });
   });
 });

@@ -2,10 +2,10 @@ import { Row, Button } from "react-bootstrap";
 import { BannerSectionProps } from "../interfaces/bannerSectionProps.interface";
 
 export const BannerSection: React.FC<BannerSectionProps> = ({ banner, loginWithRedirect }) => (
-  <Row>
-    <img aria-label="banner image" src={banner} alt="" style={{ height: "35rem", padding: "0px" }} />
+  <Row data-testid="bannerSection">
+    <img data-testid="bannerImage" src={banner} alt="" style={{ height: "35rem", padding: "0px" }} />
     <div className="shadow home-blurb">
-      <div className="m-2" data-testid="blurb">
+      <div className="m-2">
         <h5>Sidekick</h5>
         <p>Elevate your legal workflow</p>
         <p>Seamlessly integrate automation with your legal processes with your document extraction ally</p>

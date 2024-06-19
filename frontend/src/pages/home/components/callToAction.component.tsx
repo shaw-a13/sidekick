@@ -2,7 +2,7 @@ import { Row, Col, Button } from "react-bootstrap";
 import { CallToActionProps } from "../interfaces/callToActionProps.interface";
 
 export const CallToAction: React.FC<CallToActionProps> = ({ loginWithRedirect }) => (
-  <Row className="mt-5 mb-5">
+  <Row className="mt-5 mb-5" data-testid="callToActionSection">
     <Col xs={4}>
       <h1>Make the switch today</h1>
     </Col>
