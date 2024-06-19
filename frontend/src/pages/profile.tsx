@@ -12,29 +12,29 @@ const Profile = () => {
       <Container style={{ paddingTop: "8rem" }}>
         <Row className="justify-content-md-center text-center" md={2}>
           <Col>
-            <Card>
+            <Card data-testid="profileCard">
               <Card.Body>
                 <Card.Title>Profile Information </Card.Title>
                 <hr />
                 <Card.Subtitle className="mb-4">
-                  <img src={user?.picture} alt="" />
+                  <img src={user!.picture} alt="" />
                 </Card.Subtitle>
 
                 <div>
                   <Card.Subtitle className="mb-2">
-                    Name: {user?.name}
+                    Name: {user!.name}
                   </Card.Subtitle>
                   <hr />
                   <Card.Subtitle className="mb-2">
-                    User ID: {user?.sub}
+                    User ID: {user!.sub}
                   </Card.Subtitle>
                   <hr />
                   <Card.Subtitle className="mb-2">
-                    Nickname: {user?.nickname}
+                    Nickname: {user!.nickname}
                   </Card.Subtitle>
                   <hr />
                   <Card.Subtitle className="mb-2">
-                    Updated: {user?.updated_at}
+                    Updated: {user!.updated_at}
                   </Card.Subtitle>
                   <hr />
                   <Card.Subtitle className="mb-2">
