@@ -60,7 +60,7 @@ const Dashboard = () => {
       .getAllCases(token)
       .then((res) => {
         if (res) {
-          console.log(res);
+          console.log(res.data);
           setCases(res.data);
         }
       })
@@ -75,6 +75,10 @@ const Dashboard = () => {
       setAccessToken(token!);
       getCases(token);
       setLoading(false);
+      console.log(cases)
+      console.log(loading);
+      console.log(token);
+
     });
   }, [getAccessTokenSilently]);
 
@@ -83,7 +87,7 @@ const Dashboard = () => {
       <h2>Dashboard</h2>
       <Container className="pt-5">
         <table className="table table-striped">
-          <thead>
+          <thead data-testid="tableFilterHeadings">
             <tr>
               <th scope="col">Filter by Reference</th>
               <th scope="col">Filter by Name</th>
@@ -118,7 +122,7 @@ const Dashboard = () => {
               </th>
             </tr>
           </thead>
-          <thead>
+          <thead data-testid="tableDataHeadings">
             <tr>
               <th scope="col">Reference</th>
               <th scope="col">Name</th>
@@ -132,7 +136,7 @@ const Dashboard = () => {
             <Container className="mt-5">
               <Row>
                 <Col className="text-center">
-                  <Spinner animation="border" />
+                  <Spinner animation="border" data-testid="loadingSpinner" />
                 </Col>
               </Row>
             </Container>

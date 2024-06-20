@@ -4,7 +4,7 @@ import { CaseRowProps } from "../interfaces/caseRowProps.interface";
 import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
 
 export const CaseRow: React.FC<CaseRowProps> = ({ caseRecord }) => (
-  <tr>
+  <tr data-testid="caseRow">
     <td>{caseRecord.SK}</td>
     <td>{caseRecord.clientName}</td>
     <td>

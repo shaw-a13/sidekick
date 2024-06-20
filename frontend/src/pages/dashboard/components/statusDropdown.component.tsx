@@ -3,7 +3,7 @@ import { StatusDropdownProps } from "../interfaces/statusDropdownProps.interface
 import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
 
 export const StatusDropdown: React.FC<StatusDropdownProps> = ({ onClick, buttonStyle }) => (
-  <Dropdown>
+  <Dropdown data-testid="statusDropdown">
     <Dropdown.Toggle style={buttonStyle}>Status</Dropdown.Toggle>
     <Dropdown.Menu>
       {Object.keys(CaseStatus).map((statusItem) => (
