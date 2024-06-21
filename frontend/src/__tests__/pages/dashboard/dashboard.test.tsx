@@ -10,26 +10,9 @@ import { BrowserRouter } from "react-router-dom";
 import "@testing-library/jest-dom";
 import exp from "constants";
 import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
+import userEvent from "@testing-library/user-event";
 
 jest.mock("@auth0/auth0-react");
-
-// jest.mock("../../../enums/caseStatus", () => ({
-//   CaseStatus: {
-//     OPEN: "OPEN",
-//     ACTIVE: "ATIVE",
-//     PENDING: "PENDING",
-//     CLOSED: "CLOSED",
-//   },
-
-//   CaseStatusStyles: {
-//     OPEN: { style: "primary" },
-//     ACTIVE: { style: "success" },
-//     PENDING: { style: "warning" },
-//     CLOSED: { style: "danger" },
-//   },
-// }));
-
-CaseStatusStyles[CaseStatus.CLOSED] = { style: "danger" };
 
 const mockLoginWithRedirect = jest.fn();
 let mockCaseService: jest.SpyInstance;
@@ -37,7 +20,7 @@ let mockCaseService: jest.SpyInstance;
 describe("Dashboard", () => {
   beforeEach(() => {
     (useAuth0 as jest.Mock).mockReturnValue({
-      user: { authGroups: ["Admin,Worker"], picture: "https://example.com", name: "John Doe", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
+      user: { authGroups: ["Admin"], picture: "https://example.com", name: "John Doe", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
       loginWithRedirect: mockLoginWithRedirect,
       isAuthenticated: true,
       getAccessTokenSilently: jest.fn(() => Promise.resolve("testToken")),
@@ -117,58 +100,258 @@ describe("Dashboard", () => {
     expect(tableDataHeadings).toHaveTextContent("Status");
   });
 
-  test("renders the cases table with the correct data", async () => {
-    render(
-      <BrowserRouter>
-        <Dashboard />
-      </BrowserRouter>
-    );
+  describe("when the cases have loaded", () => {
+    test("renders the cases table with the correct data", async () => {
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
 
-    await waitFor(() => {
-      expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
+
+      const caseRows = screen.getAllByTestId("caseRow");
+
+      expect(caseRows).toHaveLength(4);
+      expect(caseRows[0]).toHaveTextContent("123");
+      expect(caseRows[0]).toHaveTextContent("John Doe");
+      expect(caseRows[0]).toHaveTextContent("OPEN");
+      expect(caseRows[1]).toHaveTextContent("124");
+      expect(caseRows[1]).toHaveTextContent("Jane Doe");
+      expect(caseRows[1]).toHaveTextContent("ACTIVE");
+      expect(caseRows[2]).toHaveTextContent("125");
+      expect(caseRows[2]).toHaveTextContent("John Smith");
+      expect(caseRows[2]).toHaveTextContent("PENDING");
+      expect(caseRows[3]).toHaveTextContent("126");
+      expect(caseRows[3]).toHaveTextContent("Jane Smith");
+      expect(caseRows[3]).toHaveTextContent("CLOSED");
+
+      const viewButtons = screen.getAllByRole("button", { name: /view/i });
+      expect(viewButtons).toHaveLength(4);
     });
 
-    const caseRows = screen.getAllByTestId("caseRow");
+    test("renders the cases table with the correct amount of rows after filtering by reference", async () => {
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
 
-    expect(caseRows).toHaveLength(3);
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
 
-    // expect(screen.getByText("123")).toBeInTheDocument();
-    // expect(screen.getByText("Client 1")).toBeInTheDocument();
-    // expect(screen.getByText("John Doe")).toBeInTheDocument();
-    // expect(screen.getByText("OPEN")).toBeInTheDocument();
+      const filterInput = screen.getByPlaceholderText("Search for a reference") as HTMLInputElement;
 
-    // SK: "123",
-    //   clientId: "Client 1",
-    //   clientName: "John Doe",
+      userEvent.type(filterInput, "123");
 
-    //   SK: "124",
-    //   clientId: "Client 2",
-    //   clientName: "Jane Doe",
-    //   status: "CLOSED",
+      const submitButtons = screen.getAllByRole("button");
 
-    // expect(tableRows[0]).toHaveTextContent("Client 1");
-    // expect(tableRows[0]).toHaveTextContent("Active");
-    // expect(tableRows[1]).toHaveTextContent("456");
-    // expect(tableRows[1]).toHaveTextContent("Client 2");
-    // expect(tableRows[1]).toHaveTextContent("Inactive");
-    // expect(tableRows[2]).toHaveTextContent("789");
-    // expect(tableRows[2]).toHaveTextContent("Client 3");
-    // expect(tableRows[2]).toHaveTextContent("Active");
+      submitButtons[0].click();
+      let caseRows = screen.getAllByTestId("caseRow");
+      await waitFor(() => {
+        caseRows = screen.getAllByTestId("caseRow");
+        expect(caseRows).toHaveLength(1);
+      });
+      expect(caseRows[0]).toHaveTextContent("123");
+      expect(caseRows[0]).toHaveTextContent("John Doe");
+      expect(caseRows[0]).toHaveTextContent("OPEN");
+    });
+
+    test("renders the cases table with the correct amount of rows after filtering by name", async () => {
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
+
+      const filterInput = screen.getByPlaceholderText("Search for a client") as HTMLInputElement;
+
+      userEvent.type(filterInput, "Jane Doe");
+
+      const submitButtons = screen.getAllByRole("button");
+
+      submitButtons[1].click();
+      let caseRows = screen.getAllByTestId("caseRow");
+      await waitFor(() => {
+        caseRows = screen.getAllByTestId("caseRow");
+        expect(caseRows).toHaveLength(1);
+      });
+      expect(caseRows[0]).toHaveTextContent("124");
+      expect(caseRows[0]).toHaveTextContent("Jane Doe");
+      expect(caseRows[0]).toHaveTextContent("ACTIVE");
+    });
   });
 
-  test("renders the cases table with the correct amount of rows after filtering by reference", async () => {
-    render(<Dashboard />);
+  describe("When the filtering by status", () => {
+    test("renders only the open cases when open is clicked", async () => {
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
 
-    const tableRows = screen.getAllByTestId("tableRow");
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
 
-    expect(tableRows).toHaveLength(3);
+      const dropdownToggle = screen.getByRole("button", { name: /status/i });
+      userEvent.click(dropdownToggle);
+      const openOption = screen.getAllByText("OPEN")[0];
+      userEvent.click(openOption);
+      let caseRows = screen.getAllByTestId("caseRow");
+      await waitFor(() => {
+        caseRows = screen.getAllByTestId("caseRow");
+        expect(caseRows).toHaveLength(1);
+      });
+      expect(caseRows[0]).toHaveTextContent("123");
+      expect(caseRows[0]).toHaveTextContent("John Doe");
+      expect(caseRows[0]).toHaveTextContent("OPEN");
+    });
 
-    const filterInput = screen.getByPlaceholderText("Search for a reference") as HTMLInputElement;
+    test("renders only the active cases when active is clicked", async () => {
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
 
-    filterInput.value = "123";
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
 
-    filterInput.dispatchEvent(new Event("input"));
+      const dropdownToggle = screen.getByRole("button", { name: /status/i });
+      userEvent.click(dropdownToggle);
+      const activeOption = screen.getAllByText("ACTIVE")[0];
+      userEvent.click(activeOption);
+      let caseRows = screen.getAllByTestId("caseRow");
+      await waitFor(() => {
+        caseRows = screen.getAllByTestId("caseRow");
+        expect(caseRows).toHaveLength(1);
+      });
+      expect(caseRows[0]).toHaveTextContent("124");
+      expect(caseRows[0]).toHaveTextContent("Jane Doe");
+      expect(caseRows[0]).toHaveTextContent("ACTIVE");
+    });
 
-    expect(tableRows).toHaveLength(1);
+    test("renders only the pending cases when pending is clicked", async () => {
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
+
+      const dropdownToggle = screen.getByRole("button", { name: /status/i });
+      userEvent.click(dropdownToggle);
+      const pendingOption = screen.getAllByText("PENDING")[0];
+      userEvent.click(pendingOption);
+      let caseRows = screen.getAllByTestId("caseRow");
+      await waitFor(() => {
+        caseRows = screen.getAllByTestId("caseRow");
+        expect(caseRows).toHaveLength(1);
+      });
+      expect(caseRows[0]).toHaveTextContent("125");
+      expect(caseRows[0]).toHaveTextContent("John Smith");
+      expect(caseRows[0]).toHaveTextContent("PENDING");
+    });
+    test("renders only the closed cases when closed is clicked", async () => {
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
+
+      const dropdownToggle = screen.getByRole("button", { name: /status/i });
+      userEvent.click(dropdownToggle);
+      const pendingOption = screen.getAllByText("CLOSED")[0];
+      userEvent.click(pendingOption);
+      let caseRows = screen.getAllByTestId("caseRow");
+      await waitFor(() => {
+        caseRows = screen.getAllByTestId("caseRow");
+        expect(caseRows).toHaveLength(1);
+      });
+      expect(caseRows[0]).toHaveTextContent("126");
+      expect(caseRows[0]).toHaveTextContent("Jane Smith");
+      expect(caseRows[0]).toHaveTextContent("CLOSED");
+    });
+  });
+  describe("When the reset button is clicked", () => {
+    test("renders the cases table with the correct amount of rows", async () => {
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
+
+      const filterInput = screen.getByPlaceholderText("Search for a reference") as HTMLInputElement;
+
+      userEvent.type(filterInput, "123");
+
+      const submitButtons = screen.getAllByRole("button");
+
+      submitButtons[0].click();
+      let caseRows = screen.getAllByTestId("caseRow");
+      await waitFor(() => {
+        caseRows = screen.getAllByTestId("caseRow");
+        expect(caseRows).toHaveLength(1);
+      });
+      const resetButton = screen.getByRole("button", { name: /Reset/i });
+
+      resetButton.click();
+      await waitFor(() => {
+        caseRows = screen.getAllByTestId("caseRow");
+        expect(caseRows).toHaveLength(4);
+      });
+      expect(caseRows[0]).toHaveTextContent("123");
+      expect(caseRows[0]).toHaveTextContent("John Doe");
+      expect(caseRows[0]).toHaveTextContent("OPEN");
+      expect(caseRows[1]).toHaveTextContent("124");
+      expect(caseRows[1]).toHaveTextContent("Jane Doe");
+      expect(caseRows[1]).toHaveTextContent("ACTIVE");
+      expect(caseRows[2]).toHaveTextContent("125");
+      expect(caseRows[2]).toHaveTextContent("John Smith");
+      expect(caseRows[2]).toHaveTextContent("PENDING");
+      expect(caseRows[3]).toHaveTextContent("126");
+      expect(caseRows[3]).toHaveTextContent("Jane Smith");
+      expect(caseRows[3]).toHaveTextContent("CLOSED");
+    });
+  });
+
+  describe("When the view case button is clicked", () => {
+    test("it redirects to the correct case page", async () => {
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
+
+      const viewButtons = screen.getAllByRole("button", { name: /view/i });
+
+      userEvent.click(viewButtons[0]);
+
+      expect(window.location.pathname).toEqual("/case/123");
+    });
   });
 });
