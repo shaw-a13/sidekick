@@ -65,7 +65,7 @@ const Dashboard = () => {
         }
       })
       .catch((e) => {
-        console.log(e);
+        console.error(e);
       });
   };
 
@@ -75,10 +75,9 @@ const Dashboard = () => {
       setAccessToken(token!);
       getCases(token);
       setLoading(false);
-      console.log(cases)
+      console.log(cases);
       console.log(loading);
       console.log(token);
-
     });
   }, [getAccessTokenSilently]);
 

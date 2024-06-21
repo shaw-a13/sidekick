@@ -351,4 +351,90 @@ describe("Dashboard", () => {
       expect(window.location.pathname).toEqual("/case/123");
     });
   });
+
+  describe("When a worker accesses the dashboard", () => {
+    test("renders the cases table with the correct data", async () => {
+      (useAuth0 as jest.Mock).mockReturnValue({
+        user: { authGroups: ["Worker"], picture: "https://example.com", name: "Assignee 1", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
+        loginWithRedirect: mockLoginWithRedirect,
+        isAuthenticated: true,
+        getAccessTokenSilently: jest.fn(() => Promise.resolve("testToken")),
+      });
+
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
+
+      const caseRows = screen.getAllByTestId("caseRow");
+
+      expect(caseRows).toHaveLength(1);
+      expect(caseRows[0]).toHaveTextContent("123");
+      expect(caseRows[0]).toHaveTextContent("John Doe");
+      expect(caseRows[0]).toHaveTextContent("OPEN");
+
+      const viewButtons = screen.getAllByRole("button", { name: /view/i });
+      expect(viewButtons).toHaveLength(1);
+    });
+  });
+
+  describe("When a client accesses the dashboard", () => {
+    test("renders the cases table with the correct data", async () => {
+      (useAuth0 as jest.Mock).mockReturnValue({
+        user: { authGroups: [], picture: "https://example.com", name: "Jane Doe", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
+        loginWithRedirect: mockLoginWithRedirect,
+        isAuthenticated: true,
+        getAccessTokenSilently: jest.fn(() => Promise.resolve("testToken")),
+      });
+
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("loadingSpinner")).not.toBeInTheDocument();
+      });
+
+      const caseRows = screen.getAllByTestId("caseRow");
+
+      expect(caseRows).toHaveLength(1);
+      expect(caseRows[0]).toHaveTextContent("124");
+      expect(caseRows[0]).toHaveTextContent("Jane Doe");
+      expect(caseRows[0]).toHaveTextContent("ACTIVE");
+
+      const viewButtons = screen.getAllByRole("button", { name: /view/i });
+      expect(viewButtons).toHaveLength(1);
+    });
+  });
+
+  describe("When the getCases API returns an error", () => {
+    test("it renders the error message", async () => {
+      mockCaseService.mockRestore();
+      const error = new Error("An error occurred");
+      mockCaseService = jest.spyOn(CaseService.prototype, "getAllCases").mockImplementation(() => {
+        return new Promise<AxiosResponse<Case[]>>((resolve, reject) => {
+          reject(error);
+        });
+      });
+
+      console.error = jest.fn();
+
+      render(
+        <BrowserRouter>
+          <Dashboard />
+        </BrowserRouter>
+      );
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(error);
+      });
+    });
+  });
 });

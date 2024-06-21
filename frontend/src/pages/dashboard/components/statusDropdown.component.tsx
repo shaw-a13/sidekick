@@ -7,7 +7,7 @@ export const StatusDropdown: React.FC<StatusDropdownProps> = ({ onClick, buttonS
     <Dropdown.Toggle style={buttonStyle}>Status</Dropdown.Toggle>
     <Dropdown.Menu>
       {Object.keys(CaseStatus).map((statusItem) => (
-        <Dropdown.Item onClick={() => onClick(statusItem)}>
+        <Dropdown.Item key={statusItem} onClick={() => onClick(statusItem)}>
           <Badge bg={CaseStatusStyles[statusItem as CaseStatus].style} text="light">
             {statusItem}
           </Badge>
