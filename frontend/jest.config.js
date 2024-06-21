@@ -15,7 +15,7 @@ module.exports = {
   testEnvironment: "jsdom",
   testRunner: "jest-circus/runner",
   coveragePathIgnorePatterns: ["__tests__/util", "test/helpers"],
-  testPathIgnorePatterns: ["__tests__/util"],
+  testPathIgnorePatterns: ["__tests__/util", ".*mock.*"],
   coverageDirectory: "test-reports/",
   setupFilesAfterEnv: ["jest-extended/all"],
   moduleNameMapper: {

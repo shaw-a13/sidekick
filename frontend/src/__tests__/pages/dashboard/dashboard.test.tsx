@@ -1,16 +1,13 @@
-import React, { act } from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { useAuth0 } from "@auth0/auth0-react";
 import Dashboard from "../../../pages/dashboard/dashboard";
 import { CaseService } from "../../../services/case.service";
 import { AxiosHeaders, AxiosResponse } from "axios";
 import { Case } from "../../../interfaces/case/case.interface";
-import { getMockCases } from "./mockCases";
 import { BrowserRouter } from "react-router-dom";
 import "@testing-library/jest-dom";
-import exp from "constants";
-import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
 import userEvent from "@testing-library/user-event";
+import { getMockCases } from "./mockCases";
 
 jest.mock("@auth0/auth0-react");
 
