@@ -56,7 +56,7 @@ const Navigation = () => {
 
   const renderLinks = (filterFunc: (page: any) => boolean) => {
     return pages.filter(filterFunc).map(({ name, href }) => (
-      <Link key={name} to={href} style={linkStyle}>
+      <Link data-testid="navlink"  key={name} to={href} style={linkStyle}>
         <p>{name}</p>
       </Link>
     ));

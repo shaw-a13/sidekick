@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -9,12 +9,14 @@ import exp from "constants";
 jest.mock("@auth0/auth0-react");
 
 const mockLoginWithRedirect = jest.fn();
+const mockLogout = jest.fn();
 
 describe("Navigation Component Tests", () => {
   beforeEach(() => {
     (useAuth0 as jest.Mock).mockReturnValue({
       user: { authGroups: ["Admin,Worker"], picture: "https://example.com", name: "John Doe", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
       loginWithRedirect: mockLoginWithRedirect,
+      logout: mockLogout,
       isAuthenticated: true,
     });
   });
@@ -68,6 +70,9 @@ describe("Navigation Component Tests", () => {
       expect(buttons).toHaveLength(2);
 
       expect(buttons[1]).toHaveTextContent("Log Out");
+
+      buttons[1].click();
+      expect(mockLogout).toHaveBeenCalled();
     });
     describe("When the user is an admin", () => {
       beforeEach(() => {
@@ -140,6 +145,7 @@ describe("Navigation Component Tests", () => {
     beforeEach(() => {
       (useAuth0 as jest.Mock).mockReturnValue({
         isAuthenticated: false,
+        loginWithRedirect: mockLoginWithRedirect,
       });
     });
     test("it renders the navbar with the correct links", () => {
@@ -180,6 +186,34 @@ describe("Navigation Component Tests", () => {
       expect(buttons).toHaveLength(2);
 
       expect(buttons[1]).toHaveTextContent("Log In");
+
+      buttons[1].click();
+      expect(mockLoginWithRedirect).toHaveBeenCalled();
+    });
+  });
+
+  test("It navigates to the correct page when the navlinks are clicked", async () => {
+    (useAuth0 as jest.Mock).mockReturnValue({
+      user: { authGroups: ["Admin"], picture: "https://example.com", name: "John Doe", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
+      loginWithRedirect: mockLoginWithRedirect,
+      isAuthenticated: true,
+    });
+
+    render(
+      <BrowserRouter>
+        <Navigation />
+      </BrowserRouter>
+    );
+
+    let navLinks = screen.getAllByTestId("navlink");
+    await waitFor(() => {
+      navLinks = screen.getAllByTestId("navlink");
+      expect(navLinks).toHaveLength(4);
+    });
+
+    navLinks.forEach((link) => {
+      link.click();
+      expect(window.location.pathname).toBe(link.getAttribute("href"));
     });
   });
 });
