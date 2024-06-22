@@ -1,10 +1,8 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import Navigation from "../../pages/navigation";
 import { BrowserRouter } from "react-router-dom";
-import exp from "constants";
 
 jest.mock("@auth0/auth0-react");
 
@@ -73,6 +71,7 @@ describe("Navigation Component Tests", () => {
 
       buttons[1].click();
       expect(mockLogout).toHaveBeenCalled();
+      expect(mockLogout).toHaveBeenCalledWith({ logoutParams: { returnTo: window.location.origin } });
     });
     describe("When the user is an admin", () => {
       beforeEach(() => {
