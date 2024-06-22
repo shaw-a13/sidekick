@@ -9,7 +9,7 @@ import { UploadCardProps } from "../interfaces/uploadCardProps.interface";
 export const UploadCard: React.FC<UploadCardProps> = ({ setCaseType, isExisting }) => {
   const [caseSelected, setCaseSelected] = useState(false);
   return (
-    <Card>
+    <Card data-testid="uploadCard">
       <Card.Body className="text-center">{!caseSelected && <CaseSelection setCaseSelected={setCaseSelected} setCaseType={setCaseType} />}</Card.Body>
       {!isExisting && caseSelected && <NewCase />}
       {isExisting && caseSelected && <ExistingCase />}

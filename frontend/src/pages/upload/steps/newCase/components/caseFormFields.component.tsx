@@ -26,7 +26,7 @@ export const CaseFormFields: React.FC<CaseFormFieldsProps> = ({ caseInfo, handle
     <Row className="mb-1">
       <Form.Group as={Col} controlId="validationCustom05">
         <Form.Label>Date</Form.Label>
-        <Form.Control type="date" required name="date" value={caseInfo.date} onChange={handleInputChange} />
+        <Form.Control data-testid="dateInput" type="date" required name="date" value={caseInfo.date} onChange={handleInputChange} />
         <Form.Control.Feedback type="invalid">Please provide a valid date.</Form.Control.Feedback>
       </Form.Group>
     </Row>

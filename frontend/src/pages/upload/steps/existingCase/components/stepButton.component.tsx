@@ -6,7 +6,7 @@ export const StepButton: React.FC<StepButtonProps> = ({ stepNumber, onClick, dis
   const buttonId = `step${stepNumber}`;
 
   return (
-    <Button className={buttonClasses} id={buttonId} onClick={onClick} disabled={disabled}>
+    <Button data-testid="stepButton" className={buttonClasses} id={buttonId} onClick={onClick} disabled={disabled}>
       {stepNumber + 1}
     </Button>
   );

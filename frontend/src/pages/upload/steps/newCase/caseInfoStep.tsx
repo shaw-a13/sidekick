@@ -25,6 +25,7 @@ const CaseInfoStep: React.FC<CaseInfoStepProps> = (props) => {
     const form = event.currentTarget;
     event.preventDefault();
     if (validateForm(form)) {
+      console.log("valid");
       props.caseInfoSetter((prevCaseInfo) => ({
         ...prevCaseInfo,
         clientName: props.clientName,
@@ -38,12 +39,12 @@ const CaseInfoStep: React.FC<CaseInfoStepProps> = (props) => {
   };
 
   return (
-    <Container>
+    <Container data-testid="caseInformationForm">
       <Card.Title>Case Information</Card.Title>
       <Card.Text>
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
           <CaseFormFields caseInfo={props.caseInfo} handleInputChange={handleInputChange} />
-          <Button type="submit" className="sidekick-primary-btn">
+          <Button data-testid="nextButton" type="submit" className="sidekick-primary-btn">
             <FontAwesomeIcon icon={faArrowRight} />
           </Button>
         </Form>

@@ -99,12 +99,12 @@ const DocumentUploadStep = (props: DocumentUploadStepProps) => {
   };
 
   return (
-    <Container>
+    <Container data-testid="uploadForm">
       <Card.Title>Document Upload</Card.Title>
       <Card.Text>
         <Form.Group controlId="formFileLg" className="mb-3">
           <Form.Label>Please upload the file you wish to analyse</Form.Label>
-          <Form.Control type="file" onChange={handleFileChange} />
+          <Form.Control data-testid="fileInput" type="file" onChange={handleFileChange} />
         </Form.Group>
       </Card.Text>
       {showSubmitButton && (

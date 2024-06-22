@@ -33,7 +33,7 @@ const ClientInfoStep = (props: { stepSetter: (step: number) => void; clientInfo:
   };
 
   return (
-    <Container>
+    <Container data-testid="clientInformationForm">
       <Card.Title>Client Information</Card.Title>
       <Card.Text>
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -58,7 +58,6 @@ const ClientInfoStep = (props: { stepSetter: (step: number) => void; clientInfo:
             <Form.Group as={Col} md="6" controlId="validationCustom04">
               <Form.Label>Address Line 2</Form.Label>
               <Form.Control type="text" placeholder="111 Apartment Building" name="addressLine2" value={props.clientInfo.addressLine2} onChange={handleInputChange} />
-              <Form.Control.Feedback type="invalid">Please provide a valid state.</Form.Control.Feedback>
             </Form.Group>
           </Row>
           <Row className="mb-3">
@@ -90,7 +89,7 @@ const ClientInfoStep = (props: { stepSetter: (step: number) => void; clientInfo:
               <Form.Control.Feedback type="invalid">Please provide a valid email address.</Form.Control.Feedback>
             </Form.Group>
           </Row>
-          <Button type="submit" className="sidekick-primary-btn">
+          <Button data-testid="nextButton" type="submit" className="sidekick-primary-btn">
             <FontAwesomeIcon icon={faArrowRight} />
           </Button>
         </Form>

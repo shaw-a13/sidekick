@@ -46,12 +46,12 @@ const ExistingCase = () => {
           <StepButton stepNumber={index + 1} onClick={() => setStep(index + 1)} />
         ))}
       </Card.Header>
-      <Form noValidate validated={validated}>
+      <Form noValidate validated={validated} data-testid="existingCaseForm">
         <Row className="mb-1">
           <Form.Group controlId="validationCustom05" className="text-center">
             <Form.Label>Case ID</Form.Label>
             <Form.Control type="text" placeholder="Enter a case ID" required name="caseId" value={caseId} onChange={handleInputChange} />
-            <Form.Control.Feedback type="invalid">Please provide a valid postcode.</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">Please provide a valid case id</Form.Control.Feedback>
           </Form.Group>
         </Row>
       </Form>
