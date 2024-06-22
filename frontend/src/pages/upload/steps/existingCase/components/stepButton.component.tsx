@@ -1,12 +1,12 @@
 import { Button } from "react-bootstrap";
 import { StepButtonProps } from "../interfaces/stepButtonProps.interface";
 
-export const StepButton: React.FC<StepButtonProps> = ({ stepNumber, onClick, disabled = false }) => {
-  const buttonClasses = `rounded-circle m-2 sidekick-primary-btn ${disabled ? "disabled" : ""}`;
+export const StepButton: React.FC<StepButtonProps> = ({ stepNumber }) => {
+  const buttonClasses = "rounded-circle m-2 sidekick-primary-btn";
   const buttonId = `step${stepNumber}`;
 
   return (
-    <Button data-testid="stepButton" className={buttonClasses} id={buttonId} onClick={onClick} disabled={disabled}>
+    <Button data-testid="stepButton" className={buttonClasses} id={buttonId}>
       {stepNumber + 1}
     </Button>
   );

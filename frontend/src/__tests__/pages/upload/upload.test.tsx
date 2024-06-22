@@ -357,6 +357,37 @@ describe("Upload Component Tests", () => {
 
             expect(screen.getByText("Please provide a valid date.")).toBeInTheDocument();
           });
+
+          test("It should show the client info page with the correct data when the step button is clicked", async () => {
+            render(
+              <BrowserRouter>
+                <Upload />
+              </BrowserRouter>
+            );
+            const newCaseButton = screen.getByRole("button", { name: /New/i });
+            await waitFor(() => {
+              newCaseButton.click();
+            });
+
+            validClientInfoFormSteps();
+
+            const stepButtons = screen.getAllByTestId("stepButton");
+            await waitFor(() => {
+              stepButtons[0].click();
+            });
+
+            const clientInformationForm = screen.getByTestId("clientInformationForm");
+            expect(clientInformationForm).toBeInTheDocument();
+            expect(screen.getByPlaceholderText("First name")).toHaveValue("John");
+            expect(screen.getByPlaceholderText("Last name")).toHaveValue("Doe");
+            expect(screen.getByPlaceholderText("Apartment 2")).toHaveValue("123 Main Street");
+            expect(screen.getByPlaceholderText("111 Apartment Building")).toHaveValue("Apt 2");
+            expect(screen.getByPlaceholderText("BT11 1AB")).toHaveValue("BT11 1AB");
+            expect(screen.getByPlaceholderText("Antrim")).toHaveValue("Antrim");
+            expect(screen.getByPlaceholderText("Belfast")).toHaveValue("Belfast");
+            expect(screen.getByPlaceholderText("0123456789")).toHaveValue(123456789);
+            expect(screen.getByPlaceholderText("john@test.com")).toHaveValue("john@test.com");
+          });
         });
       });
 
@@ -474,6 +505,35 @@ describe("Upload Component Tests", () => {
           });
         });
       });
+      describe("When the user hits the reset button", () => {
+        test("it resets the form", async () => {
+          render(
+            <BrowserRouter>
+              <Upload />{" "}
+            </BrowserRouter>
+          );
+          await waitFor(() => {
+            expect(screen.queryByText("You must be a worker to upload to the Sidekick application")).not.toBeInTheDocument();
+          });
+          let newCaseButton = screen.getByRole("button", { name: /New/i });
+          await waitFor(() => {
+            newCaseButton.click();
+            const clientInformationForm = screen.getByTestId("clientInformationForm");
+            expect(clientInformationForm).toBeInTheDocument();
+          });
+          const resetButton = screen.getByRole("button", { name: /Reset/i });
+          userEvent.click(resetButton);
+
+          await waitFor(() => {
+            expect(screen.getByText("Is this a new or existing case?")).toBeInTheDocument();
+          });
+
+          newCaseButton = screen.getByRole("button", { name: /New/i });
+          const existingCaseButton = screen.getByRole("button", { name: /Existing/i });
+          expect(newCaseButton).toBeInTheDocument();
+          expect(existingCaseButton).toBeInTheDocument();
+        });
+      });
     });
   });
 
@@ -492,6 +552,8 @@ describe("Upload Component Tests", () => {
 
       const stepButtons = screen.getAllByTestId("stepButton");
       expect(stepButtons).toHaveLength(1);
+      stepButtons[0].click();
+      expect(existingCaseForm).toBeInTheDocument();
 
       expect(within(existingCaseForm).getByText("Case ID")).toBeInTheDocument();
       const caseIdInput = within(existingCaseForm).getByRole("textbox");
@@ -513,6 +575,11 @@ describe("Upload Component Tests", () => {
           existingCaseButton.click();
         });
         const caseIdInput = screen.getByPlaceholderText("Enter a case ID") as HTMLInputElement;
+        userEvent.type(caseIdInput, "123");
+
+        userEvent.clear(caseIdInput);
+        expect(screen.queryByTestId("uploadForm")).not.toBeInTheDocument();
+
         userEvent.type(caseIdInput, "123");
 
         let uploadForm = screen.getByTestId("uploadForm");
@@ -560,6 +627,51 @@ describe("Upload Component Tests", () => {
         );
       });
     });
+    describe("When the user hits the reset button", () => {
+      test("it resets the form", async () => {
+        render(
+          <BrowserRouter>
+            <Upload />{" "}
+          </BrowserRouter>
+        );
+        await waitFor(() => {
+          expect(screen.queryByText("You must be a worker to upload to the Sidekick application")).not.toBeInTheDocument();
+        });
+        let existingCaseButton = screen.getByRole("button", { name: /Existing/i });
+        await waitFor(() => {
+          existingCaseButton.click();
+        });
+        const caseIdInput = screen.getByPlaceholderText("Enter a case ID") as HTMLInputElement;
+        userEvent.type(caseIdInput, "123");
+
+        let uploadForm = screen.getByTestId("uploadForm");
+        await waitFor(() => {
+          uploadForm = screen.getByTestId("uploadForm");
+          expect(uploadForm).toBeInTheDocument();
+        });
+
+        const fileInput = within(uploadForm).getByTestId("fileInput") as HTMLInputElement;
+        expect(fileInput).toBeInTheDocument();
+
+        const file = new File(["(⌐□_□)"], "test-case.pdf", {
+          type: "application/pdf",
+        });
+        userEvent.upload(fileInput, file);
+        expect(fileInput.files).toHaveLength(1);
+
+        const resetButton = screen.getByRole("button", { name: /Reset/i });
+        userEvent.click(resetButton);
+
+        await waitFor(() => {
+          expect(screen.getByText("Is this a new or existing case?")).toBeInTheDocument();
+        });
+
+        const newCaseButton = screen.getByRole("button", { name: /New/i });
+        existingCaseButton = screen.getByRole("button", { name: /Existing/i });
+        expect(newCaseButton).toBeInTheDocument();
+        expect(existingCaseButton).toBeInTheDocument();
+      });
+    });
   });
 });
 
@@ -581,6 +693,115 @@ describe("When the user is not logged in", () => {
   });
 });
 
+describe("When an error occurs", () => {
+  beforeEach(() => {
+    (useAuth0 as jest.Mock).mockReturnValue({
+      user: { authGroups: ["Admin", "Worker"], picture: "https://example.com", name: "John Doe", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
+      loginWithRedirect: mockLoginWithRedirect,
+      logout: mockLogout,
+      isAuthenticated: true,
+      getAccessTokenSilently: jest.fn().mockResolvedValue("testToken"),
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("in the upload document function", async () => {
+    const error = new Error("Test error");
+    mockDocumentPresignedUrlService = jest.spyOn(DocumentService.prototype, "getPresignedUrl").mockImplementation(() => {
+      return new Promise<AxiosResponse<PresignedUrlResponse>>((resolve, reject) => {
+        reject(error);
+      });
+    });
+
+    console.error = jest.fn();
+
+    render(
+      <BrowserRouter>
+        <Upload />{" "}
+      </BrowserRouter>
+    );
+    await waitFor(() => {
+      expect(screen.queryByText("You must be a worker to upload to the Sidekick application")).not.toBeInTheDocument();
+    });
+    const existingCaseButton = screen.getByRole("button", { name: /Existing/i });
+    await waitFor(() => {
+      existingCaseButton.click();
+    });
+    const caseIdInput = screen.getByPlaceholderText("Enter a case ID") as HTMLInputElement;
+    userEvent.type(caseIdInput, "123");
+
+    let uploadForm = screen.getByTestId("uploadForm");
+    await waitFor(() => {
+      uploadForm = screen.getByTestId("uploadForm");
+    });
+
+    const fileInput = within(uploadForm).getByTestId("fileInput") as HTMLInputElement;
+
+    const file = new File(["(⌐□_□)"], "test-case.pdf", {
+      type: "application/pdf",
+    });
+    userEvent.upload(fileInput, file);
+
+    const submitButton = within(uploadForm).getByRole("button", { name: /Submit Case/i });
+
+    userEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(console.error).toHaveBeenCalledWith(error);
+    });
+  });
+
+  test("in the add case function", async () => {
+    const error = new Error("Test error");
+    mockAddCaseService = jest.spyOn(CaseService.prototype, "addCase").mockImplementation(() => {
+      return new Promise<AxiosResponse<PresignedUrlResponse>>((resolve, reject) => {
+        reject(error);
+      });
+    });
+
+    console.error = jest.fn();
+
+    render(
+      <BrowserRouter>
+        <Upload />{" "}
+      </BrowserRouter>
+    );
+    await waitFor(() => {
+      expect(screen.queryByText("You must be a worker to upload to the Sidekick application")).not.toBeInTheDocument();
+    });
+    const newCaseButton = screen.getByRole("button", { name: /New/i });
+    await waitFor(() => {
+      newCaseButton.click();
+    });
+
+    validClientInfoFormSteps();
+    validCaseInfoFormSteps();
+
+    let uploadForm = screen.queryByTestId("uploadForm");
+    await waitFor(() => {
+      uploadForm = screen.getByTestId("uploadForm");
+    });
+
+    const fileInput = within(uploadForm!).getByTestId("fileInput") as HTMLInputElement;
+
+    const file = new File(["(⌐□_□)"], "test-case.pdf", {
+      type: "application/pdf",
+    });
+
+    userEvent.upload(fileInput, file);
+
+    const submitButton = within(uploadForm!).getByRole("button", { name: /Submit Case/i });
+
+    userEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(console.error).toHaveBeenCalledWith(error);
+    });
+  });
+});
 const validClientInfoFormSteps = () => {
   const clientInformationForm = screen.getByTestId("clientInformationForm");
 

@@ -15,6 +15,7 @@ const ExistingCase = () => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (value === "") {
+      setCaseId("");
       setValidated(false);
     } else {
       setCaseId(value);
@@ -41,10 +42,7 @@ const ExistingCase = () => {
   return (
     <div>
       <Card.Header>
-        <StepButton stepNumber={0} onClick={() => setStep(0)} />
-        {steps.slice(1).map((step, index) => (
-          <StepButton stepNumber={index + 1} onClick={() => setStep(index + 1)} />
-        ))}
+        <StepButton stepNumber={0} />
       </Card.Header>
       <Form noValidate validated={validated} data-testid="existingCaseForm">
         <Row className="mb-1">
