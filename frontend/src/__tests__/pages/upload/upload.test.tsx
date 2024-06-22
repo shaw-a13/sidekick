@@ -317,6 +317,37 @@ describe("Upload Component Tests", () => {
               expect(uploadForm).toBeInTheDocument();
             });
           });
+
+          test("It should show the client info page with the correct data when the step button is clicked", async () => {
+            render(
+              <BrowserRouter>
+                <Upload />
+              </BrowserRouter>
+            );
+            const newCaseButton = screen.getByRole("button", { name: /New/i });
+            await waitFor(() => {
+              newCaseButton.click();
+            });
+
+            validClientInfoFormSteps();
+
+            const stepButtons = screen.getAllByTestId("stepButton");
+            await waitFor(() => {
+              stepButtons[0].click();
+            });
+
+            const clientInformationForm = screen.getByTestId("clientInformationForm");
+            expect(clientInformationForm).toBeInTheDocument();
+            expect(screen.getByPlaceholderText("First name")).toHaveValue("John");
+            expect(screen.getByPlaceholderText("Last name")).toHaveValue("Doe");
+            expect(screen.getByPlaceholderText("Apartment 2")).toHaveValue("123 Main Street");
+            expect(screen.getByPlaceholderText("111 Apartment Building")).toHaveValue("Apt 2");
+            expect(screen.getByPlaceholderText("BT11 1AB")).toHaveValue("BT11 1AB");
+            expect(screen.getByPlaceholderText("Antrim")).toHaveValue("Antrim");
+            expect(screen.getByPlaceholderText("Belfast")).toHaveValue("Belfast");
+            expect(screen.getByPlaceholderText("0123456789")).toHaveValue(123456789);
+            expect(screen.getByPlaceholderText("john@test.com")).toHaveValue("john@test.com");
+          });
         });
 
         describe("When the user fills in the case information form incorrectly", () => {
@@ -356,37 +387,6 @@ describe("Upload Component Tests", () => {
             });
 
             expect(screen.getByText("Please provide a valid date.")).toBeInTheDocument();
-          });
-
-          test("It should show the client info page with the correct data when the step button is clicked", async () => {
-            render(
-              <BrowserRouter>
-                <Upload />
-              </BrowserRouter>
-            );
-            const newCaseButton = screen.getByRole("button", { name: /New/i });
-            await waitFor(() => {
-              newCaseButton.click();
-            });
-
-            validClientInfoFormSteps();
-
-            const stepButtons = screen.getAllByTestId("stepButton");
-            await waitFor(() => {
-              stepButtons[0].click();
-            });
-
-            const clientInformationForm = screen.getByTestId("clientInformationForm");
-            expect(clientInformationForm).toBeInTheDocument();
-            expect(screen.getByPlaceholderText("First name")).toHaveValue("John");
-            expect(screen.getByPlaceholderText("Last name")).toHaveValue("Doe");
-            expect(screen.getByPlaceholderText("Apartment 2")).toHaveValue("123 Main Street");
-            expect(screen.getByPlaceholderText("111 Apartment Building")).toHaveValue("Apt 2");
-            expect(screen.getByPlaceholderText("BT11 1AB")).toHaveValue("BT11 1AB");
-            expect(screen.getByPlaceholderText("Antrim")).toHaveValue("Antrim");
-            expect(screen.getByPlaceholderText("Belfast")).toHaveValue("Belfast");
-            expect(screen.getByPlaceholderText("0123456789")).toHaveValue(123456789);
-            expect(screen.getByPlaceholderText("john@test.com")).toHaveValue("john@test.com");
           });
         });
       });
@@ -802,6 +802,7 @@ describe("When an error occurs", () => {
     });
   });
 });
+
 const validClientInfoFormSteps = () => {
   const clientInformationForm = screen.getByTestId("clientInformationForm");
 
