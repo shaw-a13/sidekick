@@ -12,7 +12,7 @@ export const CaseDescription: React.FC<CaseDescriptionProps> = ({ caseInfo, user
         <Card.Title>
           Case Description{" "}
           <Button
-            className="sidekick-primary-btn"
+            className="sidekick-primary-btn m-2"
             disabled={caseInfo?.assignee !== user.name && !user["authGroups"].includes("Admin")}
             onClick={() => {
               setEditCaseDescription(!editCaseDescription);
