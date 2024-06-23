@@ -24,6 +24,8 @@ let mockGetHistory: jest.SpyInstance;
 let mockAddHistory: jest.SpyInstance;
 let mockEditCaseService: jest.SpyInstance;
 let mockEditClientService: jest.SpyInstance;
+let mockAddComment: jest.SpyInstance;
+let mockEditComment: jest.SpyInstance;
 const mockTime = new Date("2021-09-01T00:00:00.000Z");
 
 const mockLoginWithRedirect = jest.fn();
@@ -40,6 +42,10 @@ jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useParams: jest.fn().mockReturnValue({ id: "12345678" }),
 }));
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 describe("Case Component", () => {
   beforeEach(() => {
@@ -243,6 +249,34 @@ describe("Case Component", () => {
     });
 
     mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
+      return new Promise<AxiosResponse>((resolve) => {
+        resolve({
+          data: {},
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config: {
+            headers: new AxiosHeaders(),
+          },
+        });
+      });
+    });
+
+    mockAddComment = jest.spyOn(CommentService.prototype, "addComment").mockImplementation(() => {
+      return new Promise<AxiosResponse>((resolve) => {
+        resolve({
+          data: {},
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config: {
+            headers: new AxiosHeaders(),
+          },
+        });
+      });
+    });
+
+    mockEditComment = jest.spyOn(CommentService.prototype, "editComment").mockImplementation(() => {
       return new Promise<AxiosResponse>((resolve) => {
         resolve({
           data: {},
@@ -985,6 +1019,104 @@ describe("Case Component", () => {
           action: CaseHistory.ASSIGNED,
           name: "John Doe",
           timestamp: "2021-09-01T00:00:00.050Z",
+        });
+
+        await waitFor(() => {
+          expect(mockReload).toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe("When the user clicks the add comment button", () => {
+      test("the comment will be added to the case", async () => {
+        render(<Case />);
+
+        let commentsSection = screen.queryByTestId("commentsSection");
+        await waitFor(() => {
+          commentsSection = screen.getByTestId("commentsSection");
+          expect(commentsSection).toBeInTheDocument();
+        });
+
+        const addCommentBtn = screen.getByTestId("addCommentButton");
+
+        addCommentBtn.click();
+
+        let commentForm = screen.queryByTestId("commentForm");
+        await waitFor(() => {
+          commentForm = screen.getByTestId("commentForm");
+          expect(commentForm).toBeInTheDocument();
+        });
+
+        const commentInput = within(commentForm!).getByPlaceholderText("Add new comment");
+
+        userEvent.type(commentInput, "Test Comment");
+
+        const submitButton = within(commentForm!).getByText("Submit");
+
+        submitButton.click();
+
+        await waitFor(() => {
+          expect(mockAddComment).toHaveBeenCalledWith(
+            "testToken",
+            { SK: "12345678#2021-09-01T00:00:00.100Z", name: "John Doe", text: "Test Comment", timestamp: "2021-09-01T00:00:00.100Z" },
+            "12345678"
+          );
+        });
+
+        await waitFor(() => {
+          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
+            SK: "12345678#2021-09-01T00:00:00.100Z",
+            action: CaseHistory.COMMENT_ADDED,
+            name: "John Doe",
+            timestamp: "2021-09-01T00:00:00.100Z",
+          });
+        });
+
+        await waitFor(() => {
+          expect(mockReload).toHaveBeenCalled();
+        });
+      });
+    });
+    describe("When the user clicks the edit comment button", () => {
+      test("the comment will be edited", async () => {
+        render(<Case />);
+
+        let commentsSection = screen.queryByTestId("commentsSection");
+        await waitFor(() => {
+          commentsSection = screen.getByTestId("commentsSection");
+          expect(commentsSection).toBeInTheDocument();
+        });
+
+        const editCommentBtn = screen.getAllByTestId("editCommentButton");
+
+        editCommentBtn[0].click();
+
+        let commentEditForm = screen.queryByTestId("commentEditForm");
+        await waitFor(() => {
+          commentEditForm = screen.getByTestId("commentEditForm");
+          expect(commentEditForm).toBeInTheDocument();
+        });
+
+        const commentInput = within(commentEditForm!).getByPlaceholderText("Edit comment");
+
+        userEvent.clear(commentInput);
+        userEvent.type(commentInput, "Edited Comment");
+
+        const submitButton = within(commentEditForm!).getByText("Submit");
+
+        submitButton.click();
+
+        await waitFor(() => {
+          expect(mockEditComment).toHaveBeenCalledWith("testToken", { text: "Edited Comment" }, "12345678", "2021-09-01T00:00:02.000Z");
+        });
+
+        await waitFor(() => {
+          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
+            SK: "12345678#2021-09-01T00:00:00.100Z",
+            action: CaseHistory.COMMENT_EDITED,
+            name: "John Doe",
+            timestamp: "2021-09-01T00:00:00.100Z",
+          });
         });
 
         await waitFor(() => {

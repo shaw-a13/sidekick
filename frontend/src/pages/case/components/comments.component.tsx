@@ -50,6 +50,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, user, comm
           Comments{" "}
           <Button
             className="sidekick-primary-btn m-2"
+            data-testid="addCommentButton"
             onClick={() => {
               setAddComment(!addComment);
             }}
@@ -59,7 +60,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, user, comm
         </Card.Title>
         <div>
           {addComment && (
-            <Form>
+            <Form data-testid="commentForm">
               <Form.Group controlId="comment">
                 <Form.Control
                   as="textarea"
@@ -88,7 +89,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, user, comm
           )}
         </div>
         {editComment && (
-          <Form>
+          <Form data-testid="commentEditForm">
             <Form.Group controlId="comment">
               <Form.Control
                 as="textarea"
@@ -136,6 +137,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, user, comm
                     <Card.Subtitle className="mb-2">
                       <Button
                         className="sidekick-primary-btn"
+                        data-testid="editCommentButton"
                         onClick={() => {
                           setEditComment(!editComment);
                           setEditedCommentTimestamp(comment.timestamp);
