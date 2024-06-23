@@ -12,6 +12,7 @@ import { HistoryService } from "../../../services/history.service";
 import { CaseHistory } from "../../../enums/caseHistory";
 import { wait } from "@testing-library/user-event/dist/utils";
 import userEvent from "@testing-library/user-event";
+import exp from "constants";
 
 jest.mock("@auth0/auth0-react");
 
@@ -564,6 +565,30 @@ describe("Case Component", () => {
         expect(within(documentUploadModal!).getByText("Please upload the file you wish to analyse")).toBeInTheDocument();
       });
 
+      test("the document upload modal will close when the user clicks the hide button", async () => {
+        render(<Case />);
+        await waitFor(() => {
+          expect(screen.getByText("Case Documents")).toBeInTheDocument();
+        });
+        const documentUploadBtn = screen.getByTestId("documentUploadBtn");
+        documentUploadBtn.click();
+        let documentUploadModal = screen.queryByTestId("documentUploadModal");
+        await waitFor(() => {
+          documentUploadModal = screen.getByTestId("documentUploadModal");
+          expect(documentUploadModal).toBeInTheDocument();
+        });
+
+        expect(within(documentUploadModal!).getByText("Upload Document")).toBeInTheDocument();
+        expect(within(documentUploadModal!).getByText("Please upload the file you wish to analyse")).toBeInTheDocument();
+
+        const hideButton = within(documentUploadModal!).getAllByRole("button");
+
+        hideButton[0].click();
+        await waitFor(() => {
+          expect(screen.queryByTestId("documentUploadModal")).not.toBeInTheDocument();
+        });
+      });
+
       test("the document will be uploaded when a valid file is uploaded", async () => {
         const mockDocumentPresignedUrlService = jest.spyOn(DocumentService.prototype, "getPresignedUrl").mockImplementation(() => {
           return new Promise<AxiosResponse<PresignedUrlResponse>>((resolve) => {
@@ -620,7 +645,15 @@ describe("Case Component", () => {
 
         const uploadButton = screen.getByTestId("uploadButton");
 
+        let spinner = screen.queryByTestId("spinner");
+        expect(spinner).not.toBeInTheDocument();
+
         uploadButton.click();
+
+        await waitFor(() => {
+          spinner = screen.getByTestId("spinner");
+          expect(spinner).toBeInTheDocument();
+        });
 
         await waitFor(() => {
           expect(mockDocumentPresignedUrlService).toHaveBeenCalledWith("testToken", "12345678");
@@ -636,10 +669,10 @@ describe("Case Component", () => {
 
         await waitFor(() => {
           expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.100Z",
+            SK: "12345678#2021-09-01T00:00:00.150Z",
             action: CaseHistory.DOCUMENT_UPLOADED,
             name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.100Z",
+            timestamp: "2021-09-01T00:00:00.150Z",
           });
         });
 
@@ -1241,67 +1274,210 @@ describe("Case Component", () => {
           expect(mockReload).toHaveBeenCalled();
         });
       });
-    })
+    });
   });
 
   describe("When the user is authenticated but not assigned to the case", () => {
     beforeEach(() => {
       (useAuth0 as jest.Mock).mockReturnValue({
-        user: { authGroups: ["worker"], picture: "https://example.com", name: "Sam Jones", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
+        user: { authGroups: ["Worker"], picture: "https://example.com", name: "Sam Jones", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
         loginWithRedirect: mockLoginWithRedirect,
         logout: mockLogout,
         isAuthenticated: true,
         getAccessTokenSilently: jest.fn().mockResolvedValue("testToken"),
       });
-    });
 
-    mockGetSingleCase = jest.spyOn(CaseService.prototype, "getSingleCase").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {
-            SK: "12345678",
-            clientId: "56789",
-            clientName: "John Doe",
-            status: "ACTIVE",
-            description: "Test Description",
-            nature: "Property",
-            date: "2021-09-01",
-            assignee: "Jack Smith",
-          },
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
+      mockGetSingleCase = jest.spyOn(CaseService.prototype, "getSingleCase").mockImplementation(() => {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: {
+              SK: "12345678",
+              clientId: "56789",
+              clientName: "John Doe",
+              status: "ACTIVE",
+              description: "Test Description",
+              nature: "Property",
+              date: "2021-09-01",
+              assignee: "Jack Smith",
+            },
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
         });
       });
     });
-
     test("the user will not be able to upload a document", async () => {
-      
+      render(<Case />);
+      await waitFor(() => {
+        expect(screen.getByText("Case Documents")).toBeInTheDocument();
+      });
+
+      const documentUploadBtn = screen.getByTestId("documentUploadBtn");
+      expect(documentUploadBtn).toBeInTheDocument();
+      expect(documentUploadBtn).toBeDisabled();
     });
 
     test("the user will not be able to edit the case details", async () => {
+      render(<Case />);
+
+      let caseInfoSection = screen.queryByTestId("caseInfoSection");
+      await waitFor(() => {
+        caseInfoSection = screen.getByTestId("caseInfoSection");
+        expect(caseInfoSection).toBeInTheDocument();
+      });
+
+      const editButton = within(caseInfoSection!).getByText("Edit");
+
+      expect(editButton).toBeDisabled();
     });
 
     test("the user will not be able to edit the client details", async () => {
+      render(<Case />);
+
+      let caseInfoPaginator = screen.queryAllByTestId("caseInfoPaginator");
+      await waitFor(() => {
+        caseInfoPaginator = screen.getAllByTestId("caseInfoPaginator");
+        expect(caseInfoPaginator).toHaveLength(2);
+      });
+      caseInfoPaginator[1].click();
+
+      let clientInfoSection = screen.queryByTestId("clientInfoSection");
+      await waitFor(() => {
+        clientInfoSection = screen.getByTestId("clientInfoSection");
+        expect(clientInfoSection).toBeInTheDocument();
+      });
+
+      const editButton = within(clientInfoSection!).getByText("Edit");
+
+      expect(editButton).toBeDisabled();
     });
 
     test("the user will not be able to assign the case to themselves", async () => {
-    });
+      render(<Case />);
 
-    test("the user will not be able to add a comment", async () => {
+      let caseInfoSection = screen.queryByTestId("caseInfoSection");
+      await waitFor(() => {
+        caseInfoSection = screen.getByTestId("caseInfoSection");
+        expect(caseInfoSection).toBeInTheDocument();
+      });
+
+      expect(screen.queryByTestId("assignToMeBtn")).not.toBeInTheDocument();
     });
 
     test("the user will not be able to edit a comment", async () => {
+      render(<Case />);
+
+      let commentsSection = screen.queryByTestId("commentsSection");
+      await waitFor(() => {
+        commentsSection = screen.getByTestId("commentsSection");
+        expect(commentsSection).toBeInTheDocument();
+      });
+
+      const editCommentBtns = screen.getAllByTestId("editCommentButton");
+
+      expect(editCommentBtns).toHaveLength(4);
+
+      editCommentBtns.forEach((btn) => {
+        expect(btn).toBeDisabled();
+      });
     });
 
     test("the user will not be able to delete a comment", async () => {
+      render(<Case />);
+
+      let commentsSection = screen.queryByTestId("commentsSection");
+      await waitFor(() => {
+        commentsSection = screen.getByTestId("commentsSection");
+        expect(commentsSection).toBeInTheDocument();
+      });
+
+      const deleteCommentBtns = screen.getAllByTestId("deleteCommentButton");
+
+      expect(deleteCommentBtns).toHaveLength(4);
+
+      deleteCommentBtns.forEach((btn) => {
+        expect(btn).toBeDisabled();
+      });
     });
 
     test("the user will not be able to edit the description", async () => {
+      render(<Case />);
+
+      let descriptionSection = screen.queryByTestId("descriptionSection");
+      await waitFor(() => {
+        descriptionSection = screen.getByTestId("descriptionSection");
+        expect(descriptionSection).toBeInTheDocument();
+      });
+
+      const editButton = within(descriptionSection!).getByText("Edit");
+
+      expect(editButton).toBeDisabled();
     });
-    
-  })
+  });
+
+  describe("When an error occurs in the updateExtractionData function during initial rendering", () => {
+    test("the extractions table will be empty", async () => {
+      mockGetDocumentExtractionResult = jest.spyOn(DocumentService.prototype, "getDocumentExtractionResult").mockImplementation(() => {
+        return new Promise<AxiosResponse>((resolve, reject) => {
+          reject(new Error("Test error"));
+        });
+      });
+
+      render(<Case />);
+      let documentExtractions = screen.queryByTestId("documentExtractions");
+      await waitFor(() => {
+        documentExtractions = screen.getByTestId("documentExtractions");
+        expect(documentExtractions).toBeInTheDocument();
+      });
+
+      expect(within(documentExtractions!).getByText("Awaiting extraction results, please refresh the page")).toBeInTheDocument();
+    });
+  });
+
+  describe("When an error occurs in the updateExtractionData function during rerender", () => {
+    test("the extractions table will be empty", async () => {
+      mockGetDocumentExtractionResult
+        .mockImplementationOnce(() => {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: getMockExtractionResult(),
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        })
+        .mockImplementationOnce(() => {
+          return new Promise<AxiosResponse>((resolve, reject) => {
+            reject(new Error("Test error"));
+          });
+        });
+
+      console.error = jest.fn();
+
+      render(<Case />);
+      let documentExtractions = screen.queryByTestId("documentExtractions");
+      await waitFor(() => {
+        documentExtractions = screen.getByTestId("documentExtractions");
+        expect(documentExtractions).toBeInTheDocument();
+      });
+
+      const documentViewerBtns = screen.queryAllByTestId("documentViewerBtn");
+      expect(documentViewerBtns).toHaveLength(2);
+      documentViewerBtns[1].click();
+
+      await waitFor(() => {
+        expect(within(documentExtractions!).getByText("Awaiting extraction results, please refresh the page")).toBeInTheDocument();
+      });
+
+      expect(console.error).toHaveBeenCalledWith(new Error("Test error"));
+    });
+  });
 });

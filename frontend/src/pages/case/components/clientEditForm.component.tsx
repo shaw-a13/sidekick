@@ -29,7 +29,7 @@ const submitClientEdit = async (
       } else if (edit_obj.firstName) {
         const name = edit_obj.firstName + " " + clientInfo.lastName;
         await caseService.editCase(token, { clientName: name }, caseId);
-      } else if (edit_obj.lastName) {
+      } else {
         const name = clientInfo.firstName + " " + edit_obj.lastName;
         await caseService.editCase(token, { clientName: name }, caseId);
       }

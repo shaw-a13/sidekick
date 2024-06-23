@@ -70,6 +70,7 @@ const Case = () => {
         console.log(extractionData);
       });
     } catch (error) {
+      console.error(error);
       setExtractionData(undefined);
     }
   };
@@ -79,10 +80,9 @@ const Case = () => {
       setAccessToken(token!);
       await getCase(token!).then(async (res) => {
         setCaseInfo(res!.data);
-        if (res)
-          await getClientInfo(token!, res?.data.clientId).then((res) => {
-            setClientInfo(res?.data);
-          });
+        await getClientInfo(token!, res!.data.clientId).then((res) => {
+          setClientInfo(res!.data);
+        });
       });
       await documentService.getDocuments(token!, id!).then(async (res) => {
         setDocApiData(res!.data);
@@ -97,10 +97,10 @@ const Case = () => {
         }
       });
       await getComments(token!).then((res) => {
-        setComments(res?.data);
+        setComments(res!.data);
       });
       await getHistory(token!).then((res) => {
-        setHistory(res?.data);
+        setHistory(res!.data);
       });
 
       setLoading(false);
@@ -109,7 +109,7 @@ const Case = () => {
 
   return (
     <Container>
-      {(isAuthenticated && user && user["authGroups"].includes("Worker")) || (isAuthenticated && user && user["authGroups"].length === 0 && caseInfo?.clientName === user.name) ? (
+      {(isAuthenticated && user && user["authGroups"].includes("Worker")) || (isAuthenticated && user && user["authGroups"].length === 0 && caseInfo && caseInfo.clientName === user.name) ? (
         <div style={{ paddingTop: "8rem" }}>
           <UploadModal historyService={historyService} id={id!} accessToken={accessToken} show={uploadModal} setShow={setUploadModal} user={user} />
           <div>

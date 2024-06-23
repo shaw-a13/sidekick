@@ -138,6 +138,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, user, comm
                       <Button
                         className="sidekick-primary-btn"
                         data-testid="editCommentButton"
+                        disabled={comment.name !== user.name && !user["authGroups"].includes("Admin")}
                         onClick={() => {
                           setEditComment(!editComment);
                           setEditedCommentTimestamp(comment.timestamp);

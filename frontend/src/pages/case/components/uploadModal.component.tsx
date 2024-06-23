@@ -12,20 +12,16 @@ const uploadDocument = async (document: any, caseId: string, accessToken: string
     const key = res!.data.key;
     console.log(presignedUrl);
     console.log(key);
-    if (presignedUrl) {
-      await documentService.uploadDocument(presignedUrl, document).then(async () => {
-        await documentService
-          .triggerIngestion(accessToken, caseId, key!)
-          .then(async () =>
-            historyService.addHistory(accessToken, caseId, {
-              SK: `${caseId}#${new Date().toISOString()}`,
-              action: CaseHistory.DOCUMENT_UPLOADED,
-              name: user!.name!,
-              timestamp: new Date().toISOString(),
-            })
-          );
-      });
-    }
+    await documentService.uploadDocument(presignedUrl, document).then(async () => {
+      await documentService.triggerIngestion(accessToken, caseId, key!).then(async () =>
+        historyService.addHistory(accessToken, caseId, {
+          SK: `${caseId}#${new Date().toISOString()}`,
+          action: CaseHistory.DOCUMENT_UPLOADED,
+          name: user!.name!,
+          timestamp: new Date().toISOString(),
+        })
+      );
+    });
   });
 };
 
@@ -55,6 +51,7 @@ export const UploadModal = ({
   };
 
   const handleDocumentUpload = (historyService: HistoryService, user: any) => {
+    console.log("Showl 1" + showLoader);
     uploadDocument(uploadFile, id, accessToken, historyService, user).then(() => {
       setShowLoader(true);
       setTimeout(() => {
@@ -73,7 +70,11 @@ export const UploadModal = ({
           <Form.Label>Please upload the file you wish to analyse</Form.Label>
           <Form.Control data-testid="fileInput" type="file" onChange={handleFileUpload} />
         </Form.Group>
-        <div className="text-center mt-3">{showLoader && <Spinner animation="border" />}</div>
+        {showLoader && (
+          <div data-testid="spinner" className="text-center mt-3">
+            <Spinner className="text-center mt-3" animation="border" />
+          </div>
+        )}
         <div className="text-center mt-3">
           <Button data-testid="uploadButton" ref={uploadButtonRef} id="submitUploadBtn" className="sidekick-primary-btn d-none" onClick={() => handleDocumentUpload(historyService, user)}>
             Upload

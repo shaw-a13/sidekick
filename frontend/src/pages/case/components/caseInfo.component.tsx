@@ -30,7 +30,7 @@ export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, caseService,
           Case Information{" "}
           <Button
             className="sidekick-primary-btn"
-            disabled={caseInfo?.assignee !== user.name && !user["authGroups"].includes("Admin")}
+            disabled={caseInfo!.assignee !== user.name && !user["authGroups"].includes("Admin")}
             onClick={() => {
               setEditCaseDetails(!editCaseDetails);
             }}

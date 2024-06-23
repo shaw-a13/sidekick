@@ -5,7 +5,7 @@ import { ExtractionTableProps } from "../interfaces/extractionTableProps.interfa
 import "./ExtractionTable.css";
 
 export const EmptyResults: React.FC = () => (
-  <div className="text-center">
+  <div className="text-center" data-testid="emptyResults">
     <Container className="mt-5">
       <Row>
         <Col className="text-center">
