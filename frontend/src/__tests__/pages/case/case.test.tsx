@@ -739,15 +739,39 @@ describe("Case Component", () => {
         });
 
         const clientNameInput = within(caseEditForm!).getByPlaceholderText("Enter client name");
+        const natureInput = within(caseEditForm!).getByPlaceholderText("Enter nature");
+        const dateInput = within(caseEditForm!).getByDisplayValue("2021-09-01");
+        const statusInput = within(caseEditForm!).getByTestId("statusSelect");
+        const assigneeInput = within(caseEditForm!).getByPlaceholderText("Enter assignee");
+        const clientIdInput = within(caseEditForm!).getByPlaceholderText("Enter client ID");
+
         userEvent.clear(clientNameInput);
         userEvent.type(clientNameInput, "Zac Efron");
+
+        userEvent.clear(natureInput);
+        userEvent.type(natureInput, "Criminal");
+
+        userEvent.clear(dateInput);
+        userEvent.type(dateInput, "2021-09-02");
+
+        userEvent.clear(assigneeInput);
+        userEvent.type(assigneeInput, "Jane Jones");
+
+        userEvent.selectOptions(statusInput, "ACTIVE");
+
+        userEvent.clear(clientIdInput);
+        userEvent.type(clientIdInput, "56789");
 
         const submitButton = within(caseEditForm!).getByText("Submit");
 
         submitButton.click();
 
         await waitFor(() => {
-          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { clientName: "Zac Efron" }, "12345678");
+          expect(mockEditCaseService).toHaveBeenCalledWith(
+            "testToken",
+            { assignee: "Jane Jones", clientId: "56789", clientName: "Zac Efron", date: "2021-09-02", nature: "Criminal", status: "ACTIVE" },
+            "12345678"
+          );
         });
 
         await waitFor(() => {

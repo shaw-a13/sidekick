@@ -115,6 +115,7 @@ export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseServic
         <Form.Label>Status</Form.Label>
         <Form.Select
           name="status"
+          data-testid="statusSelect"
           defaultValue={caseInfo.status}
           onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
             handleCaseEditChange(event, setCaseEditInfo, caseEditInfo);
