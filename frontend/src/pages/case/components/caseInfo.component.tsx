@@ -5,9 +5,19 @@ import { CaseEditProps } from "../../../interfaces/case/caseEditProps.interface"
 import { CaseService } from "../../../services/case.service";
 import { CaseStatus, CaseStatusStyles } from "../../../enums/caseStatus";
 import { useState } from "react";
+import { HistoryService } from "../../../services/history.service";
+import { CaseHistory } from "../../../enums/caseHistory";
 
-const assignCase = async (edit_obj: CaseEditProps, caseService: CaseService, token: string, id: string) => {
-  await caseService.editCase(token, edit_obj, id!).then(() => window.location.reload());
+const assignCase = async (edit_obj: CaseEditProps, caseService: CaseService, historyService: HistoryService, token: string, id: string, userName: string) => {
+  let date = new Date().toISOString();
+  await caseService
+    .editCase(token, edit_obj, id!)
+    .then(async () => await historyService.addHistory(token, id, { SK: `${id}#${date}`, action: CaseHistory.DETAILS_EDITED, name: userName, timestamp: date }))
+    .then(async () => {
+      date = new Date().toISOString();
+      await historyService.addHistory(token, id, { SK: `${id}#${date}`, action: CaseHistory.ASSIGNED, name: userName, timestamp: date });
+    })
+    .then(() => window.location.reload());
 };
 
 export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, caseService, clientService, historyService, accessToken, id }) => {
@@ -53,7 +63,7 @@ export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, caseService,
                   className="sidekick-primary-btn m-2"
                   data-testid="assignToMeBtn"
                   onClick={() => {
-                    assignCase({ assignee: user.name, status: CaseStatus.ACTIVE }, caseService, accessToken, id!);
+                    assignCase({ assignee: user.name, status: CaseStatus.ACTIVE }, caseService, historyService, accessToken, id!, user.name);
                   }}
                 >
                   Assign to me

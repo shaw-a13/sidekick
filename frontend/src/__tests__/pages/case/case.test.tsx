@@ -952,5 +952,45 @@ describe("Case Component", () => {
         });
       });
     });
+
+    describe("When the user clicks the assign to me button", () => {
+      test("the case will be assigned to the user", async () => {
+        render(<Case />);
+
+        let caseInfoSection = screen.queryByTestId("caseInfoSection");
+        await waitFor(() => {
+          caseInfoSection = screen.getByTestId("caseInfoSection");
+          expect(caseInfoSection).toBeInTheDocument();
+        });
+
+        const assignToMeBtn = screen.getByTestId("assignToMeBtn");
+
+        assignToMeBtn.click();
+
+        await waitFor(() => {
+          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { assignee: "John Doe", status: "ACTIVE" }, "12345678");
+        });
+
+        await waitFor(() => {
+          expect(mockAddHistory).toHaveBeenNthCalledWith(1, "testToken", "12345678", {
+            SK: "12345678#2021-09-01T00:00:00.050Z",
+            action: CaseHistory.DETAILS_EDITED,
+            name: "John Doe",
+            timestamp: "2021-09-01T00:00:00.050Z",
+          });
+        });
+
+        expect(mockAddHistory).toHaveBeenNthCalledWith(2, "testToken", "12345678", {
+          SK: "12345678#2021-09-01T00:00:00.050Z",
+          action: CaseHistory.ASSIGNED,
+          name: "John Doe",
+          timestamp: "2021-09-01T00:00:00.050Z",
+        });
+
+        await waitFor(() => {
+          expect(mockReload).toHaveBeenCalled();
+        });
+      });
+    });
   });
 });
