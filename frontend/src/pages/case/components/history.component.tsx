@@ -20,12 +20,12 @@ export const History: React.FC<HistoryProps> = ({ history }) => {
     });
 
   return (
-    <Card className="mt-3">
+    <Card className="mt-3" data-testid="caseHistory">
       <Card.Body>
         <Card.Title>History</Card.Title>
         <Pagination>
           {[...Array(totalPages)].map((_, index) => (
-            <Pagination.Item className="paginationItem" key={index} active={index + 1 === currentPage} onClick={() => handleChangePage(index + 1)}>
+            <Pagination.Item data-testid="historyPaginator" className="paginationItem" key={index} active={index + 1 === currentPage} onClick={() => handleChangePage(index + 1)}>
               {index + 1}
             </Pagination.Item>
           ))}
@@ -33,7 +33,7 @@ export const History: React.FC<HistoryProps> = ({ history }) => {
         {paginatedData.map((history) => {
           const date = new Date(Date.parse(history.timestamp));
           return (
-            <div>
+            <div data-testid="history">
               <hr />
               <Row>
                 <Col>

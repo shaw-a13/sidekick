@@ -7,7 +7,7 @@ export const CaseDescription: React.FC<CaseDescriptionProps> = ({ caseInfo, user
   const [editCaseDescription, setEditCaseDescription] = useState(false);
 
   return (
-    <Card>
+    <Card data-testid="descriptionSection">
       <Card.Body>
         <Card.Title>
           Case Description{" "}

@@ -75,7 +75,7 @@ export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseServic
   const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
 
   return (
-    <Form>
+    <Form data-testid="caseEditForm">
       <Form.Group controlId="formClientName">
         <Form.Label>Client Name</Form.Label>
         <Form.Control
@@ -155,6 +155,7 @@ export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseServic
       </Form.Group>
       <div className="text-center">
         <Button
+          
           className="sidekick-primary-btn m-2"
           onClick={() => {
             submitCaseEdit(CaseHistory.DETAILS_EDITED, caseEditInfo!, caseService, clientService, historyService, accessToken, caseInfo.clientId, id, user.name);

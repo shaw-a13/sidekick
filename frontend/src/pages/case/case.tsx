@@ -65,8 +65,8 @@ const Case = () => {
 
   const updateExtractionData = async (docNo: number) => {
     try {
-      await axios.get<ExtractionResultProps[]>(docApiData!.urls[docNo].processed).then((res) => {
-        setExtractionData(res.data);
+      await documentService.getDocumentExtractionResult(docApiData!.urls[docNo].processed).then((res) => {
+        setExtractionData(res!.data);
         console.log(extractionData);
       });
     } catch (error) {
@@ -78,19 +78,19 @@ const Case = () => {
     getAccessTokenSilently().then(async (token: string) => {
       setAccessToken(token!);
       await getCase(token!).then(async (res) => {
-        setCaseInfo(res?.data);
+        setCaseInfo(res!.data);
         if (res)
           await getClientInfo(token!, res?.data.clientId).then((res) => {
             setClientInfo(res?.data);
           });
       });
       await documentService.getDocuments(token!, id!).then(async (res) => {
-        setDocApiData(res?.data);
-        setDocumentData(res?.data.urls[docNo].original!);
+        setDocApiData(res!.data);
+        setDocumentData(res!.data.urls[docNo].original!);
         try {
-          await axios.get<ExtractionResultProps[]>(res?.data.urls[docNo].processed!).then((res) => {
-            setExtractionData(res.data);
-            console.log(res.data);
+          await documentService.getDocumentExtractionResult(res!.data.urls[docNo].processed!).then((res) => {
+            setExtractionData(res!.data);
+            console.log(res!.data);
           });
         } catch (error) {
           setExtractionData(undefined);
@@ -145,7 +145,7 @@ const Case = () => {
                   </Row>
                   <Row>
                     <Col>
-                      <Card>
+                      <Card data-testid="documentExtractions">
                         <Card.Body>
                           <Card.Title>Document Extractions</Card.Title>
                           {extractionData && <ExtractionTable extractionData={extractionData} />}

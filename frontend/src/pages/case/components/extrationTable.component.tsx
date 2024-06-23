@@ -36,13 +36,13 @@ export const ExtractionTable: React.FC<ExtractionTableProps> = ({ extractionData
     <>
       <Pagination>
         {[...Array(totalPages)].map((_, index) => (
-          <Pagination.Item className="paginationItem" key={index} active={index + 1 === currentPage} onClick={() => handleChangePage(index + 1)}>
+          <Pagination.Item data-testid="extractionPaginator" className="paginationItem" key={index} active={index + 1 === currentPage} onClick={() => handleChangePage(index + 1)}>
             {index + 1}
           </Pagination.Item>
         ))}
       </Pagination>
-      <Table striped bordered hover>
-        <thead>
+      <Table striped bordered hover data-testid="extractionTable">
+        <thead data-testid="extractionTableHeading">
           <tr>
             <th>Key</th>
             <th>Value</th>
@@ -53,7 +53,7 @@ export const ExtractionTable: React.FC<ExtractionTableProps> = ({ extractionData
         </thead>
         <tbody>
           {paginatedData.map((result: ExtractionResultProps) => (
-            <tr>
+            <tr data-testid="extractionResult">
               <td>{result.key}</td>
               <td>{result.value}</td>
               <td>{result.locations.pageNumber}</td>

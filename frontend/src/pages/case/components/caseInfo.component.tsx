@@ -14,7 +14,7 @@ export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, caseService,
   const [editCaseDetails, setEditCaseDetails] = useState(false);
 
   return (
-    <Card>
+    <Card data-testid="caseInfoSection">
       <Card.Body>
         <Card.Title>
           Case Information{" "}
@@ -51,6 +51,7 @@ export const CaseInfo: React.FC<CaseInfoProps> = ({ caseInfo, user, caseService,
               <div className="text-center">
                 <Button
                   className="sidekick-primary-btn m-2"
+                  data-testid="assignToMeBtn"
                   onClick={() => {
                     assignCase({ assignee: user.name, status: CaseStatus.ACTIVE }, caseService, accessToken, id!);
                   }}

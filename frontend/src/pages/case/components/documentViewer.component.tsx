@@ -7,6 +7,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ caseInfo, user, 
       <Card.Title>
         Case Documents{" "}
         <Button
+        data-testid="documentUploadBtn"
           className="sidekick-primary-btn"
           disabled={caseInfo?.assignee !== user.name && caseInfo?.clientName !== user.name && !user["authGroups"].includes("Admin")}
           onClick={() => {
@@ -20,6 +21,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ caseInfo, user, 
       <div className="mb-2">
         {docApiData!.urls.map((doc: any, index: number) => (
           <Button
+            data-testid="documentViewerBtn"
             className="sidekick-primary-btn rounded-circle m-2"
             onClick={() => {
               updateExtractionData(index);

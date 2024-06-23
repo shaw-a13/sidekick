@@ -8,17 +8,14 @@ const uploadDocument = async (document: any, caseId: string, accessToken: string
   const documentService = new DocumentService();
 
   documentService.getPresignedUrl(accessToken, caseId).then(async (res) => {
-    const presignedUrl = res?.data.presignedUrl;
-    const key = res?.data.key;
+    const presignedUrl = res!.data.presignedUrl;
+    const key = res!.data.key;
     console.log(presignedUrl);
     console.log(key);
     if (presignedUrl) {
       await documentService.uploadDocument(presignedUrl, document).then(async () => {
         await documentService
           .triggerIngestion(accessToken, caseId, key!)
-          .then(async (ingeRes) => {
-            console.log(`IngesRes: ${ingeRes?.data.executionArn}`);
-          })
           .then(async () =>
             historyService.addHistory(accessToken, caseId, {
               SK: `${caseId}#${new Date().toISOString()}`,
@@ -67,18 +64,18 @@ export const UploadModal = ({
   };
 
   return (
-    <Modal show={show} onHide={() => setShow(false)}>
+    <Modal show={show} onHide={() => setShow(false)} data-testid="documentUploadModal">
       <Modal.Header closeButton>
         <Modal.Title>Upload Document</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form.Group controlId="formFileLg" className="mb-3">
           <Form.Label>Please upload the file you wish to analyse</Form.Label>
-          <Form.Control type="file" onChange={handleFileUpload} />
+          <Form.Control data-testid="fileInput" type="file" onChange={handleFileUpload} />
         </Form.Group>
         <div className="text-center mt-3">{showLoader && <Spinner animation="border" />}</div>
         <div className="text-center mt-3">
-          <Button ref={uploadButtonRef} id="submitUploadBtn" className="sidekick-primary-btn d-none" onClick={() => handleDocumentUpload(historyService, user)}>
+          <Button data-testid="uploadButton" ref={uploadButtonRef} id="submitUploadBtn" className="sidekick-primary-btn d-none" onClick={() => handleDocumentUpload(historyService, user)}>
             Upload
           </Button>
         </div>

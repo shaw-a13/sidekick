@@ -44,7 +44,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, user, comm
   const [commentEdits, setCommentEdits] = useState<CommentEditProps>({} as CommentEditProps);
 
   return (
-    <Card>
+    <Card data-testid="commentsSection">
       <Card.Body>
         <Card.Title>
           Comments{" "}
@@ -120,7 +120,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, user, comm
             console.log(Date.parse(comment.timestamp));
             const date = new Date(Date.parse(comment.timestamp));
             return (
-              <div>
+              <div data-testid="comment">
                 <hr />
 
                 <Row>

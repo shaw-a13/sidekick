@@ -39,7 +39,7 @@ export const CaseInfoPaginator: React.FC<CaseInfoPaginatorProps> = ({ caseInfo, 
     <div className="mt-3">
       <Pagination>
         {pages.map((page, index) => (
-          <Pagination.Item className="paginationItem" key={index} active={index === currentPage} onClick={() => handleChangePage(index)}>
+          <Pagination.Item data-testid="caseInfoPaginator" className="paginationItem" key={index} active={index === currentPage} onClick={() => handleChangePage(index)}>
             {page.name}
           </Pagination.Item>
         ))}
