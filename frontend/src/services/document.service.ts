@@ -1,6 +1,8 @@
 import axios from "axios";
 import { BaseService } from "./base.service";
 import { DocumentResultResponse } from "../interfaces/document/documentResultResponse.interface";
+import { url } from "inspector";
+import { ExtractionResultProps } from "../pages/case/interfaces/extractionResultProps.interface";
 
 export interface PresignedUrlResponse {
   presignedUrl: string;
@@ -45,6 +47,15 @@ export class DocumentService extends BaseService {
           Authorization: `Bearer ${token}`,
         },
       });
+    } catch (error) {
+      console.log("error");
+      console.error(error);
+    }
+  }
+
+  public async getDocumentExtractionResult(url: string) {
+    try {
+      return await axios.get<ExtractionResultProps[]>(url);
     } catch (error) {
       console.log("error");
       console.error(error);

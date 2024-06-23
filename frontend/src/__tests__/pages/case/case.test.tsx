@@ -22,6 +22,8 @@ let mockGetDocumentExtractionResult: jest.SpyInstance;
 let mockGetComments: jest.SpyInstance;
 let mockGetHistory: jest.SpyInstance;
 let mockAddHistory: jest.SpyInstance;
+let mockEditCaseService: jest.SpyInstance;
+let mockEditClientService: jest.SpyInstance;
 const mockTime = new Date("2021-09-01T00:00:00.000Z");
 
 const mockLoginWithRedirect = jest.fn();
@@ -213,6 +215,34 @@ describe("Case Component", () => {
     });
 
     mockAddHistory = jest.spyOn(HistoryService.prototype, "addHistory").mockImplementation(() => {
+      return new Promise<AxiosResponse>((resolve) => {
+        resolve({
+          data: {},
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config: {
+            headers: new AxiosHeaders(),
+          },
+        });
+      });
+    });
+
+    mockEditCaseService = jest.spyOn(CaseService.prototype, "editCase").mockImplementation(() => {
+      return new Promise<AxiosResponse>((resolve) => {
+        resolve({
+          data: {},
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config: {
+            headers: new AxiosHeaders(),
+          },
+        });
+      });
+    });
+
+    mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
       return new Promise<AxiosResponse>((resolve) => {
         resolve({
           data: {},
@@ -608,34 +638,6 @@ describe("Case Component", () => {
       });
 
       test("the case details will be updated when the submit button is clicked", async () => {
-        const mockEditCaseService = jest.spyOn(CaseService.prototype, "editCase").mockImplementation(() => {
-          return new Promise<AxiosResponse>((resolve) => {
-            resolve({
-              data: {},
-              status: 200,
-              statusText: "OK",
-              headers: {},
-              config: {
-                headers: new AxiosHeaders(),
-              },
-            });
-          });
-        });
-
-        const mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
-          return new Promise<AxiosResponse>((resolve) => {
-            resolve({
-              data: {},
-              status: 200,
-              statusText: "OK",
-              headers: {},
-              config: {
-                headers: new AxiosHeaders(),
-              },
-            });
-          });
-        });
-
         render(<Case />);
 
         let caseInfoSection = screen.queryByTestId("caseInfoSection");
@@ -676,6 +678,272 @@ describe("Case Component", () => {
             action: CaseHistory.DETAILS_EDITED,
             name: "John Doe",
             timestamp: "2021-09-01T00:00:00.100Z",
+          });
+        });
+
+        await waitFor(() => {
+          expect(mockReload).toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe("When the user clicks the edit client details button", () => {
+      test("the client details will be editable", async () => {
+        render(<Case />);
+
+        let caseInfoPaginator = screen.queryAllByTestId("caseInfoPaginator");
+        await waitFor(() => {
+          caseInfoPaginator = screen.getAllByTestId("caseInfoPaginator");
+          expect(caseInfoPaginator).toHaveLength(2);
+        });
+        caseInfoPaginator[1].click();
+
+        let clientInfoSection = screen.queryByTestId("clientInfoSection");
+        await waitFor(() => {
+          clientInfoSection = screen.getByTestId("clientInfoSection");
+          expect(clientInfoSection).toBeInTheDocument();
+        });
+
+        const editButton = within(clientInfoSection!).getByText("Edit");
+
+        editButton.click();
+
+        let clientEditForm = screen.queryByTestId("clientEditForm");
+        await waitFor(() => {
+          clientEditForm = screen.getByTestId("clientEditForm");
+          expect(clientEditForm).toBeInTheDocument();
+        });
+
+        const firstNameInput = within(clientEditForm!).getByPlaceholderText("Enter first name");
+        const lastNameInput = within(clientEditForm!).getByPlaceholderText("Enter last name");
+        const addressLine1Input = within(clientEditForm!).getByPlaceholderText("Enter address line 1");
+        const addressLine2Input = within(clientEditForm!).getByPlaceholderText("Enter address line 2");
+        const cityInput = within(clientEditForm!).getByPlaceholderText("Enter city");
+        const countyInput = within(clientEditForm!).getByPlaceholderText("Enter county");
+        const postcodeInput = within(clientEditForm!).getByPlaceholderText("Enter postcode");
+        const emailInput = within(clientEditForm!).getByPlaceholderText("Enter email");
+        const phoneNumberInput = within(clientEditForm!).getByPlaceholderText("Enter phone number");
+
+        expect(firstNameInput).toBeInTheDocument();
+        expect(lastNameInput).toBeInTheDocument();
+        expect(addressLine1Input).toBeInTheDocument();
+        expect(addressLine2Input).toBeInTheDocument();
+        expect(cityInput).toBeInTheDocument();
+        expect(countyInput).toBeInTheDocument();
+        expect(postcodeInput).toBeInTheDocument();
+        expect(phoneNumberInput).toBeInTheDocument();
+        expect(emailInput).toBeInTheDocument();
+      });
+
+      test("the client details (first name only) will be updated when the submit button is clicked", async () => {
+        const mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {},
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        });
+
+        render(<Case />);
+
+        let caseInfoPaginator = screen.queryAllByTestId("caseInfoPaginator");
+        await waitFor(() => {
+          caseInfoPaginator = screen.getAllByTestId("caseInfoPaginator");
+          expect(caseInfoPaginator).toHaveLength(2);
+        });
+        caseInfoPaginator[1].click();
+
+        let clientInfoSection = screen.queryByTestId("clientInfoSection");
+        await waitFor(() => {
+          clientInfoSection = screen.getByTestId("clientInfoSection");
+          expect(clientInfoSection).toBeInTheDocument();
+        });
+
+        const editButton = within(clientInfoSection!).getByText("Edit");
+
+        editButton.click();
+
+        let clientEditForm = screen.queryByTestId("clientEditForm");
+        await waitFor(() => {
+          clientEditForm = screen.getByTestId("clientEditForm");
+          expect(clientEditForm).toBeInTheDocument();
+        });
+
+        const firstNameInput = within(clientEditForm!).getByPlaceholderText("Enter first name");
+
+        userEvent.clear(firstNameInput);
+        userEvent.type(firstNameInput, "Zac");
+
+        const submitButton = within(clientEditForm!).getByText("Submit");
+
+        submitButton.click();
+
+        await waitFor(() => {
+          expect(mockEditClientService).toHaveBeenCalledWith("testToken", { firstName: "Zac" }, "56789");
+        });
+
+        await waitFor(() => {
+          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { clientName: "Zac Doe" }, "12345678");
+        });
+
+        await waitFor(() => {
+          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
+            SK: "12345678#2021-09-01T00:00:00.150Z",
+            action: CaseHistory.CLIENT_EDITED,
+            name: "John Doe",
+            timestamp: "2021-09-01T00:00:00.150Z",
+          });
+        });
+
+        await waitFor(() => {
+          expect(mockReload).toHaveBeenCalled();
+        });
+      });
+
+      test("the client details (last name only) will be updated when the submit button is clicked", async () => {
+        const mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {},
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        });
+
+        render(<Case />);
+
+        let caseInfoPaginator = screen.queryAllByTestId("caseInfoPaginator");
+        await waitFor(() => {
+          caseInfoPaginator = screen.getAllByTestId("caseInfoPaginator");
+          expect(caseInfoPaginator).toHaveLength(2);
+        });
+        caseInfoPaginator[1].click();
+
+        let clientInfoSection = screen.queryByTestId("clientInfoSection");
+        await waitFor(() => {
+          clientInfoSection = screen.getByTestId("clientInfoSection");
+          expect(clientInfoSection).toBeInTheDocument();
+        });
+
+        const editButton = within(clientInfoSection!).getByText("Edit");
+
+        editButton.click();
+
+        let clientEditForm = screen.queryByTestId("clientEditForm");
+        await waitFor(() => {
+          clientEditForm = screen.getByTestId("clientEditForm");
+          expect(clientEditForm).toBeInTheDocument();
+        });
+
+        const lastNameInput = within(clientEditForm!).getByPlaceholderText("Enter last name");
+
+        userEvent.clear(lastNameInput);
+        userEvent.type(lastNameInput, "Efron");
+
+        const submitButton = within(clientEditForm!).getByText("Submit");
+
+        submitButton.click();
+
+        await waitFor(() => {
+          expect(mockEditClientService).toHaveBeenCalledWith("testToken", { lastName: "Efron" }, "56789");
+        });
+
+        await waitFor(() => {
+          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { clientName: "John Efron" }, "12345678");
+        });
+
+        await waitFor(() => {
+          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
+            SK: "12345678#2021-09-01T00:00:00.150Z",
+            action: CaseHistory.CLIENT_EDITED,
+            name: "John Doe",
+            timestamp: "2021-09-01T00:00:00.150Z",
+          });
+        });
+
+        await waitFor(() => {
+          expect(mockReload).toHaveBeenCalled();
+        });
+      });
+
+      test("the client details (first and last name) will be updated when the submit button is clicked", async () => {
+        const mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {},
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        });
+
+        render(<Case />);
+
+        let caseInfoPaginator = screen.queryAllByTestId("caseInfoPaginator");
+        await waitFor(() => {
+          caseInfoPaginator = screen.getAllByTestId("caseInfoPaginator");
+          expect(caseInfoPaginator).toHaveLength(2);
+        });
+        caseInfoPaginator[1].click();
+
+        let clientInfoSection = screen.queryByTestId("clientInfoSection");
+        await waitFor(() => {
+          clientInfoSection = screen.getByTestId("clientInfoSection");
+          expect(clientInfoSection).toBeInTheDocument();
+        });
+
+        const editButton = within(clientInfoSection!).getByText("Edit");
+
+        editButton.click();
+
+        let clientEditForm = screen.queryByTestId("clientEditForm");
+        await waitFor(() => {
+          clientEditForm = screen.getByTestId("clientEditForm");
+          expect(clientEditForm).toBeInTheDocument();
+        });
+
+        const firstNameInput = within(clientEditForm!).getByPlaceholderText("Enter first name");
+        const lastNameInput = within(clientEditForm!).getByPlaceholderText("Enter last name");
+
+        userEvent.clear(firstNameInput);
+        userEvent.type(firstNameInput, "Zac");
+
+        userEvent.clear(lastNameInput);
+        userEvent.type(lastNameInput, "Efron");
+
+        const submitButton = within(clientEditForm!).getByText("Submit");
+
+        submitButton.click();
+
+        await waitFor(() => {
+          expect(mockEditClientService).toHaveBeenCalledWith("testToken", { firstName: "Zac", lastName: "Efron" }, "56789");
+        });
+
+        await waitFor(() => {
+          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { clientName: "Zac Efron" }, "12345678");
+        });
+
+        await waitFor(() => {
+          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
+            SK: "12345678#2021-09-01T00:00:00.150Z",
+            action: CaseHistory.CLIENT_EDITED,
+            name: "John Doe",
+            timestamp: "2021-09-01T00:00:00.150Z",
           });
         });
 

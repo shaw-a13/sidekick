@@ -50,7 +50,7 @@ export const ClientEditForm: React.FC<ClientEditFormProps> = ({ clientInfo, case
   };
 
   return (
-    <Form>
+    <Form data-testid="clientEditForm">
       <Form.Group controlId="formFirstName">
         <Form.Label>First Name</Form.Label>
         <Form.Control type="text" name="firstName" placeholder="Enter first name" defaultValue={clientInfo.firstName} onChange={handleClientEditChange} />

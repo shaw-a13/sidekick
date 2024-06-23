@@ -6,7 +6,7 @@ import { Card, Button, Row, Col } from "react-bootstrap";
 export const ClientInfo: React.FC<ClientInfoProps> = ({ clientInfo, caseService, clientService, historyService, accessToken, caseId, assignee, user }) => {
   const [editClientInfo, setEditClientInfo] = useState(false);
   return (
-    <Card>
+    <Card data-testid="clientInfoSection">
       <Card.Body>
         <Card.Title>
           Client Information{" "}
