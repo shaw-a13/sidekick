@@ -9,7 +9,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ caseInfo, user, 
         <Button
         data-testid="documentUploadBtn"
           className="sidekick-primary-btn"
-          disabled={caseInfo?.assignee !== user.name && caseInfo?.clientName !== user.name && !user["authGroups"].includes("Admin")}
+          disabled={caseInfo!.assignee !== user.name && caseInfo!.clientName !== user.name && !user["authGroups"].includes("Admin")}
           onClick={() => {
             setUploadModal(true);
           }}

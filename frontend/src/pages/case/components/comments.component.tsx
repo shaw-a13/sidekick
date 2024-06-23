@@ -151,6 +151,7 @@ export const Comments: React.FC<CommentsProps> = ({ comments, caseId, user, comm
                     <Card.Subtitle className="mb-2">
                       <Button
                         className="btn-danger"
+                        data-testid="deleteCommentButton"
                         disabled={comment.name !== user.name && !user["authGroups"].includes("Admin")}
                         onClick={() => {
                           submitCommentDelete(commentService, historyService, accessToken, caseId, comment.timestamp, user.name);

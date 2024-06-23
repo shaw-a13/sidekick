@@ -26,6 +26,7 @@ let mockEditCaseService: jest.SpyInstance;
 let mockEditClientService: jest.SpyInstance;
 let mockAddComment: jest.SpyInstance;
 let mockEditComment: jest.SpyInstance;
+let mockDeleteComment: jest.SpyInstance;
 const mockTime = new Date("2021-09-01T00:00:00.000Z");
 
 const mockLoginWithRedirect = jest.fn();
@@ -277,6 +278,20 @@ describe("Case Component", () => {
     });
 
     mockEditComment = jest.spyOn(CommentService.prototype, "editComment").mockImplementation(() => {
+      return new Promise<AxiosResponse>((resolve) => {
+        resolve({
+          data: {},
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config: {
+            headers: new AxiosHeaders(),
+          },
+        });
+      });
+    });
+
+    mockDeleteComment = jest.spyOn(CommentService.prototype, "deleteComment").mockImplementation(() => {
       return new Promise<AxiosResponse>((resolve) => {
         resolve({
           data: {},
@@ -1124,5 +1139,169 @@ describe("Case Component", () => {
         });
       });
     });
+    describe("When the user clicks the delete comment button", () => {
+      test("the comment will be deleted", async () => {
+        render(<Case />);
+
+        let commentsSection = screen.queryByTestId("commentsSection");
+        await waitFor(() => {
+          commentsSection = screen.getByTestId("commentsSection");
+          expect(commentsSection).toBeInTheDocument();
+        });
+
+        const deleteCommentBtn = screen.getAllByTestId("deleteCommentButton");
+
+        deleteCommentBtn[0].click();
+
+        await waitFor(() => {
+          expect(mockDeleteComment).toHaveBeenCalledWith("testToken", "12345678", "2021-09-01T00:00:02.000Z");
+        });
+
+        await waitFor(() => {
+          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
+            SK: "12345678#2021-09-01T00:00:00.050Z",
+            action: CaseHistory.COMMENT_DELETED,
+            name: "John Doe",
+            timestamp: "2021-09-01T00:00:00.050Z",
+          });
+        });
+
+        await waitFor(() => {
+          expect(mockReload).toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe("When the user clicks the edit description button", () => {
+      test("the description will be editable", async () => {
+        render(<Case />);
+
+        let descriptionSection = screen.queryByTestId("descriptionSection");
+        await waitFor(() => {
+          descriptionSection = screen.getByTestId("descriptionSection");
+          expect(descriptionSection).toBeInTheDocument();
+        });
+
+        const editButton = within(descriptionSection!).getByText("Edit");
+
+        editButton.click();
+
+        let descriptionEditForm = screen.queryByRole("descriptionEditForm");
+        await waitFor(() => {
+          descriptionEditForm = screen.getByTestId("descriptionEditForm");
+          expect(descriptionEditForm).toBeInTheDocument();
+        });
+
+        const descriptionInput = within(descriptionEditForm!).getByRole("textbox");
+
+        expect(descriptionInput).toBeInTheDocument();
+      });
+
+      test("the description will be updated when the submit button is clicked", async () => {
+        render(<Case />);
+
+        let descriptionSection = screen.queryByTestId("descriptionSection");
+        await waitFor(() => {
+          descriptionSection = screen.getByTestId("descriptionSection");
+          expect(descriptionSection).toBeInTheDocument();
+        });
+
+        const editButton = within(descriptionSection!).getByText("Edit");
+
+        editButton.click();
+
+        let descriptionEditForm = screen.queryByRole("descriptionEditForm");
+        await waitFor(() => {
+          descriptionEditForm = screen.getByTestId("descriptionEditForm");
+          expect(descriptionEditForm).toBeInTheDocument();
+        });
+
+        const descriptionInput = within(descriptionEditForm!).getByRole("textbox");
+        userEvent.clear(descriptionInput);
+        userEvent.type(descriptionInput, "Edited Description");
+
+        const submitButton = within(descriptionEditForm!).getByText("Submit");
+
+        submitButton.click();
+
+        await waitFor(() => {
+          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { description: "Edited Description" }, "12345678");
+        });
+
+        await waitFor(() => {
+          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
+            SK: "12345678#2021-09-01T00:00:00.100Z",
+            action: CaseHistory.DESCRIPTION_EDITED,
+            name: "John Doe",
+            timestamp: "2021-09-01T00:00:00.100Z",
+          });
+        });
+
+        await waitFor(() => {
+          expect(mockReload).toHaveBeenCalled();
+        });
+      });
+    })
   });
+
+  describe("When the user is authenticated but not assigned to the case", () => {
+    beforeEach(() => {
+      (useAuth0 as jest.Mock).mockReturnValue({
+        user: { authGroups: ["worker"], picture: "https://example.com", name: "Sam Jones", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
+        loginWithRedirect: mockLoginWithRedirect,
+        logout: mockLogout,
+        isAuthenticated: true,
+        getAccessTokenSilently: jest.fn().mockResolvedValue("testToken"),
+      });
+    });
+
+    mockGetSingleCase = jest.spyOn(CaseService.prototype, "getSingleCase").mockImplementation(() => {
+      return new Promise<AxiosResponse>((resolve) => {
+        resolve({
+          data: {
+            SK: "12345678",
+            clientId: "56789",
+            clientName: "John Doe",
+            status: "ACTIVE",
+            description: "Test Description",
+            nature: "Property",
+            date: "2021-09-01",
+            assignee: "Jack Smith",
+          },
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config: {
+            headers: new AxiosHeaders(),
+          },
+        });
+      });
+    });
+
+    test("the user will not be able to upload a document", async () => {
+      
+    });
+
+    test("the user will not be able to edit the case details", async () => {
+    });
+
+    test("the user will not be able to edit the client details", async () => {
+    });
+
+    test("the user will not be able to assign the case to themselves", async () => {
+    });
+
+    test("the user will not be able to add a comment", async () => {
+    });
+
+    test("the user will not be able to edit a comment", async () => {
+    });
+
+    test("the user will not be able to delete a comment", async () => {
+    });
+
+    test("the user will not be able to edit the description", async () => {
+    });
+    
+  })
 });

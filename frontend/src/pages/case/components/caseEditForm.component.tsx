@@ -43,7 +43,7 @@ export const CaseDescEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseSe
   const [caseEditInfo, setCaseEditInfo] = useState<CaseEditProps>();
 
   return (
-    <Form>
+    <Form data-testid="descriptionEditForm">
       <Form.Group controlId="formClientName">
         <Form.Control
           as="textarea"
@@ -155,7 +155,7 @@ export const CaseEditForm: React.FC<CaseEditFormProps> = ({ caseInfo, caseServic
       </Form.Group>
       <div className="text-center">
         <Button
-          
+
           className="sidekick-primary-btn m-2"
           onClick={() => {
             submitCaseEdit(CaseHistory.DETAILS_EDITED, caseEditInfo!, caseService, clientService, historyService, accessToken, caseInfo.clientId, id, user.name);
