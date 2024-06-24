@@ -2,7 +2,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Case from "../../../pages/case/case";
 import { CaseService } from "../../../services/case.service";
-import { AxiosHeaders, AxiosResponse } from "axios";
+import axios, { AxiosHeaders, AxiosResponse } from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { ClientService } from "../../../services/client.service";
 import { DocumentService, IngestionResponse, PresignedUrlResponse } from "../../../services/document.service";
@@ -10,24 +10,14 @@ import { getMockExtractionResult } from "./mockExtractionResult";
 import { CommentService } from "../../../services/comment.service";
 import { HistoryService } from "../../../services/history.service";
 import { CaseHistory } from "../../../enums/caseHistory";
-import { wait } from "@testing-library/user-event/dist/utils";
 import userEvent from "@testing-library/user-event";
-import exp from "constants";
 
 jest.mock("@auth0/auth0-react");
 
-let mockGetSingleCase: jest.SpyInstance;
-let mockGetSingleClient: jest.SpyInstance;
-let mockGetDocuments: jest.SpyInstance;
-let mockGetDocumentExtractionResult: jest.SpyInstance;
-let mockGetComments: jest.SpyInstance;
-let mockGetHistory: jest.SpyInstance;
-let mockAddHistory: jest.SpyInstance;
-let mockEditCaseService: jest.SpyInstance;
-let mockEditClientService: jest.SpyInstance;
-let mockAddComment: jest.SpyInstance;
-let mockEditComment: jest.SpyInstance;
-let mockDeleteComment: jest.SpyInstance;
+let mockAxiosGet: jest.SpyInstance;
+let mockAxiosPost: jest.SpyInstance;
+let mockAxiosPut: jest.SpyInstance;
+let mockAxiosDelete: jest.SpyInstance;
 const mockTime = new Date("2021-09-01T00:00:00.000Z");
 
 const mockLoginWithRedirect = jest.fn();
@@ -59,170 +49,216 @@ describe("Case Component", () => {
       getAccessTokenSilently: jest.fn().mockResolvedValue("testToken"),
     });
 
-    mockGetSingleCase = jest.spyOn(CaseService.prototype, "getSingleCase").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {
-            SK: "12345678",
-            clientId: "56789",
-            clientName: "John Doe",
-            status: "OPEN",
-            description: "Test Description",
-            nature: "Property",
-            date: "2021-09-01",
-            assignee: "",
-          },
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
+    mockAxiosGet = jest.spyOn(axios, "get").mockImplementation((url: string) => {
+      if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678") {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: {
+              SK: "12345678",
+              clientId: "56789",
+              clientName: "John Doe",
+              status: "OPEN",
+              description: "Test Description",
+              nature: "Property",
+              date: "2021-09-01",
+              assignee: "",
+            },
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
         });
-      });
-    });
-    mockGetSingleClient = jest.spyOn(ClientService.prototype, "getSingleClient").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {
-            SK: "56789",
-            firstName: "John",
-            lastName: "Doe",
-            addressLine1: "123 Test St",
-            addressLine2: "",
-            postcode: "12345",
-            county: "Test County",
-            city: "Test City",
-            phoneNumber: "1234567890",
-            email: "john@test.com",
-          },
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
+      } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/upload/12345678") {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: { presignedUrl: "https://testpresignedurl.com", key: "testKey" },
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
         });
-      });
-    });
-    mockGetDocuments = jest.spyOn(DocumentService.prototype, "getDocuments").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {
-            urls: [
+      } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789") {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: {
+              SK: "56789",
+              firstName: "John",
+              lastName: "Doe",
+              addressLine1: "123 Test St",
+              addressLine2: "",
+              postcode: "12345",
+              county: "Test County",
+              city: "Test City",
+              phoneNumber: "1234567890",
+              email: "john@test.com",
+            },
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
+        });
+      } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/download/12345678") {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: {
+              urls: [
+                {
+                  original: "https://example.com/original1234567.pdf",
+                  processed: "https://example.com/processed12345667.json",
+                },
+                {
+                  original: "https://example.com/original874747383.pdf",
+                  processed: "https://example.com/processed874747383.json",
+                },
+              ],
+            },
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
+        });
+      } else if (url.includes("processed")) {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: getMockExtractionResult(),
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
+        });
+      } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678") {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: [
               {
-                original: "https://example.com/original1234567.pdf",
-                processed: "https://example.com/processed12345667.json",
+                SK: "123456",
+                name: "John Doe",
+                text: "Test Comment 1",
+                timestamp: "2021-09-01T00:00:02.000Z",
               },
               {
-                original: "https://example.com/original874747383.pdf",
-                processed: "https://example.com/processed874747383.json",
+                SK: "1234567",
+                name: "Jane Doe",
+                text: "Test Comment 2",
+                timestamp: "2021-09-01T00:00:01.000Z",
+              },
+              {
+                SK: "332221",
+                name: "Jack Jones",
+                text: "Test Comment 3",
+                timestamp: "2021-09-01T00:00:02.000Z",
+              },
+              {
+                SK: "33399",
+                name: "Jill Smith",
+                text: "Test Comment 4",
+                timestamp: "2021-09-01T00:00:01.000Z",
               },
             ],
-          },
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
         });
-      });
+      } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678") {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: [
+              {
+                SK: "123456",
+                name: "John Doe",
+                action: CaseHistory.OPENED,
+                timestamp: "2021-09-01T00:00:00.100Z",
+              },
+              {
+                SK: "1234567",
+                name: "Jane Doe",
+                action: CaseHistory.DOCUMENT_UPLOADED,
+                timestamp: "2021-09-01T00:00:00.020Z",
+              },
+              {
+                SK: "332221",
+                name: "Jack Jones",
+                action: CaseHistory.COMMENT_ADDED,
+                timestamp: "2021-09-01T00:00:00.010Z",
+              },
+              {
+                SK: "33399",
+                name: "Jill Smith",
+                action: CaseHistory.COMMENT_ADDED,
+                timestamp: "2021-09-01T00:00:00.001Z",
+              },
+            ],
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
+        });
+      } else {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: {},
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
+        });
+      }
     });
 
-    mockGetDocumentExtractionResult = jest.spyOn(DocumentService.prototype, "getDocumentExtractionResult").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: getMockExtractionResult(),
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
+    mockAxiosPost = jest.spyOn(axios, "post").mockImplementation((url: string) => {
+      if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678") {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: {},
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
         });
-      });
+      } else {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: {},
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
+        });
+      }
     });
 
-    mockGetComments = jest.spyOn(CommentService.prototype, "getAllComments").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: [
-            {
-              SK: "123456",
-              name: "John Doe",
-              text: "Test Comment 1",
-              timestamp: "2021-09-01T00:00:02.000Z",
-            },
-            {
-              SK: "1234567",
-              name: "Jane Doe",
-              text: "Test Comment 2",
-              timestamp: "2021-09-01T00:00:01.000Z",
-            },
-            {
-              SK: "332221",
-              name: "Jack Jones",
-              text: "Test Comment 3",
-              timestamp: "2021-09-01T00:00:02.000Z",
-            },
-            {
-              SK: "33399",
-              name: "Jill Smith",
-              text: "Test Comment 4",
-              timestamp: "2021-09-01T00:00:01.000Z",
-            },
-          ],
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
-      });
-    });
-
-    mockGetHistory = jest.spyOn(HistoryService.prototype, "getAllHistory").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: [
-            {
-              SK: "123456",
-              name: "John Doe",
-              action: CaseHistory.OPENED,
-              timestamp: "2021-09-01T00:00:00.100Z",
-            },
-            {
-              SK: "1234567",
-              name: "Jane Doe",
-              action: CaseHistory.DOCUMENT_UPLOADED,
-              timestamp: "2021-09-01T00:00:00.020Z",
-            },
-            {
-              SK: "332221",
-              name: "Jack Jones",
-              action: CaseHistory.COMMENT_ADDED,
-              timestamp: "2021-09-01T00:00:00.010Z",
-            },
-            {
-              SK: "33399",
-              name: "Jill Smith",
-              action: CaseHistory.COMMENT_ADDED,
-              timestamp: "2021-09-01T00:00:00.001Z",
-            },
-          ],
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
-      });
-    });
-
-    mockAddHistory = jest.spyOn(HistoryService.prototype, "addHistory").mockImplementation(() => {
+    mockAxiosPut = jest.spyOn(axios, "put").mockImplementation(() => {
       return new Promise<AxiosResponse>((resolve) => {
         resolve({
           data: {},
@@ -236,63 +272,7 @@ describe("Case Component", () => {
       });
     });
 
-    mockEditCaseService = jest.spyOn(CaseService.prototype, "editCase").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {},
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
-      });
-    });
-
-    mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {},
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
-      });
-    });
-
-    mockAddComment = jest.spyOn(CommentService.prototype, "addComment").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {},
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
-      });
-    });
-
-    mockEditComment = jest.spyOn(CommentService.prototype, "editComment").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {},
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
-      });
-    });
-
-    mockDeleteComment = jest.spyOn(CommentService.prototype, "deleteComment").mockImplementation(() => {
+    mockAxiosDelete = jest.spyOn(axios, "delete").mockImplementation(() => {
       return new Promise<AxiosResponse>((resolve) => {
         resolve({
           data: {},
@@ -590,40 +570,6 @@ describe("Case Component", () => {
       });
 
       test("the document will be uploaded when a valid file is uploaded", async () => {
-        const mockDocumentPresignedUrlService = jest.spyOn(DocumentService.prototype, "getPresignedUrl").mockImplementation(() => {
-          return new Promise<AxiosResponse<PresignedUrlResponse>>((resolve) => {
-            resolve({
-              data: { presignedUrl: "https://testpresignedurl.com", key: "testKey" },
-              status: 200,
-              statusText: "OK",
-              headers: {},
-              config: {
-                headers: new AxiosHeaders(),
-              },
-            });
-          });
-        });
-
-        const mockDocumentUploadService = jest.spyOn(DocumentService.prototype, "uploadDocument").mockImplementation(() => {
-          return new Promise((resolve) => {
-            resolve();
-          });
-        });
-
-        const mockDocumentTriggerIngestionService = jest.spyOn(DocumentService.prototype, "triggerIngestion").mockImplementation(() => {
-          return new Promise<AxiosResponse<IngestionResponse>>((resolve) => {
-            resolve({
-              data: { executionArn: "testExecutionArn" },
-              status: 200,
-              statusText: "OK",
-              headers: {},
-              config: {
-                headers: new AxiosHeaders(),
-              },
-            });
-          });
-        });
-
         render(<Case />);
         await waitFor(() => {
           expect(screen.getByText("Case Documents")).toBeInTheDocument();
@@ -656,24 +602,27 @@ describe("Case Component", () => {
         });
 
         await waitFor(() => {
-          expect(mockDocumentPresignedUrlService).toHaveBeenCalledWith("testToken", "12345678");
+          expect(mockAxiosGet).toHaveBeenCalledWith("https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/download/12345678", { headers: { Authorization: "Bearer testToken" } });
         });
 
         await waitFor(() => {
-          expect(mockDocumentUploadService).toHaveBeenCalledWith("https://testpresignedurl.com", file);
+          expect(mockAxiosPut).toHaveBeenCalledWith("https://testpresignedurl.com", file, { headers: { "Content-Type": "application/pdf" } });
         });
 
         await waitFor(() => {
-          expect(mockDocumentTriggerIngestionService).toHaveBeenCalledWith("testToken", "12345678", "testKey");
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/ingestion",
+            { caseId: "12345678", key: "testKey" },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.150Z",
-            action: CaseHistory.DOCUMENT_UPLOADED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.150Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            { SK: "12345678#2021-09-01T00:00:00.150Z", action: CaseHistory.DOCUMENT_UPLOADED, name: "John Doe", timestamp: "2021-09-01T00:00:00.150Z" },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         jest.advanceTimersByTime(2000);
@@ -767,24 +716,46 @@ describe("Case Component", () => {
         submitButton.click();
 
         await waitFor(() => {
-          expect(mockEditCaseService).toHaveBeenCalledWith(
-            "testToken",
-            { assignee: "Jane Jones", clientId: "56789", clientName: "Zac Efron", date: "2021-09-02", nature: "Criminal", status: "ACTIVE" },
-            "12345678"
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678",
+            {
+              props: [
+                { key: "clientName", value: "Zac Efron" },
+                { key: "nature", value: "Criminal" },
+                { key: "date", value: "2021-09-02" },
+                { key: "assignee", value: "Jane Jones" },
+                { key: "status", value: "ACTIVE" },
+                { key: "clientId", value: "56789" },
+              ],
+            },
+            { headers: { Authorization: "Bearer testToken" } }
           );
         });
 
         await waitFor(() => {
-          expect(mockEditClientService).toHaveBeenCalledWith("testToken", { firstName: "Zac", lastName: "Efron" }, "56789");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789",
+            {
+              props: [
+                { key: "firstName", value: "Zac" },
+                { key: "lastName", value: "Efron" },
+              ],
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.100Z",
-            action: CaseHistory.DETAILS_EDITED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.100Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            {
+              SK: "12345678#2021-09-01T00:00:00.100Z",
+              action: CaseHistory.DETAILS_EDITED,
+              name: "John Doe",
+              timestamp: "2021-09-01T00:00:00.100Z",
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
@@ -842,20 +813,6 @@ describe("Case Component", () => {
       });
 
       test("the client details (first name only) will be updated when the submit button is clicked", async () => {
-        const mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
-          return new Promise<AxiosResponse>((resolve) => {
-            resolve({
-              data: {},
-              status: 200,
-              statusText: "OK",
-              headers: {},
-              config: {
-                headers: new AxiosHeaders(),
-              },
-            });
-          });
-        });
-
         render(<Case />);
 
         let caseInfoPaginator = screen.queryAllByTestId("caseInfoPaginator");
@@ -891,20 +848,32 @@ describe("Case Component", () => {
         submitButton.click();
 
         await waitFor(() => {
-          expect(mockEditClientService).toHaveBeenCalledWith("testToken", { firstName: "Zac" }, "56789");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789",
+            { props: [{ key: "firstName", value: "Zac" }] },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { clientName: "Zac Doe" }, "12345678");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678",
+            { props: [{ key: "clientName", value: "Zac Doe" }] },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.150Z",
-            action: CaseHistory.CLIENT_EDITED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.150Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            {
+              SK: "12345678#2021-09-01T00:00:00.150Z",
+              action: CaseHistory.CLIENT_EDITED,
+              name: "John Doe",
+              timestamp: "2021-09-01T00:00:00.150Z",
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
@@ -913,20 +882,6 @@ describe("Case Component", () => {
       });
 
       test("the client details (last name only) will be updated when the submit button is clicked", async () => {
-        const mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
-          return new Promise<AxiosResponse>((resolve) => {
-            resolve({
-              data: {},
-              status: 200,
-              statusText: "OK",
-              headers: {},
-              config: {
-                headers: new AxiosHeaders(),
-              },
-            });
-          });
-        });
-
         render(<Case />);
 
         let caseInfoPaginator = screen.queryAllByTestId("caseInfoPaginator");
@@ -962,20 +917,32 @@ describe("Case Component", () => {
         submitButton.click();
 
         await waitFor(() => {
-          expect(mockEditClientService).toHaveBeenCalledWith("testToken", { lastName: "Efron" }, "56789");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789",
+            { props: [{ key: "lastName", value: "Efron" }] },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { clientName: "John Efron" }, "12345678");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678",
+            { props: [{ key: "clientName", value: "John Efron" }] },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.150Z",
-            action: CaseHistory.CLIENT_EDITED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.150Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            {
+              SK: "12345678#2021-09-01T00:00:00.150Z",
+              action: CaseHistory.CLIENT_EDITED,
+              name: "John Doe",
+              timestamp: "2021-09-01T00:00:00.150Z",
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
@@ -984,20 +951,6 @@ describe("Case Component", () => {
       });
 
       test("the client details (first and last name) will be updated when the submit button is clicked", async () => {
-        const mockEditClientService = jest.spyOn(ClientService.prototype, "editClient").mockImplementation(() => {
-          return new Promise<AxiosResponse>((resolve) => {
-            resolve({
-              data: {},
-              status: 200,
-              statusText: "OK",
-              headers: {},
-              config: {
-                headers: new AxiosHeaders(),
-              },
-            });
-          });
-        });
-
         render(<Case />);
 
         let caseInfoPaginator = screen.queryAllByTestId("caseInfoPaginator");
@@ -1037,20 +990,37 @@ describe("Case Component", () => {
         submitButton.click();
 
         await waitFor(() => {
-          expect(mockEditClientService).toHaveBeenCalledWith("testToken", { firstName: "Zac", lastName: "Efron" }, "56789");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789",
+            {
+              props: [
+                { key: "firstName", value: "Zac" },
+                { key: "lastName", value: "Efron" },
+              ],
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { clientName: "Zac Efron" }, "12345678");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678",
+            { props: [{ key: "clientName", value: "Zac Efron" }] },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.150Z",
-            action: CaseHistory.CLIENT_EDITED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.150Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            {
+              SK: "12345678#2021-09-01T00:00:00.150Z",
+              action: CaseHistory.CLIENT_EDITED,
+              name: "John Doe",
+              timestamp: "2021-09-01T00:00:00.150Z",
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
@@ -1074,24 +1044,41 @@ describe("Case Component", () => {
         assignToMeBtn.click();
 
         await waitFor(() => {
-          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { assignee: "John Doe", status: "ACTIVE" }, "12345678");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678",
+            {
+              props: [
+                { key: "assignee", value: "John Doe" },
+                { key: "status", value: "ACTIVE" },
+              ],
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenNthCalledWith(1, "testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.050Z",
-            action: CaseHistory.DETAILS_EDITED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.050Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            {
+              SK: "12345678#2021-09-01T00:00:00.050Z",
+              action: CaseHistory.DETAILS_EDITED,
+              name: "John Doe",
+              timestamp: "2021-09-01T00:00:00.050Z",
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
-        expect(mockAddHistory).toHaveBeenNthCalledWith(2, "testToken", "12345678", {
-          SK: "12345678#2021-09-01T00:00:00.050Z",
-          action: CaseHistory.ASSIGNED,
-          name: "John Doe",
-          timestamp: "2021-09-01T00:00:00.050Z",
-        });
+        expect(mockAxiosPost).toHaveBeenCalledWith(
+          "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+          {
+            SK: "12345678#2021-09-01T00:00:00.050Z",
+            action: CaseHistory.ASSIGNED,
+            name: "John Doe",
+            timestamp: "2021-09-01T00:00:00.050Z",
+          },
+          { headers: { Authorization: "Bearer testToken" } }
+        );
 
         await waitFor(() => {
           expect(mockReload).toHaveBeenCalled();
@@ -1128,20 +1115,24 @@ describe("Case Component", () => {
         submitButton.click();
 
         await waitFor(() => {
-          expect(mockAddComment).toHaveBeenCalledWith(
-            "testToken",
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678",
             { SK: "12345678#2021-09-01T00:00:00.100Z", name: "John Doe", text: "Test Comment", timestamp: "2021-09-01T00:00:00.100Z" },
-            "12345678"
+            { headers: { Authorization: "Bearer testToken" } }
           );
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.100Z",
-            action: CaseHistory.COMMENT_ADDED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.100Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            {
+              SK: "12345678#2021-09-01T00:00:00.100Z",
+              action: CaseHistory.COMMENT_ADDED,
+              name: "John Doe",
+              timestamp: "2021-09-01T00:00:00.100Z",
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
@@ -1179,16 +1170,24 @@ describe("Case Component", () => {
         submitButton.click();
 
         await waitFor(() => {
-          expect(mockEditComment).toHaveBeenCalledWith("testToken", { text: "Edited Comment" }, "12345678", "2021-09-01T00:00:02.000Z");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678/2021-09-01T00:00:02.000Z",
+            { props: [{ key: "text", value: "Edited Comment" }] },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.100Z",
-            action: CaseHistory.COMMENT_EDITED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.100Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            {
+              SK: "12345678#2021-09-01T00:00:00.100Z",
+              action: CaseHistory.COMMENT_EDITED,
+              name: "John Doe",
+              timestamp: "2021-09-01T00:00:00.100Z",
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
@@ -1211,16 +1210,22 @@ describe("Case Component", () => {
         deleteCommentBtn[0].click();
 
         await waitFor(() => {
-          expect(mockDeleteComment).toHaveBeenCalledWith("testToken", "12345678", "2021-09-01T00:00:02.000Z");
+          expect(mockAxiosDelete).toHaveBeenCalledWith("https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678/2021-09-01T00:00:02.000Z", {
+            headers: { Authorization: "Bearer testToken" },
+          });
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.050Z",
-            action: CaseHistory.COMMENT_DELETED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.050Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            {
+              SK: "12345678#2021-09-01T00:00:00.050Z",
+              action: CaseHistory.COMMENT_DELETED,
+              name: "John Doe",
+              timestamp: "2021-09-01T00:00:00.050Z",
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
@@ -1282,16 +1287,24 @@ describe("Case Component", () => {
         submitButton.click();
 
         await waitFor(() => {
-          expect(mockEditCaseService).toHaveBeenCalledWith("testToken", { description: "Edited Description" }, "12345678");
+          expect(mockAxiosPut).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678",
+            { props: [{ key: "description", value: "Edited Description" }] },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockAddHistory).toHaveBeenCalledWith("testToken", "12345678", {
-            SK: "12345678#2021-09-01T00:00:00.100Z",
-            action: CaseHistory.DESCRIPTION_EDITED,
-            name: "John Doe",
-            timestamp: "2021-09-01T00:00:00.100Z",
-          });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678",
+            {
+              SK: "12345678#2021-09-01T00:00:00.100Z",
+              action: CaseHistory.DESCRIPTION_EDITED,
+              name: "John Doe",
+              timestamp: "2021-09-01T00:00:00.100Z",
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
@@ -1311,27 +1324,173 @@ describe("Case Component", () => {
         getAccessTokenSilently: jest.fn().mockResolvedValue("testToken"),
       });
 
-      mockGetSingleCase = jest.spyOn(CaseService.prototype, "getSingleCase").mockImplementation(() => {
-        return new Promise<AxiosResponse>((resolve) => {
-          resolve({
-            data: {
-              SK: "12345678",
-              clientId: "56789",
-              clientName: "John Doe",
-              status: "ACTIVE",
-              description: "Test Description",
-              nature: "Property",
-              date: "2021-09-01",
-              assignee: "Jack Smith",
-            },
-            status: 200,
-            statusText: "OK",
-            headers: {},
-            config: {
-              headers: new AxiosHeaders(),
-            },
+      mockAxiosGet.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                SK: "12345678",
+                clientId: "56789",
+                clientName: "John Doe",
+                status: "ACTIVE",
+                description: "Test Description",
+                nature: "Property",
+                date: "2021-09-01",
+                assignee: "Jack Smith",
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
           });
-        });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                SK: "56789",
+                firstName: "John",
+                lastName: "Doe",
+                addressLine1: "123 Test Street",
+                addressLine2: "Testville",
+                city: "Test City",
+                county: "Test County",
+                postcode: "TE1 1ST",
+                email: "john@test.com",
+                phoneNumber: "01234567890",
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/download/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                urls: [
+                  {
+                    original: "https://example.com/original1234567.pdf",
+                    processed: "https://example.com/processed12345667.json",
+                  },
+                  {
+                    original: "https://example.com/original874747383.pdf",
+                    processed: "https://example.com/processed874747383.json",
+                  },
+                ],
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url.includes("processed")) {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: getMockExtractionResult(),
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: [
+                {
+                  SK: "123456",
+                  name: "John Doe",
+                  text: "Test Comment 1",
+                  timestamp: "2021-09-01T00:00:02.000Z",
+                },
+                {
+                  SK: "1234567",
+                  name: "Jane Doe",
+                  text: "Test Comment 2",
+                  timestamp: "2021-09-01T00:00:01.000Z",
+                },
+                {
+                  SK: "332221",
+                  name: "Jack Jones",
+                  text: "Test Comment 3",
+                  timestamp: "2021-09-01T00:00:02.000Z",
+                },
+                {
+                  SK: "33399",
+                  name: "Jill Smith",
+                  text: "Test Comment 4",
+                  timestamp: "2021-09-01T00:00:01.000Z",
+                },
+              ],
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: [
+                {
+                  SK: "123456",
+                  name: "John Doe",
+                  action: CaseHistory.OPENED,
+                  timestamp: "2021-09-01T00:00:00.100Z",
+                },
+                {
+                  SK: "1234567",
+                  name: "Jane Doe",
+                  action: CaseHistory.DOCUMENT_UPLOADED,
+                  timestamp: "2021-09-01T00:00:00.020Z",
+                },
+                {
+                  SK: "332221",
+                  name: "Jack Jones",
+                  action: CaseHistory.COMMENT_ADDED,
+                  timestamp: "2021-09-01T00:00:00.010Z",
+                },
+                {
+                  SK: "33399",
+                  name: "Jill Smith",
+                  action: CaseHistory.COMMENT_ADDED,
+                  timestamp: "2021-09-01T00:00:00.001Z",
+                },
+              ],
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {},
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        }
       });
     });
     test("the user will not be able to upload a document", async () => {
@@ -1445,10 +1604,165 @@ describe("Case Component", () => {
 
   describe("When an error occurs in the updateExtractionData function during initial rendering", () => {
     test("the extractions table will be empty", async () => {
-      mockGetDocumentExtractionResult = jest.spyOn(DocumentService.prototype, "getDocumentExtractionResult").mockImplementation(() => {
-        return new Promise<AxiosResponse>((resolve, reject) => {
-          reject(new Error("Test error"));
-        });
+      mockAxiosGet.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                SK: "12345678",
+                clientId: "56789",
+                clientName: "John Doe",
+                status: "ACTIVE",
+                description: "Test Description",
+                nature: "Property",
+                date: "2021-09-01",
+                assignee: "Jack Smith",
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                SK: "56789",
+                firstName: "John",
+                lastName: "Doe",
+                addressLine1: "123 Test Street",
+                addressLine2: "Testville",
+                city: "Test City",
+                county: "Test County",
+                postcode: "TE1 1ST",
+                email: "john@test.com",
+                phoneNumber: "01234567890",
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/download/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                urls: [
+                  {
+                    original: "https://example.com/original1234567.pdf",
+                    processed: "https://example.com/processed12345667.json",
+                  },
+                  {
+                    original: "https://example.com/original874747383.pdf",
+                    processed: "https://example.com/processed874747383.json",
+                  },
+                ],
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url.includes("processed")) {
+          return new Promise<AxiosResponse>((resolve, reject) => {
+            reject(new Error("Test error"));
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: [
+                {
+                  SK: "123456",
+                  name: "John Doe",
+                  text: "Test Comment 1",
+                  timestamp: "2021-09-01T00:00:02.000Z",
+                },
+                {
+                  SK: "1234567",
+                  name: "Jane Doe",
+                  text: "Test Comment 2",
+                  timestamp: "2021-09-01T00:00:01.000Z",
+                },
+                {
+                  SK: "332221",
+                  name: "Jack Jones",
+                  text: "Test Comment 3",
+                  timestamp: "2021-09-01T00:00:02.000Z",
+                },
+                {
+                  SK: "33399",
+                  name: "Jill Smith",
+                  text: "Test Comment 4",
+                  timestamp: "2021-09-01T00:00:01.000Z",
+                },
+              ],
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: [
+                {
+                  SK: "123456",
+                  name: "John Doe",
+                  action: CaseHistory.OPENED,
+                  timestamp: "2021-09-01T00:00:00.100Z",
+                },
+                {
+                  SK: "1234567",
+                  name: "Jane Doe",
+                  action: CaseHistory.DOCUMENT_UPLOADED,
+                  timestamp: "2021-09-01T00:00:00.020Z",
+                },
+                {
+                  SK: "332221",
+                  name: "Jack Jones",
+                  action: CaseHistory.COMMENT_ADDED,
+                  timestamp: "2021-09-01T00:00:00.010Z",
+                },
+                {
+                  SK: "33399",
+                  name: "Jill Smith",
+                  action: CaseHistory.COMMENT_ADDED,
+                  timestamp: "2021-09-01T00:00:00.001Z",
+                },
+              ],
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {},
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        }
       });
 
       render(<Case />);
@@ -1464,8 +1778,75 @@ describe("Case Component", () => {
 
   describe("When an error occurs in the updateExtractionData function during rerender", () => {
     test("the extractions table will be empty", async () => {
-      mockGetDocumentExtractionResult
-        .mockImplementationOnce(() => {
+      mockAxiosGet.mockImplementationOnce((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                SK: "12345678",
+                clientId: "56789",
+                clientName: "John Doe",
+                status: "ACTIVE",
+                description: "Test Description",
+                nature: "Property",
+                date: "2021-09-01",
+                assignee: "Jack Smith",
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                SK: "56789",
+                firstName: "John",
+                lastName: "Doe",
+                addressLine1: "123 Test Street",
+                addressLine2: "Testville",
+                city: "Test City",
+                county: "Test County",
+                postcode: "TE1 1ST",
+                email: "john@test.com",
+                phoneNumber: "01234567890",
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/download/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                urls: [
+                  {
+                    original: "https://example.com/original1234567.pdf",
+                    processed: "https://example.com/processed12345667.json",
+                  },
+                  {
+                    original: "https://example.com/original874747383.pdf",
+                    processed: "https://example.com/processed874747383.json",
+                  },
+                ],
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url.includes("processed")) {
           return new Promise<AxiosResponse>((resolve) => {
             resolve({
               data: getMockExtractionResult(),
@@ -1477,12 +1858,255 @@ describe("Case Component", () => {
               },
             });
           });
-        })
-        .mockImplementationOnce(() => {
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: [
+                {
+                  SK: "123456",
+                  name: "John Doe",
+                  text: "Test Comment 1",
+                  timestamp: "2021-09-01T00:00:02.000Z",
+                },
+                {
+                  SK: "1234567",
+                  name: "Jane Doe",
+                  text: "Test Comment 2",
+                  timestamp: "2021-09-01T00:00:01.000Z",
+                },
+                {
+                  SK: "332221",
+                  name: "Jack Jones",
+                  text: "Test Comment 3",
+                  timestamp: "2021-09-01T00:00:02.000Z",
+                },
+                {
+                  SK: "33399",
+                  name: "Jill Smith",
+                  text: "Test Comment 4",
+                  timestamp: "2021-09-01T00:00:01.000Z",
+                },
+              ],
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: [
+                {
+                  SK: "123456",
+                  name: "John Doe",
+                  action: CaseHistory.OPENED,
+                  timestamp: "2021-09-01T00:00:00.100Z",
+                },
+                {
+                  SK: "1234567",
+                  name: "Jane Doe",
+                  action: CaseHistory.DOCUMENT_UPLOADED,
+                  timestamp: "2021-09-01T00:00:00.020Z",
+                },
+                {
+                  SK: "332221",
+                  name: "Jack Jones",
+                  action: CaseHistory.COMMENT_ADDED,
+                  timestamp: "2021-09-01T00:00:00.010Z",
+                },
+                {
+                  SK: "33399",
+                  name: "Jill Smith",
+                  action: CaseHistory.COMMENT_ADDED,
+                  timestamp: "2021-09-01T00:00:00.001Z",
+                },
+              ],
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {},
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        }
+      });
+
+      mockAxiosGet.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                SK: "12345678",
+                clientId: "56789",
+                clientName: "John Doe",
+                status: "ACTIVE",
+                description: "Test Description",
+                nature: "Property",
+                date: "2021-09-01",
+                assignee: "Jack Smith",
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                SK: "56789",
+                firstName: "John",
+                lastName: "Doe",
+                addressLine1: "123 Test Street",
+                addressLine2: "Testville",
+                city: "Test City",
+                county: "Test County",
+                postcode: "TE1 1ST",
+                email: "john@test.com",
+                phoneNumber: "01234567890",
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/download/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                urls: [
+                  {
+                    original: "https://example.com/original1234567.pdf",
+                    processed: "https://example.com/processed12345667.json",
+                  },
+                  {
+                    original: "https://example.com/original874747383.pdf",
+                    processed: "https://example.com/processed874747383.json",
+                  },
+                ],
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url.includes("processed")) {
           return new Promise<AxiosResponse>((resolve, reject) => {
             reject(new Error("Test error"));
           });
-        });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: [
+                {
+                  SK: "123456",
+                  name: "John Doe",
+                  text: "Test Comment 1",
+                  timestamp: "2021-09-01T00:00:02.000Z",
+                },
+                {
+                  SK: "1234567",
+                  name: "Jane Doe",
+                  text: "Test Comment 2",
+                  timestamp: "2021-09-01T00:00:01.000Z",
+                },
+                {
+                  SK: "332221",
+                  name: "Jack Jones",
+                  text: "Test Comment 3",
+                  timestamp: "2021-09-01T00:00:02.000Z",
+                },
+                {
+                  SK: "33399",
+                  name: "Jill Smith",
+                  text: "Test Comment 4",
+                  timestamp: "2021-09-01T00:00:01.000Z",
+                },
+              ],
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: [
+                {
+                  SK: "123456",
+                  name: "John Doe",
+                  action: CaseHistory.OPENED,
+                  timestamp: "2021-09-01T00:00:00.100Z",
+                },
+                {
+                  SK: "1234567",
+                  name: "Jane Doe",
+                  action: CaseHistory.DOCUMENT_UPLOADED,
+                  timestamp: "2021-09-01T00:00:00.020Z",
+                },
+                {
+                  SK: "332221",
+                  name: "Jack Jones",
+                  action: CaseHistory.COMMENT_ADDED,
+                  timestamp: "2021-09-01T00:00:00.010Z",
+                },
+                {
+                  SK: "33399",
+                  name: "Jill Smith",
+                  action: CaseHistory.COMMENT_ADDED,
+                  timestamp: "2021-09-01T00:00:00.001Z",
+                },
+              ],
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {},
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        }
+      });
 
       console.error = jest.fn();
 
