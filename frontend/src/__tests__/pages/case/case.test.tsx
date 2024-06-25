@@ -1,14 +1,9 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Case from "../../../pages/case/case";
-import { CaseService } from "../../../services/case.service";
 import axios, { AxiosHeaders, AxiosResponse } from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
-import { ClientService } from "../../../services/client.service";
-import { DocumentService, IngestionResponse, PresignedUrlResponse } from "../../../services/document.service";
 import { getMockExtractionResult } from "./mockExtractionResult";
-import { CommentService } from "../../../services/comment.service";
-import { HistoryService } from "../../../services/history.service";
 import { CaseHistory } from "../../../enums/caseHistory";
 import userEvent from "@testing-library/user-event";
 
