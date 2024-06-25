@@ -72,20 +72,22 @@ const DocumentUploadStep = (props: DocumentUploadStepProps) => {
         .then(async () => {
           await uploadDocument(props.uploadFile!, props.accessToken, props.caseInfo!.SK);
         })
-        .then(async () => setInitialHistory(props.accessToken, props.caseInfo!.SK, user))
-        .then(async () =>
+        .then(async () => await setInitialHistory(props.accessToken, props.caseInfo!.SK, user))
+        .then(() =>
           setTimeout(() => {
+            console.log(`Document uploaded ${props.caseInfo!.SK}`);
             navigate(`/case/${props.caseInfo!.SK}`);
           }, 2000)
         );
     } else {
       await uploadDocument(props.uploadFile!, props.accessToken, props.caseId!)
-        .then(async () => setInitialHistory(props.accessToken, props.caseId!, user))
-        .then(async () =>
+        .then(async () => await setInitialHistory(props.accessToken, props.caseId!, user))
+        .then(() => {
+          console.log(`Document uploaded ${props.caseId}`);
           setTimeout(() => {
             navigate(`/case/${props.caseId!}`);
-          }, 2000)
-        );
+          }, 2000);
+        });
     }
   };
 

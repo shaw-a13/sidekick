@@ -4,27 +4,20 @@ import { useAuth0 } from "@auth0/auth0-react";
 import Upload from "../../../pages/upload/upload";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
-import { DocumentService, IngestionResponse, PresignedUrlResponse } from "../../../services/document.service";
-import { AxiosHeaders, AxiosResponse } from "axios";
-import { HistoryService } from "../../../services/history.service";
-import { CaseHistory } from "../../../enums/caseHistory";
-import exp from "constants";
-import { ClientService } from "../../../services/client.service";
-import { CaseService } from "../../../services/case.service";
+import axios, { AxiosHeaders, AxiosResponse } from "axios";
 import { CaseStatus } from "../../../enums/caseStatus";
+import { CaseHistory } from "../../../enums/caseHistory";
 
 jest.mock("@auth0/auth0-react");
 
 const mockLoginWithRedirect = jest.fn();
 const mockLogout = jest.fn();
+
 jest.mock("uuid", () => ({ v4: () => "123456789" }));
 
-let mockDocumentPresignedUrlService: jest.SpyInstance;
-let mockDocumentUploadService: jest.SpyInstance;
-let mockDocumentTriggerIngestionService: jest.SpyInstance;
-let mockHistoryService: jest.SpyInstance;
-let mockAddClientService: jest.SpyInstance;
-let mockAddCaseService: jest.SpyInstance;
+let mockAxiosGet: jest.SpyInstance;
+let mockAxiosPost: jest.SpyInstance;
+let mockAxiosPut: jest.SpyInstance;
 
 const mockTime = "2021-09-01T00:00:00.000Z";
 
@@ -37,37 +30,8 @@ describe("Upload Component Tests", () => {
       isAuthenticated: true,
       getAccessTokenSilently: jest.fn().mockResolvedValue("testToken"),
     });
-
-    mockAddClientService = jest.spyOn(ClientService.prototype, "addClient").mockImplementation(() => {
+    mockAxiosGet = jest.spyOn(axios, "get").mockImplementation(() => {
       return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {},
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
-      });
-    });
-
-    mockAddCaseService = jest.spyOn(CaseService.prototype, "addCase").mockImplementation(() => {
-      return new Promise<AxiosResponse>((resolve) => {
-        resolve({
-          data: {},
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
-      });
-    });
-
-    mockDocumentPresignedUrlService = jest.spyOn(DocumentService.prototype, "getPresignedUrl").mockImplementation(() => {
-      return new Promise<AxiosResponse<PresignedUrlResponse>>((resolve) => {
         resolve({
           data: { presignedUrl: "https://testpresignedurl.com", key: "testKey" },
           status: 200,
@@ -80,29 +44,7 @@ describe("Upload Component Tests", () => {
       });
     });
 
-    mockDocumentUploadService = jest.spyOn(DocumentService.prototype, "uploadDocument").mockImplementation(() => {
-      return new Promise((resolve) => {
-        resolve();
-      });
-    });
-
-    mockDocumentTriggerIngestionService = jest.spyOn(DocumentService.prototype, "triggerIngestion").mockImplementation(() => {
-      return new Promise<AxiosResponse<IngestionResponse>>((resolve) => {
-        resolve({
-          data: { executionArn: "testExecutionArn" },
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
-      });
-    });
-
-    jest.useFakeTimers().setSystemTime(new Date(mockTime));
-
-    mockHistoryService = jest.spyOn(HistoryService.prototype, "addHistory").mockImplementation(() => {
+    mockAxiosPost = jest.spyOn(axios, "post").mockImplementation(() => {
       return new Promise<AxiosResponse>((resolve) => {
         resolve({
           data: {},
@@ -115,6 +57,22 @@ describe("Upload Component Tests", () => {
         });
       });
     });
+
+    mockAxiosPut = jest.spyOn(axios, "put").mockImplementation(() => {
+      return new Promise<AxiosResponse>((resolve) => {
+        resolve({
+          data: {},
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config: {
+            headers: new AxiosHeaders(),
+          },
+        });
+      });
+    });
+
+    jest.useFakeTimers().setSystemTime(new Date(mockTime));
   });
 
   afterEach(() => {
@@ -459,45 +417,57 @@ describe("Upload Component Tests", () => {
 
             userEvent.click(submitButton);
             await waitFor(() => {
-              expect(mockAddClientService).toHaveBeenCalledWith("testToken", {
-                SK: `123456789`,
-                firstName: "John",
-                lastName: "Doe",
-                addressLine1: "123 Main Street",
-                addressLine2: "Apt 2",
-                postcode: "BT11 1AB",
-                county: "Antrim",
-                city: "Belfast",
-                phoneNumber: "0123456789",
-                email: "john@test.com",
-              });
+              expect(mockAxiosPost).toHaveBeenCalledWith(
+                "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients",
+                {
+                  SK: `123456789`,
+                  addressLine1: "123 Main Street",
+                  addressLine2: "Apt 2",
+                  city: "Belfast",
+                  county: "Antrim",
+                  email: "john@test.com",
+                  firstName: "John",
+                  lastName: "Doe",
+                  phoneNumber: "0123456789",
+                  postcode: "BT11 1AB",
+                },
+                { headers: { Authorization: "Bearer testToken" } }
+              );
             });
 
             await waitFor(() => {
-              expect(mockAddCaseService).toHaveBeenCalledWith("testToken", {
-                SK: `123456789`,
-                assignee: "",
-                clientId: "123456789",
-                clientName: "John Doe",
-                date: "2021-09-01",
-                description: "Test description",
-                nature: "Family",
-                status: CaseStatus.OPEN,
-              });
+              expect(mockAxiosPost).toHaveBeenCalledWith(
+                "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases",
+                {
+                  SK: `123456789`,
+                  assignee: "",
+                  clientId: "123456789",
+                  clientName: "John Doe",
+                  date: "2021-09-01",
+                  description: "Test description",
+                  nature: "Family",
+                  status: CaseStatus.OPEN,
+                },
+                { headers: { Authorization: "Bearer testToken" } }
+              );
             });
             await waitFor(() => {
-              expect(mockDocumentPresignedUrlService).toHaveBeenCalledWith("testToken", "123456789");
+              expect(mockAxiosGet).toHaveBeenCalledWith("https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/upload/123456789", { headers: { Authorization: "Bearer testToken" } });
             });
             await waitFor(() => {
-              expect(mockDocumentUploadService).toHaveBeenCalledWith("https://testpresignedurl.com", file);
+              expect(mockAxiosPut).toHaveBeenCalledWith("https://testpresignedurl.com", file, { headers: { "Content-Type": "application/pdf" } });
             });
             await waitFor(() => {
-              expect(mockDocumentTriggerIngestionService).toHaveBeenCalledWith("testToken", "123456789", "testKey");
+              expect(mockAxiosPost).toHaveBeenCalledWith(
+                "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/ingestion",
+                { caseId: "123456789", key: "testKey" },
+                { headers: { Authorization: "Bearer testToken" } }
+              );
             });
 
+            jest.advanceTimersByTime(2000);
             await waitFor(
               () => {
-                jest.advanceTimersByTime(2000);
                 expect(window.location.pathname).toBe("/case/123456789");
               },
               { timeout: 3000 }
@@ -604,23 +574,45 @@ describe("Upload Component Tests", () => {
 
         userEvent.click(submitButton);
         await waitFor(() => {
-          expect(mockDocumentPresignedUrlService).toHaveBeenCalledWith("testToken", "123");
+          expect(mockAxiosGet).toHaveBeenCalledWith("https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/upload/123", { headers: { Authorization: "Bearer testToken" } });
         });
         await waitFor(() => {
-          expect(mockDocumentUploadService).toHaveBeenCalledWith("https://testpresignedurl.com", file);
+          expect(mockAxiosPut).toHaveBeenCalledWith("https://testpresignedurl.com", file, { headers: { "Content-Type": "application/pdf" } });
         });
         await waitFor(() => {
-          expect(mockDocumentTriggerIngestionService).toHaveBeenCalledWith("testToken", "123", "testKey");
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/ingestion",
+            { caseId: "123", key: "testKey" },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
 
         await waitFor(() => {
-          expect(mockHistoryService).toHaveBeenNthCalledWith(1, "testToken", "123", { SK: `123#${mockTime}`, action: CaseHistory.OPENED, name: "John Doe", timestamp: mockTime });
+          expect(mockAxiosPost).toHaveBeenCalledWith(
+            "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/123",
+            {
+              SK: `123#${mockTime}`,
+              action: CaseHistory.OPENED,
+              name: "John Doe",
+              timestamp: mockTime,
+            },
+            { headers: { Authorization: "Bearer testToken" } }
+          );
         });
-        expect(mockHistoryService).toHaveBeenNthCalledWith(2, "testToken", "123", { SK: `123#${mockTime}`, action: CaseHistory.DOCUMENT_UPLOADED, name: "John Doe", timestamp: mockTime });
+        expect(mockAxiosPost).toHaveBeenCalledWith(
+          "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/123",
+          {
+            SK: `123#${mockTime}`,
+            action: CaseHistory.DOCUMENT_UPLOADED,
+            name: "John Doe",
+            timestamp: mockTime,
+          },
+          { headers: { Authorization: "Bearer testToken" } }
+        );
 
+        jest.advanceTimersByTime(2000);
         await waitFor(
           () => {
-            jest.advanceTimersByTime(2000);
             expect(window.location.pathname).toBe("/case/123");
           },
           { timeout: 3000 }
@@ -673,132 +665,145 @@ describe("Upload Component Tests", () => {
       });
     });
   });
-});
-
-describe("When the user is not logged in", () => {
-  beforeEach(() => {
-    (useAuth0 as jest.Mock).mockReturnValue({
-      user: null,
-      loginWithRedirect: mockLoginWithRedirect,
-      logout: mockLogout,
-      isAuthenticated: false,
-    });
-  });
-
-  test("it renders the warning message and uploadCard not rendered", () => {
-    render(<Upload />);
-    const warningMessage = screen.getByText("You must be a worker to upload to the Sidekick application");
-    expect(warningMessage).toBeInTheDocument();
-    expect(screen.queryByTestId("uploadCard")).not.toBeInTheDocument();
-  });
-});
-
-describe("When an error occurs", () => {
-  beforeEach(() => {
-    (useAuth0 as jest.Mock).mockReturnValue({
-      user: { authGroups: ["Admin", "Worker"], picture: "https://example.com", name: "John Doe", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
-      loginWithRedirect: mockLoginWithRedirect,
-      logout: mockLogout,
-      isAuthenticated: true,
-      getAccessTokenSilently: jest.fn().mockResolvedValue("testToken"),
-    });
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  test("in the upload document function", async () => {
-    const error = new Error("Test error");
-    mockDocumentPresignedUrlService = jest.spyOn(DocumentService.prototype, "getPresignedUrl").mockImplementation(() => {
-      return new Promise<AxiosResponse<PresignedUrlResponse>>((resolve, reject) => {
-        reject(error);
+  describe("When the user is not logged in", () => {
+    beforeEach(() => {
+      (useAuth0 as jest.Mock).mockReturnValue({
+        user: null,
+        loginWithRedirect: mockLoginWithRedirect,
+        logout: mockLogout,
+        isAuthenticated: false,
       });
     });
 
-    console.error = jest.fn();
-
-    render(
-      <BrowserRouter>
-        <Upload />{" "}
-      </BrowserRouter>
-    );
-    await waitFor(() => {
-      expect(screen.queryByText("You must be a worker to upload to the Sidekick application")).not.toBeInTheDocument();
-    });
-    const existingCaseButton = screen.getByRole("button", { name: /Existing/i });
-    await waitFor(() => {
-      existingCaseButton.click();
-    });
-    const caseIdInput = screen.getByPlaceholderText("Enter a case ID") as HTMLInputElement;
-    userEvent.type(caseIdInput, "123");
-
-    let uploadForm = screen.getByTestId("uploadForm");
-    await waitFor(() => {
-      uploadForm = screen.getByTestId("uploadForm");
-    });
-
-    const fileInput = within(uploadForm).getByTestId("fileInput") as HTMLInputElement;
-
-    const file = new File(["(⌐□_□)"], "test-case.pdf", {
-      type: "application/pdf",
-    });
-    userEvent.upload(fileInput, file);
-
-    const submitButton = within(uploadForm).getByRole("button", { name: /Submit Case/i });
-
-    userEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith(error);
+    test("it renders the warning message and uploadCard not rendered", () => {
+      render(<Upload />);
+      const warningMessage = screen.getByText("You must be a worker to upload to the Sidekick application");
+      expect(warningMessage).toBeInTheDocument();
+      expect(screen.queryByTestId("uploadCard")).not.toBeInTheDocument();
     });
   });
 
-  test("in the add case function", async () => {
-    const error = new Error("Test error");
-    mockAddCaseService = jest.spyOn(CaseService.prototype, "addCase").mockImplementation(() => {
-      return new Promise<AxiosResponse<PresignedUrlResponse>>((resolve, reject) => {
-        reject(error);
+  describe("When an error occurs", () => {
+    beforeEach(() => {
+      (useAuth0 as jest.Mock).mockReturnValue({
+        user: { authGroups: ["Admin", "Worker"], picture: "https://example.com", name: "John Doe", sub: "123", nickname: "JD", updated_at: "2021-09-01" },
+        loginWithRedirect: mockLoginWithRedirect,
+        logout: mockLogout,
+        isAuthenticated: true,
+        getAccessTokenSilently: jest.fn().mockResolvedValue("testToken"),
       });
     });
 
-    console.error = jest.fn();
-
-    render(
-      <BrowserRouter>
-        <Upload />{" "}
-      </BrowserRouter>
-    );
-    await waitFor(() => {
-      expect(screen.queryByText("You must be a worker to upload to the Sidekick application")).not.toBeInTheDocument();
-    });
-    const newCaseButton = screen.getByRole("button", { name: /New/i });
-    await waitFor(() => {
-      newCaseButton.click();
+    afterEach(() => {
+      jest.clearAllMocks();
     });
 
-    validClientInfoFormSteps();
-    validCaseInfoFormSteps();
+    test("in the upload document function", async () => {
+      const error = new Error("Test error");
+      mockAxiosGet = jest.spyOn(axios, "get").mockImplementation(() => {
+        return new Promise<AxiosResponse>((resolve, reject) => {
+          reject(error);
+        });
+      });
 
-    let uploadForm = screen.queryByTestId("uploadForm");
-    await waitFor(() => {
-      uploadForm = screen.getByTestId("uploadForm");
+      console.error = jest.fn();
+
+      render(
+        <BrowserRouter>
+          <Upload />{" "}
+        </BrowserRouter>
+      );
+      await waitFor(() => {
+        expect(screen.queryByText("You must be a worker to upload to the Sidekick application")).not.toBeInTheDocument();
+      });
+      const existingCaseButton = screen.getByRole("button", { name: /Existing/i });
+      await waitFor(() => {
+        existingCaseButton.click();
+      });
+      const caseIdInput = screen.getByPlaceholderText("Enter a case ID") as HTMLInputElement;
+      userEvent.type(caseIdInput, "123");
+
+      let uploadForm = screen.getByTestId("uploadForm");
+      await waitFor(() => {
+        uploadForm = screen.getByTestId("uploadForm");
+      });
+
+      const fileInput = within(uploadForm).getByTestId("fileInput") as HTMLInputElement;
+
+      const file = new File(["(⌐□_□)"], "test-case.pdf", {
+        type: "application/pdf",
+      });
+      userEvent.upload(fileInput, file);
+
+      const submitButton = within(uploadForm).getByRole("button", { name: /Submit Case/i });
+
+      userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(error);
+      });
     });
 
-    const fileInput = within(uploadForm!).getByTestId("fileInput") as HTMLInputElement;
+    test("in the add case function", async () => {
+      const error = new Error("Test error");
+      mockAxiosPost = jest.spyOn(axios, "post").mockImplementation((url: string) => {
+        if (url.includes("cases")) {
+          return new Promise<AxiosResponse>((resolve, rejects) => {
+            rejects(error);
+          });
+        } else {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {},
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        }
+      });
 
-    const file = new File(["(⌐□_□)"], "test-case.pdf", {
-      type: "application/pdf",
-    });
+      console.error = jest.fn();
 
-    userEvent.upload(fileInput, file);
+      render(
+        <BrowserRouter>
+          <Upload />{" "}
+        </BrowserRouter>
+      );
+      await waitFor(() => {
+        expect(screen.queryByText("You must be a worker to upload to the Sidekick application")).not.toBeInTheDocument();
+      });
+      const newCaseButton = screen.getByRole("button", { name: /New/i });
+      await waitFor(() => {
+        newCaseButton.click();
+      });
 
-    const submitButton = within(uploadForm!).getByRole("button", { name: /Submit Case/i });
+      validClientInfoFormSteps();
+      validCaseInfoFormSteps();
 
-    userEvent.click(submitButton);
+      let uploadForm = screen.queryByTestId("uploadForm");
+      await waitFor(() => {
+        uploadForm = screen.getByTestId("uploadForm");
+      });
 
-    await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith(error);
+      const fileInput = within(uploadForm!).getByTestId("fileInput") as HTMLInputElement;
+
+      const file = new File(["(⌐□_□)"], "test-case.pdf", {
+        type: "application/pdf",
+      });
+
+      userEvent.upload(fileInput, file);
+
+      const submitButton = within(uploadForm!).getByRole("button", { name: /Submit Case/i });
+
+      userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(error);
+      });
     });
   });
 });
