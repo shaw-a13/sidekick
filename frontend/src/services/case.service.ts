@@ -32,19 +32,6 @@ export class CaseService extends BaseService{
         }
     }
 
-    public async deleteCase(token: string, caseId: string) {
-        try {
-            return await axios.delete(`${this.baseUrl}/cases/${caseId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-        } catch (error) {
-            console.log('error')
-            console.error(error);
-        }
-    }
-
     public async addCase(token: string, caseInfo: Case) {
         try {
             return await axios.post(`${this.baseUrl}/cases`, caseInfo, {
@@ -66,7 +53,6 @@ export class CaseService extends BaseService{
             data.props.push({key, value})
         }
 
-        console.log(data)
         try {
             return await axios.put(`${this.baseUrl}/cases/${caseId}`, data, {
                 headers: {

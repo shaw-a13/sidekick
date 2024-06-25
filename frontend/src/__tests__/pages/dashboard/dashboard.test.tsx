@@ -1,9 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { useAuth0 } from "@auth0/auth0-react";
 import Dashboard from "../../../pages/dashboard/dashboard";
-import { CaseService } from "../../../services/case.service";
-import { AxiosHeaders, AxiosResponse } from "axios";
-import { Case } from "../../../interfaces/case/case.interface";
+import axios, { AxiosResponse } from "axios";
 import { BrowserRouter } from "react-router-dom";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
@@ -12,7 +10,7 @@ import { getMockCases } from "./mockCases";
 jest.mock("@auth0/auth0-react");
 
 const mockLoginWithRedirect = jest.fn();
-let mockCaseService: jest.SpyInstance;
+let mockAxiosGet: jest.SpyInstance;
 
 describe("Dashboard", () => {
   beforeEach(() => {
@@ -23,17 +21,13 @@ describe("Dashboard", () => {
       getAccessTokenSilently: jest.fn(() => Promise.resolve("testToken")),
     });
 
-    mockCaseService = jest.spyOn(CaseService.prototype, "getAllCases").mockImplementation(() => {
-      return new Promise<AxiosResponse<Case[]>>((resolve) => {
-        resolve({
-          data: getMockCases(),
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-        });
+    mockAxiosGet = jest.spyOn(axios, "get").mockImplementation(() => {
+      return Promise.resolve({
+        data: getMockCases(),
+        status: 200,
+        statusText: "OK",
+        headers: {},
+        config: {},
       });
     });
   });
@@ -416,11 +410,10 @@ describe("Dashboard", () => {
 
   describe("When the getCases API returns an error", () => {
     test("it renders the error message", async () => {
-      mockCaseService.mockRestore();
       const error = new Error("An error occurred");
-      mockCaseService = jest.spyOn(CaseService.prototype, "getAllCases").mockImplementation(() => {
-        return new Promise<AxiosResponse<Case[]>>((resolve, reject) => {
-          reject(error);
+      mockAxiosGet = jest.spyOn(axios, "get").mockImplementation((resolve, rejects) => {
+        return new Promise<AxiosResponse>((resolve, rejects) => {
+          rejects(error);
         });
       });
 

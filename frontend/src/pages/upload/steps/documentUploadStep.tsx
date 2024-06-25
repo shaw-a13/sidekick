@@ -30,13 +30,8 @@ const addCase = async (clientInfo: Client, caseInfo: Case, accessToken: string) 
   const clientService = new ClientService();
   const caseService = new CaseService();
 
-  try {
-    await clientService.addClient(accessToken, clientInfo);
-    await caseService.addCase(accessToken, caseInfo);
-  } catch (error) {
-    console.error("Error adding case");
-    console.error(error);
-  }
+  await clientService.addClient(accessToken, clientInfo);
+  await caseService.addCase(accessToken, caseInfo);
 };
 
 const setInitialHistory = async (accessToken: string, caseId: string, user: any) => {

@@ -806,7 +806,72 @@ describe("Upload Component Tests", () => {
       });
     });
   });
+
+  describe("When an error occurs adding a new client", () => {
+    test("then the error is logged", async () => {
+      const error = new Error("Test error");
+      mockAxiosPost = jest.spyOn(axios, "post").mockImplementation((url: string) => {
+        if (url.includes("clients")) {
+          return new Promise<AxiosResponse>((resolve, rejects) => {
+            rejects(error);
+          });
+        } else {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {},
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        }
+      });
+
+      console.error = jest.fn();
+
+      render(
+        <BrowserRouter>
+          <Upload />{" "}
+        </BrowserRouter>
+      );
+      await waitFor(() => {
+        expect(screen.queryByText("You must be a worker to upload to the Sidekick application")).not.toBeInTheDocument();
+      });
+      const newCaseButton = screen.getByRole("button", { name: /New/i });
+      await waitFor(() => {
+        newCaseButton.click();
+      });
+
+      validClientInfoFormSteps();
+      validCaseInfoFormSteps();
+
+      let uploadForm = screen.queryByTestId("uploadForm");
+      await waitFor(() => {
+        uploadForm = screen.getByTestId("uploadForm");
+      });
+
+      const fileInput = within(uploadForm!).getByTestId("fileInput") as HTMLInputElement;
+
+      const file = new File(["(⌐□_□)"], "test-case.pdf", {
+        type: "application/pdf",
+      });
+
+      userEvent.upload(fileInput, file);
+
+      const submitButton = within(uploadForm!).getByRole("button", { name: /Submit Case/i });
+
+      userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(error);
+      });
+    });
+  })
 });
+
 
 const validClientInfoFormSteps = () => {
   const clientInformationForm = screen.getByTestId("clientInformationForm");

@@ -1771,6 +1771,533 @@ describe("Case Component", () => {
     });
   });
 
+  describe("When an error occurs getting the case", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+      mockAxiosGet.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678") {
+          return new Promise<AxiosResponse>((resolve, rejects) => {
+            rejects(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs getting the client", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+      mockAxiosGet.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/cases/12345678") {
+          return new Promise<AxiosResponse>((resolve) => {
+            resolve({
+              data: {
+                SK: "12345678",
+                clientId: "56789",
+                clientName: "John Doe",
+                status: "ACTIVE",
+                description: "Test Description",
+                nature: "Property",
+                date: "2021-09-01",
+                assignee: "Jack Smith",
+              },
+              status: 200,
+              statusText: "OK",
+              headers: {},
+              config: {
+                headers: new AxiosHeaders(),
+              },
+            });
+          });
+        } else if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/clients/56789") {
+          return new Promise<AxiosResponse>((resolve, rejects) => {
+            rejects(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs getting the comments", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+
+      mockAxiosGet.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678") {
+          return new Promise<AxiosResponse>((resolve, rejects) => {
+            rejects(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs getting the history", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+
+      mockAxiosGet.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678") {
+          return new Promise<AxiosResponse>((resolve, rejects) => {
+            rejects(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs editing the case", () => {
+    test("the error will be logged", async () => {
+      mockAxiosPut = jest.spyOn(axios, "put").mockImplementation(() => {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: {},
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
+        });
+      });
+      const mockError = new Error("Test error");
+      mockAxiosPut.mockImplementationOnce(() => {
+        return new Promise<AxiosResponse>((resolve, reject) => {
+          reject(mockError);
+        });
+      });
+
+      render(<Case />);
+
+      let caseInfoSection = screen.queryByTestId("caseInfoSection");
+      await waitFor(() => {
+        caseInfoSection = screen.getByTestId("caseInfoSection");
+        expect(caseInfoSection).toBeInTheDocument();
+      });
+
+      const editButton = within(caseInfoSection!).getByText("Edit");
+
+      editButton.click();
+
+      let caseEditForm = screen.queryByTestId("caseEditForm");
+      await waitFor(() => {
+        caseEditForm = screen.getByTestId("caseEditForm");
+        expect(caseEditForm).toBeInTheDocument();
+      });
+
+      const clientNameInput = within(caseEditForm!).getByPlaceholderText("Enter client name");
+      const natureInput = within(caseEditForm!).getByPlaceholderText("Enter nature");
+      const dateInput = within(caseEditForm!).getByDisplayValue("2021-09-01");
+      const statusInput = within(caseEditForm!).getByTestId("statusSelect");
+      const assigneeInput = within(caseEditForm!).getByPlaceholderText("Enter assignee");
+      const clientIdInput = within(caseEditForm!).getByPlaceholderText("Enter client ID");
+
+      userEvent.clear(clientNameInput);
+      userEvent.type(clientNameInput, "Zac Efron");
+
+      userEvent.clear(natureInput);
+      userEvent.type(natureInput, "Criminal");
+
+      userEvent.clear(dateInput);
+      userEvent.type(dateInput, "2021-09-02");
+
+      userEvent.clear(assigneeInput);
+      userEvent.type(assigneeInput, "Jane Jones");
+
+      userEvent.selectOptions(statusInput, "ACTIVE");
+
+      userEvent.clear(clientIdInput);
+      userEvent.type(clientIdInput, "56789");
+
+      const submitButton = within(caseEditForm!).getByText("Submit");
+
+      submitButton.click();
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs editing the client", () => {
+    test("the error will be logged", async () => {
+      mockAxiosPut = jest.spyOn(axios, "put").mockImplementation(() => {
+        return new Promise<AxiosResponse>((resolve) => {
+          resolve({
+            data: {},
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
+          });
+        });
+      });
+      const mockError = new Error("Test error");
+      mockAxiosPut.mockImplementationOnce(() => {
+        return new Promise<AxiosResponse>((resolve, reject) => {
+          reject(mockError);
+        });
+      });
+
+      render(<Case />);
+
+      let caseInfoPaginator = screen.queryAllByTestId("caseInfoPaginator");
+      await waitFor(() => {
+        caseInfoPaginator = screen.getAllByTestId("caseInfoPaginator");
+        expect(caseInfoPaginator).toHaveLength(2);
+      });
+      caseInfoPaginator[1].click();
+
+      let clientInfoSection = screen.queryByTestId("clientInfoSection");
+      await waitFor(() => {
+        clientInfoSection = screen.getByTestId("clientInfoSection");
+        expect(clientInfoSection).toBeInTheDocument();
+      });
+
+      const editButton = within(clientInfoSection!).getByText("Edit");
+
+      editButton.click();
+
+      let clientEditForm = screen.queryByTestId("clientEditForm");
+      await waitFor(() => {
+        clientEditForm = screen.getByTestId("clientEditForm");
+        expect(clientEditForm).toBeInTheDocument();
+      });
+
+      const firstNameInput = within(clientEditForm!).getByPlaceholderText("Enter first name");
+
+      userEvent.clear(firstNameInput);
+      userEvent.type(firstNameInput, "Zac");
+
+      const submitButton = within(clientEditForm!).getByText("Submit");
+
+      submitButton.click();
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs adding a comment", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+      mockAxiosPost.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/comments/12345678") {
+          return new Promise<AxiosResponse>((resolve, reject) => {
+            reject(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      let commentsSection = screen.queryByTestId("commentsSection");
+      await waitFor(() => {
+        commentsSection = screen.getByTestId("commentsSection");
+        expect(commentsSection).toBeInTheDocument();
+      });
+
+      const addCommentBtn = screen.getByTestId("addCommentButton");
+
+      addCommentBtn.click();
+
+      let commentForm = screen.queryByTestId("commentForm");
+      await waitFor(() => {
+        commentForm = screen.getByTestId("commentForm");
+        expect(commentForm).toBeInTheDocument();
+      });
+
+      const commentInput = within(commentForm!).getByPlaceholderText("Add new comment");
+
+      userEvent.type(commentInput, "Test Comment");
+
+      const submitButton = within(commentForm!).getByText("Submit");
+
+      submitButton.click();
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs adding history", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+      mockAxiosPost.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/history/12345678") {
+          return new Promise<AxiosResponse>((resolve, reject) => {
+            reject(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      let commentsSection = screen.queryByTestId("commentsSection");
+      await waitFor(() => {
+        commentsSection = screen.getByTestId("commentsSection");
+        expect(commentsSection).toBeInTheDocument();
+      });
+
+      const addCommentBtn = screen.getByTestId("addCommentButton");
+
+      addCommentBtn.click();
+
+      let commentForm = screen.queryByTestId("commentForm");
+      await waitFor(() => {
+        commentForm = screen.getByTestId("commentForm");
+        expect(commentForm).toBeInTheDocument();
+      });
+
+      const commentInput = within(commentForm!).getByPlaceholderText("Add new comment");
+
+      userEvent.type(commentInput, "Test Comment");
+
+      const submitButton = within(commentForm!).getByText("Submit");
+
+      submitButton.click();
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs editing a comment", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+      mockAxiosPut.mockImplementation((url: string) => {
+        if (url.includes("comments")) {
+          return new Promise<AxiosResponse>((resolve, reject) => {
+            reject(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      let commentsSection = screen.queryByTestId("commentsSection");
+      await waitFor(() => {
+        commentsSection = screen.getByTestId("commentsSection");
+        expect(commentsSection).toBeInTheDocument();
+      });
+
+      const editCommentBtns = screen.getAllByTestId("editCommentButton");
+
+      editCommentBtns[0].click();
+
+      let commentEditForm = screen.queryByTestId("commentEditForm");
+      await waitFor(() => {
+        commentEditForm = screen.getByTestId("commentEditForm");
+        expect(commentEditForm).toBeInTheDocument();
+      });
+
+      const commentInput = within(commentEditForm!).getByRole("textbox");
+
+      userEvent.clear(commentInput);
+      userEvent.type(commentInput, "Edited Comment");
+
+      const submitButton = within(commentEditForm!).getByText("Submit");
+
+      submitButton.click();
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  
+  })
+
+  describe("When an error occurs deleting a comment", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+      mockAxiosDelete.mockImplementation((url: string) => {
+        if (url.includes("comments")) {
+          return new Promise<AxiosResponse>((resolve, reject) => {
+            reject(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      let commentsSection = screen.queryByTestId("commentsSection");
+      await waitFor(() => {
+        commentsSection = screen.getByTestId("commentsSection");
+        expect(commentsSection).toBeInTheDocument();
+      });
+
+      const deleteCommentBtns = screen.getAllByTestId("deleteCommentButton");
+
+      deleteCommentBtns[0].click();
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs uploading a document", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+      mockAxiosPut.mockImplementation((url: string) => {
+        if (url === "https://testpresignedurl.com") {
+          return new Promise<AxiosResponse>((resolve, reject) => {
+            reject(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Case Documents")).toBeInTheDocument();
+      });
+      const documentUploadBtn = screen.getByTestId("documentUploadBtn");
+      documentUploadBtn.click();
+      let documentUploadModal = screen.queryByTestId("documentUploadModal");
+      await waitFor(() => {
+        documentUploadModal = screen.getByTestId("documentUploadModal");
+        expect(documentUploadModal).toBeInTheDocument();
+      });
+
+      const fileInput = screen.getByTestId("fileInput") as HTMLInputElement;
+
+      const file = new File(["(⌐□_□)"], "test.pdf", { type: "application/pdf" });
+
+      userEvent.upload(fileInput, file);
+      expect(fileInput.files).toHaveLength(1);
+
+      const uploadButton = screen.getByTestId("uploadButton");
+
+      let spinner = screen.queryByTestId("spinner");
+      expect(spinner).not.toBeInTheDocument();
+
+      uploadButton.click();
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs getting the download urls", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+      mockAxiosGet.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/download/12345678") {
+          return new Promise<AxiosResponse>((resolve, reject) => {
+            reject(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      console.error = jest.fn();
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
+  describe("When an error occurs triggering the ingestion", () => {
+    test("the error will be logged", async () => {
+      const mockError = new Error("Test error");
+      mockAxiosPost.mockImplementation((url: string) => {
+        if (url === "https://oo4zjrnf7c.execute-api.eu-west-1.amazonaws.com/prod/ingestion") {
+          return new Promise<AxiosResponse>((resolve, reject) => {
+            reject(mockError);
+          });
+        }
+      });
+
+      render(<Case />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Case Documents")).toBeInTheDocument();
+      });
+      const documentUploadBtn = screen.getByTestId("documentUploadBtn");
+      documentUploadBtn.click();
+      let documentUploadModal = screen.queryByTestId("documentUploadModal");
+      await waitFor(() => {
+        documentUploadModal = screen.getByTestId("documentUploadModal");
+        expect(documentUploadModal).toBeInTheDocument();
+      });
+
+      const fileInput = screen.getByTestId("fileInput") as HTMLInputElement;
+
+      const file = new File(["(⌐□_□)"], "test.pdf", { type: "application/pdf" });
+
+      userEvent.upload(fileInput, file);
+      expect(fileInput.files).toHaveLength(1);
+
+      const uploadButton = screen.getByTestId("uploadButton");
+
+      let spinner = screen.queryByTestId("spinner");
+      expect(spinner).not.toBeInTheDocument();
+
+      uploadButton.click();
+
+      console.error = jest.fn();
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(mockError);
+      });
+    });
+  });
+
   describe("When an error occurs in the updateExtractionData function during rerender", () => {
     test("the extractions table will be empty", async () => {
       mockAxiosGet.mockImplementationOnce((url: string) => {

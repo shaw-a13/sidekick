@@ -56,17 +56,12 @@ const Dashboard = () => {
   const caseService = new CaseService();
 
   const getCases = (token: string) => {
-    caseService
-      .getAllCases(token)
-      .then((res) => {
-        if (res) {
-          console.log(res.data);
-          setCases(res.data);
-        }
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+    caseService.getAllCases(token).then((res) => {
+      if (res) {
+        console.log(res.data);
+        setCases(res.data);
+      }
+    });
   };
 
   useEffect(() => {

@@ -79,28 +79,48 @@ const Case = () => {
     getAccessTokenSilently().then(async (token: string) => {
       setAccessToken(token!);
       await getCase(token!).then(async (res) => {
-        setCaseInfo(res!.data);
-        await getClientInfo(token!, res!.data.clientId).then((res) => {
-          setClientInfo(res!.data);
-        });
+        if (res && res.data) {
+          setCaseInfo(res!.data);
+          await getClientInfo(token!, res!.data.clientId).then((res) => {
+            if (res && res.data) {
+              setClientInfo(res.data);
+            } else {
+              setClientInfo(undefined);
+            }
+          });
+        } else {
+          setCaseInfo(undefined);
+        }
       });
       await documentService.getDocuments(token!, id!).then(async (res) => {
-        setDocApiData(res!.data);
-        setDocumentData(res!.data.urls[docNo].original!);
-        try {
-          await documentService.getDocumentExtractionResult(res!.data.urls[docNo].processed!).then((res) => {
-            setExtractionData(res!.data);
-            console.log(res!.data);
+        if (res && res.data.urls) {
+          setDocApiData(res.data);
+          setDocumentData(res.data.urls[docNo].original!);
+          await documentService.getDocumentExtractionResult(res.data.urls[docNo].processed!).then((res) => {
+            if (res && res.data) {
+              setExtractionData(res.data);
+            } else {
+              setExtractionData(undefined);
+            }
           });
-        } catch (error) {
-          setExtractionData(undefined);
+        } else {
+          setDocApiData(undefined);
+          setDocumentData("");
         }
       });
       await getComments(token!).then((res) => {
-        setComments(res!.data);
+        if (res && res.data) {
+          setComments(res.data);
+        } else {
+          setComments(undefined);
+        }
       });
       await getHistory(token!).then((res) => {
-        setHistory(res!.data);
+        if (res && res.data) {
+          setHistory(res.data);
+        } else {
+          setHistory(undefined);
+        }
       });
 
       setLoading(false);
@@ -119,27 +139,31 @@ const Case = () => {
                 <Container>
                   <Row className="mb-3">
                     <Col sm={7}>
-                      <DocumentViewer
-                        caseInfo={caseInfo!}
-                        user={user}
-                        docApiData={docApiData!}
-                        setUploadModal={setUploadModal}
-                        updateExtractionData={updateExtractionData}
-                        setDocumentData={setDocumentData}
-                        setDocNo={setDocNo}
-                        documentData={documentData}
-                      />
+                      {caseInfo && docApiData && (
+                        <DocumentViewer
+                          caseInfo={caseInfo}
+                          user={user}
+                          docApiData={docApiData}
+                          setUploadModal={setUploadModal}
+                          updateExtractionData={updateExtractionData}
+                          setDocumentData={setDocumentData}
+                          setDocNo={setDocNo}
+                          documentData={documentData}
+                        />
+                      )}
                     </Col>
                     <Col>
-                      <CaseInfoPaginator
-                        caseInfo={caseInfo!}
-                        user={user}
-                        caseService={caseService}
-                        clientService={clientService}
-                        historyService={historyService}
-                        accessToken={accessToken}
-                        clientInfo={clientInfo!}
-                      />
+                      {caseInfo && clientInfo && (
+                        <CaseInfoPaginator
+                          caseInfo={caseInfo}
+                          user={user}
+                          caseService={caseService}
+                          clientService={clientService}
+                          historyService={historyService}
+                          accessToken={accessToken}
+                          clientInfo={clientInfo}
+                        />
+                      )}
                       {history && <History history={history} />}
                     </Col>
                   </Row>
@@ -155,10 +179,14 @@ const Case = () => {
                     </Col>
                   </Row>
                   <Row className="mt-3">
-                    <Col sm={6}>
-                      <CaseDescription caseInfo={caseInfo!} user={user!} caseService={caseService} clientService={clientService} historyService={historyService} accessToken={accessToken} />
-                    </Col>
-                    <Col sm={6}>{comments && <Comments comments={comments} caseId={id!} user={user!} commentService={commentService} historyService={historyService} accessToken={accessToken} />}</Col>
+                    {caseInfo && (
+                      <Col sm={6}>
+                        <CaseDescription caseInfo={caseInfo} user={user} caseService={caseService} clientService={clientService} historyService={historyService} accessToken={accessToken} />
+                      </Col>
+                    )}
+                    {id && (
+                      <Col sm={6}>{comments && <Comments comments={comments} caseId={id} user={user} commentService={commentService} historyService={historyService} accessToken={accessToken} />}</Col>
+                    )}
                   </Row>
                   <Row className="mt-3 mb-3"></Row>
                 </Container>
