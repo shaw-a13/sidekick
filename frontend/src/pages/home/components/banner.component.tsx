@@ -3,7 +3,7 @@ import { BannerSectionProps } from "../interfaces/bannerSectionProps.interface";
 
 export const BannerSection: React.FC<BannerSectionProps> = ({ banner, loginWithRedirect }) => (
   <Row data-testid="bannerSection">
-    <img data-testid="bannerImage" src={banner} alt="" style={{ height: "35rem", padding: "0px" }} />
+    <img data-testid="bannerImage" src={banner} alt="Legal writing on page" style={{ height: "35rem", padding: "0px" }} />
     <div className="shadow home-blurb">
       <div className="m-2">
         <h5>Sidekick</h5>

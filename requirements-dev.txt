@@ -1,0 +1,8 @@
+pytest==7.4.2
+pytest-mock==3.11.1
+pytest-cov==4.1.0
+flake8==6.1.0
+autopep8 ==2.0.4
+moto==4.2.6
+boto3==1.17.0
+amazon-textract-response-parser==1.0.3

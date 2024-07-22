@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Col, Pagination } from "react-bootstrap";
+import { Pagination } from "react-bootstrap";
 import { CaseInfo as CaseInfoComponent } from "./caseInfo.component";
 import { ClientInfo } from "./clientInfo.component";
 import { CaseInfoPaginatorProps } from "../interfaces/caseInfoPaginatorProps.interface";

@@ -15,7 +15,7 @@ export const Feature: React.FC<FeatureProps> = ({ icon, title, text }) => (
 
 export const FeatureSection = ({ features }: { features: FeatureProps[] }) => (
   <Row data-testid="featureSection">
-    <div style={{ backgroundColor: "#162836" }}>
+    <div style={{ backgroundColor: "#090F15" }}>
       <Row className="text-center m-4">
         {features.map((feature, index) => (
           <Feature icon={feature.icon} title={feature.title} text={feature.text} />

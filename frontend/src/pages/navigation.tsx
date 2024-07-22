@@ -56,7 +56,7 @@ const Navigation = () => {
 
   const renderLinks = (filterFunc: (page: any) => boolean) => {
     return pages.filter(filterFunc).map(({ name, href }) => (
-      <Link data-testid="navlink"  key={name} to={href} style={linkStyle}>
+      <Link data-testid="navlink" key={name} to={href} style={linkStyle}>
         <p>{name}</p>
       </Link>
     ));
@@ -76,10 +76,10 @@ const Navigation = () => {
   };
 
   return (
-    <Navbar data-testid="navbar" variant="dark" expand="lg" fixed="top" className="shadow-lg" style={{ backgroundColor: "#162836" }}>
+    <Navbar data-testid="navbar" variant="dark" expand="lg" fixed="top" className="shadow-lg" style={{ backgroundColor: "#090F15" }}>
       <Container>
         <Navbar.Brand href="/">
-          <img data-testid="logo" alt="" width={"150"} src={logo} className="d-inline-block align-top m-2" />{" "}
+          <img data-testid="logo" alt="Sidekick logo" aria-label="Sidekick" width={"150"} src={logo} className="d-inline-block align-top m-2" />{" "}
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" color="#CF7650">

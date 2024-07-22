@@ -17,7 +17,7 @@ const Profile = () => {
                 <Card.Title>Profile Information </Card.Title>
                 <hr />
                 <Card.Subtitle className="mb-4">
-                  <img src={user!.picture} alt="" />
+                  <img src={user!.picture} alt="Profile face" />
                 </Card.Subtitle>
 
                 <div>
